@@ -32,8 +32,8 @@ void lk9025_init(Lk9025 *motor, uint32_t device_id) {
     lk9025_register(motor);
 }
 
-// 电机失能
-void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID) {
+// 电机停止
+void lk9025_stop(CanType can_type, Lk9025SendID CMD_ID) {
     tx_msg.StdId = CMD_ID;
     tx_msg.IDE = CAN_ID_STD;
     tx_msg.RTR = CAN_RTR_DATA;
@@ -41,7 +41,7 @@ void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID) {
 
     uint8_t tx_data[8] = {0};
 
-    tx_data[0] = 0x80;
+    tx_data[0] = 0x81;
     tx_data[1] = 0;
     tx_data[2] = 0;
     tx_data[3] = 0;

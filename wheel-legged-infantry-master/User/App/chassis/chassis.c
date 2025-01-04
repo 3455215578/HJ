@@ -213,8 +213,16 @@ static void chassis_pid_init() {
 /************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
 
+    /** 上电延时1500ms再发关节电机使能报文，否则使能不了 **/
+    osDelay(1500);
+
+    /** 关节电机使能 **/
+    joint_enable();
+
     chassis.leg_L.leg_index = L;
     chassis.leg_R.leg_index = R;
+
+    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     /** 底盘pid初始化 **/
     chassis_pid_init();
@@ -257,34 +265,6 @@ static void chassis_motor_cmd_send() {
   set_wheel_torque(0, 0);
 
 #endif
-}
-
-/********************** 检查关节和轮毂是否使能成功 **************************/
-static void check_enable(void)
-{
-    if (!chassis.is_joint_enable) {
-        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
-        HAL_Delay(2);
-        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
-        HAL_Delay(2);
-
-        chassis.is_joint_enable = true;
-        return;
-    }
-
-    if(!chassis.is_wheel_enable)
-    {
-        lk9025_set_enable(CAN_1,WHEEL_L_SEND);
-        HAL_Delay(2);
-        lk9025_set_enable(CAN_1,WHEEL_R_SEND);
-        HAL_Delay(2);
-
-        chassis.is_wheel_enable = true;
-        return;
-    }
-
 }
 
 /*************************** 返回底盘结构体指针 *****************************/
@@ -333,32 +313,42 @@ static void chassis_disable_task() {
 
     /**
      * 因为LK电机上电默认使能，之前有过遥控器失能后轮毂电机依然疯转的现象，
-     * 因此选择在INIT模式再使能，并且失能后失能轮毂电机
+     * 因此选择在INIT模式再使能，并且失能后停止轮毂电机，但此时轮毂仍可以接受信息并产生动作
      * **/
-    wheel_disable();
+    wheel_stop();
 }
 
 /*********************** 初始化任务 ***************************/
 static void chassis_init_task() {
 
-    HAL_Delay(1500); // 上电延时1500ms再发关节电机使能报文，否则使能不了
 
-    /** 关节电机使能 **/
-    joint_enable();
-    /** 轮毂电机使能 **/
-    wheel_enable();
+    if (!chassis.is_joint_enable) {
+        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
+        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
+        HAL_Delay(2);
+        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
+        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
+        HAL_Delay(2);
 
-    check_enable();
-
-    if(chassis.is_joint_enable && chassis.is_wheel_enable)
-    {
-        chassis.init_flag = true;
+        chassis.is_joint_enable = true;
+        return;
     }
+
+    chassis.init_flag = true;
+
+//    if(chassis.is_joint_enable && chassis.is_wheel_enable)
+//    {
+//        chassis.init_flag = true;
+//    }
 
 }
 
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
+
+    lqr_ctrl();
+    vmc_ctrl();
+    chassis_vx_kalman_run();
 
 }
 
