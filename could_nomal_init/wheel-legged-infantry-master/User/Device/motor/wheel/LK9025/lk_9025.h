@@ -1,0 +1,28 @@
+#ifndef WHEEL_LEG_APP_INC_BOT_DRIVER_LK_9025_H_
+#define WHEEL_LEG_APP_INC_BOT_DRIVER_LK_9025_H_
+
+#include <stdint-gcc.h>
+#include "can_device.h"
+
+typedef struct{
+  uint32_t id;
+  float angular_vel;
+  float torque;
+  uint32_t last_heartbeat_timestamp_ms;
+} Lk9025;
+
+void lk9025_init(Lk9025 *motor, uint32_t device_id);
+
+void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID);
+
+void lk9025_set_enable(CanType can_type, Lk9025SendID CMD_ID);
+
+void lk9025_torque_set(CanType can_type, Lk9025SendID CMD_ID, float motor_torque);
+
+void lk9025_multi_torque_set(CanType can_type, float motor1_torque, float motor2_torque);
+
+void lk9025_clear_motor_errors(CanType can_type, Lk9025SendID CMD_ID);
+
+void lk9025_can_msg_unpack(uint32_t id, uint8_t data[]);
+
+#endif
