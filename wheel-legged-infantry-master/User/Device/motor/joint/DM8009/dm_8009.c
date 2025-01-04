@@ -17,10 +17,7 @@ static CAN_RxHeaderTypeDef rx_msg;
 
 static uint8_t rx_data[9];
 
-static void dm6006_register(Dm8009 *motor) {
-    motors[motors_len] = motor;
-    ++motors_len;
-}
+
 
 static int float_to_uint(float x, float x_min, float x_max, int bits) {
     /// Converts a float to an unsigned int, given range and number of bits///
@@ -36,6 +33,11 @@ static float uint_to_float(int x_int, float x_min, float x_max, int bits) {
     return ((float) x_int) * span / ((float) ((1 << bits) - 1)) + offset;
 }
 
+static void dm8009_register(Dm8009 *motor) {
+    motors[motors_len] = motor;
+    ++motors_len;
+}
+
 void dm8009_init(Dm8009 *motor, uint32_t device_id) {
     motor->id = device_id;
 
@@ -45,7 +47,7 @@ void dm8009_init(Dm8009 *motor, uint32_t device_id) {
 
     motor->last_heartbeat_timestamp_ms = 0;
 
-    dm6006_register(motor);
+    dm8009_register(motor);
 }
 
 void set_dm8009_enable(CanType can_type, Dm8009SendID CMD_ID) {

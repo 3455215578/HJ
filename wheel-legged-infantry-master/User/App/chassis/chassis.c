@@ -18,9 +18,6 @@
 #include "error.h"
 
 
-
-
-
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
@@ -331,8 +328,8 @@ static void chassis_disable_task() {
     chassis.is_chassis_offground = false;
     chassis.jump_flag = false;
 
-    lk9025_set_enable(CAN_2, WHEEL_L_SEND);
-    lk9025_set_enable(CAN_2, WHEEL_R_SEND);
+    lk9025_set_enable(CAN_1, WHEEL_L_SEND);
+    lk9025_set_enable(CAN_1, WHEEL_R_SEND);
 }
 
 /** ≥ı ºªØ **/
@@ -370,7 +367,7 @@ extern void chassis_task(void const *pvParameters) {
 
         get_IMU_info();
 
-#if REMOTE
+#if CHASSIS_REMOTE
         set_chassis_mode();
 
     set_chassis_ctrl_info();
@@ -382,16 +379,15 @@ extern void chassis_task(void const *pvParameters) {
 
         switch (chassis.chassis_ctrl_mode) {
             case CHASSIS_INIT:
-//        xTaskResumeAll();
                 chassis_init_task();
-//        chassis_enable_task();
-//        is_chassis_off_ground();
                 break;
 
-            case CHASSIS_ENABLE:chassis_enable_task();
+            case CHASSIS_ENABLE:
+                chassis_enable_task();
                 break;
 
-            case CHASSIS_DISABLE:chassis_disable_task();
+            case CHASSIS_DISABLE:
+                chassis_disable_task();
                 break;
 
 //      case CHASSIS_SPIN:chassis.chassis_ctrl_info.v_m_per_s = 0;
