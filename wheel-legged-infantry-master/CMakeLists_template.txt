@@ -49,25 +49,46 @@ else ()
 endif ()
 
 include_directories(${includes}
-        bsp/
-                App/
-                App/Inc
-                App/Inc/Bot
-                App/Inc/Lib
-                App/Inc/Bot/Device
-                App/Inc/Bot/Driver
-                App/Inc/Bot/Driver/IMU
-                App/Inc/Bot/OI
-                App/Inc/Bot/Subsystem
-                App/Inc/Lib/Algorithm
-                App/Inc/Lib/Controller
-                App/Inc/Lib/Filter
-                App/Inc/Lib/Util
+        User/Algorithm/AHRS
+        User/Algorithm/delay
+        User/Algorithm/filter/moving_filter
+        User/Algorithm/filter/vx_kalman_filter
+        User/Algorithm/lqr
+        User/Algorithm/pid
+        User/Algorithm/user_lib
+        User/Algorithm/vmc
+
+        User/App/chassis
+        User/App/gimbal
+
+        User/Bsp/can
+        User/Bsp/flash
+
+        User/Device/bmi088
+        User/Device/buzzer
+        User/Device/ist8310
+        User/Device/key_board
+        User/Device/led
+        User/Device/motor/joint
+        User/Device/motor/joint/DM8009
+        User/Device/motor/joint/CyberGear
+        User/Device/motor/wheel
+        User/Device/motor/wheel/LK9025
+        User/Device/remote
+        User/Device/servo
+
+        User/Robot_def
 )
 
 add_definitions(${defines})
 
-file(GLOB_RECURSE SOURCES ${sources} "bsp/*.*" "App/*.*" )
+file(GLOB_RECURSE SOURCES ${sources}
+        "User/Algorithm/*.*"
+        "User/App/*.*"
+        "User/Bsp/*.*"
+        "User/Device/*.*"
+        "User/Robot_def/*.*"
+        )
 
 set(LINKER_SCRIPT $${CMAKE_SOURCE_DIR}/${linkerScript})
 
