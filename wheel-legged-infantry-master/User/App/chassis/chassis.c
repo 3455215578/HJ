@@ -186,18 +186,13 @@ void chassis_init() {
     chassis.leg_L.leg_index = L;
     chassis.leg_R.leg_index = R;
 
-    // 轮毂电机使能
-    wheel_init();
-
-    osDelay(2);
+//    // 轮毂电机使能
+//    wheel_init();
 
     // 关节电机使能
     joint_init();
 
     chassis_pid_init();
-
-    // 底盘模式初始化为失能
-    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     // 底盘状态位
     chassis.is_chassis_offground = false;
@@ -325,6 +320,7 @@ static void chassis_disable_task() {
 
     chassis.init_flag = false;
     chassis.is_joint_enable = false;
+    chassis.is_wheel_enable = false;
     chassis.is_chassis_balance = false;
     chassis.recover_finish = false;
     chassis.is_chassis_offground = false;
@@ -346,6 +342,15 @@ static void chassis_init_task() {
         set_dm8009_enable(CAN_2, JOINT_RB_SEND);
         HAL_Delay(2);
         chassis.is_joint_enable = true;
+        return;
+    }
+
+    if(!chassis.is_wheel_enable)
+    {
+        lk9025_set_enable(CAN_1,WHEEL_L_SEND);
+        HAL_Delay(2);
+        lk9025_set_enable(CAN_1,WHEEL_R_SEND);
+        chassis.is_wheel_enable = true;
         return;
     }
 
