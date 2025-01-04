@@ -277,7 +277,9 @@ static void check_enable(void)
     if(!chassis.is_wheel_enable)
     {
         lk9025_set_enable(CAN_1,WHEEL_L_SEND);
+        HAL_Delay(2);
         lk9025_set_enable(CAN_1,WHEEL_R_SEND);
+        HAL_Delay(2);
 
         chassis.is_wheel_enable = true;
         return;
@@ -339,21 +341,14 @@ static void chassis_disable_task() {
 /*********************** 初始化任务 ***************************/
 static void chassis_init_task() {
 
+    HAL_Delay(1500); // 上电延时1500ms再发关节电机使能报文，否则使能不了
 
-    if(!chassis.is_joint_enable)
-    {
-        HAL_Delay(1500); // 上电延时1500ms再发关节电机使能报文，否则使能不了
-        /** 关节电机使能 **/
-        joint_enable();
-    }
-    if(!chassis.is_wheel_enable)
-    {
-        /** 轮毂电机使能 **/
-        wheel_enable();
-    }
+    /** 关节电机使能 **/
+    joint_enable();
+    /** 轮毂电机使能 **/
+    wheel_enable();
 
     check_enable();
-
 
     if(chassis.is_joint_enable && chassis.is_wheel_enable)
     {
