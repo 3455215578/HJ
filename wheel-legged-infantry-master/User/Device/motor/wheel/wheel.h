@@ -6,7 +6,7 @@
 
 void wheel_disable();
 
-void wheel_init();
+void wheel_enable();
 
 void set_wheel_torque(float torque_nm_L, float torque_nm_R);
 

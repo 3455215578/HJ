@@ -210,17 +210,11 @@ static void chassis_pid_init() {
              CHASSIS_ROLL_PID_D);
 }
 
-/************************ 底盘初始化 **********************/
+/************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
-
-//    osDelay(2000);// 上电延时再进行关节电机使能，否则使能不了
 
     chassis.leg_L.leg_index = L;
     chassis.leg_R.leg_index = R;
-
-    // 轮毂电机在INIT模式再使能，避免疯转
-
-
 
     /** 底盘pid初始化 **/
     chassis_pid_init();
@@ -242,7 +236,9 @@ void chassis_init() {
 
 /************************ 向底盘电机发送力矩 **********************/
 static void chassis_motor_cmd_send() {
-#if DEBUG_MODE // DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出
+
+/** DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出 **/
+#if DEBUG_MODE
     set_joint_torque(0, 0, 0, 0);
     osDelay(2);
     set_wheel_torque(0, 0);
@@ -263,7 +259,31 @@ static void chassis_motor_cmd_send() {
 #endif
 }
 
+/********************** 检查关节和轮毂是否使能成功 **************************/
+static void check_enable(void)
+{
+    if (!chassis.is_joint_enable) {
+        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
+        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
+        HAL_Delay(2);
+        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
+        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
+        HAL_Delay(2);
 
+        chassis.is_joint_enable = true;
+        return;
+    }
+
+    if(!chassis.is_wheel_enable)
+    {
+        lk9025_set_enable(CAN_1,WHEEL_L_SEND);
+        lk9025_set_enable(CAN_1,WHEEL_R_SEND);
+
+        chassis.is_wheel_enable = true;
+        return;
+    }
+
+}
 
 /*************************** 返回底盘结构体指针 *****************************/
 Chassis *get_chassis() {
@@ -280,16 +300,17 @@ Chassis *get_chassis() {
  *******************************************************************************/
 
 
-/************** 失能任务 ******************/
+/************************* 失能任务 ***************************/
 static void chassis_disable_task() {
 
-    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
     chassis.leg_L.wheel_torque = 0;
     chassis.leg_R.wheel_torque = 0;
     chassis.leg_L.joint_F_torque = 0;
     chassis.leg_L.joint_B_torque = 0;
     chassis.leg_R.joint_F_torque = 0;
     chassis.leg_R.joint_B_torque = 0;
+
+    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     chassis.leg_L.state_variable_feedback.x = 0;
     chassis.leg_R.state_variable_feedback.x = 0;
@@ -298,66 +319,65 @@ static void chassis_disable_task() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
-    chassis.init_flag = false;
-    chassis.is_joint_enable = false;
-    chassis.is_wheel_enable = false;
-    chassis.is_chassis_balance = false;
-    chassis.recover_finish = false;
-    chassis.is_chassis_offground = false;
-    chassis.jump_flag = false;
+    /** 初始化标志位 **/
+    chassis.is_joint_enable = false; // 关节电机使能标志位
+    chassis.is_wheel_enable = false; // 轮毂电机使能标志位
+    chassis.init_flag = false; // 初始化成功标志位
 
+    chassis.is_chassis_balance = false; // 平衡标志位
+    chassis.recover_finish = false; // 倒地自救成功标志位
+    chassis.is_chassis_offground = false; // 离地标志位
+    chassis.jump_flag = false; // 跳跃标志位 置1时进入跳跃模式
+
+    /**
+     * 因为LK电机上电默认使能，之前有过遥控器失能后轮毂电机依然疯转的现象，
+     * 因此选择在INIT模式再使能，并且失能后失能轮毂电机
+     * **/
     wheel_disable();
 }
 
-/************** 初始化任务 ******************/
+/*********************** 初始化任务 ***************************/
 static void chassis_init_task() {
 
-    HAL_Delay(2000);
 
-    /** 关节电机使能 **/
-    joint_enable();
-
-    if (!chassis.is_joint_enable) {
-        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
-        HAL_Delay(2);
-        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
-        HAL_Delay(2);
-        chassis.is_joint_enable = true;
-        return;
+    if(!chassis.is_joint_enable)
+    {
+        HAL_Delay(1500); // 上电延时1500ms再发关节电机使能报文，否则使能不了
+        /** 关节电机使能 **/
+        joint_enable();
     }
-
     if(!chassis.is_wheel_enable)
     {
-        lk9025_set_enable(CAN_1,WHEEL_L_SEND);
-        HAL_Delay(2);
-        lk9025_set_enable(CAN_1,WHEEL_R_SEND);
-        chassis.is_wheel_enable = true;
-        return;
+        /** 轮毂电机使能 **/
+        wheel_enable();
     }
+
+    check_enable();
+
 
     if(chassis.is_joint_enable && chassis.is_wheel_enable)
     {
         chassis.init_flag = true;
     }
 
-
 }
 
-/************** 使能任务 ******************/
+/*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
 }
 
-/************** 总任务 ******************/
+/*********************** 总任务 ******************************/
 extern void chassis_task(void const *pvParameters) {
 
     chassis_init();
 
+    // ???
     TickType_t last_wake_time = xTaskGetTickCount();
+
     while (1) {
 
+        // ???
         vTaskSuspendAll();
 
         get_IMU_info();
@@ -385,18 +405,15 @@ extern void chassis_task(void const *pvParameters) {
                 chassis_disable_task();
                 break;
 
-//      case CHASSIS_SPIN:chassis.chassis_ctrl_info.v_m_per_s = 0;
-//        chassis.chassis_ctrl_info.yaw_angle_rad = 0;
-//        chassis_enable_task();
-//        break;
-
             default:break;
         }
 
+        // ???
         xTaskResumeAll();
 
         chassis_motor_cmd_send();
 
+        // ???
         vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
     }
 }

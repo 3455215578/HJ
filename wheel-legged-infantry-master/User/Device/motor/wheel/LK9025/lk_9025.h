@@ -1,7 +1,7 @@
 #ifndef LK_9025_H
 #define LK_9025_H
 
-#include "stdint-gcc.h"
+#include <stdint-gcc.h>
 #include "can_device.h"
 
 typedef struct{
@@ -18,10 +18,6 @@ void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID);
 void lk9025_set_enable(CanType can_type, Lk9025SendID CMD_ID);
 
 void lk9025_torque_set(CanType can_type, Lk9025SendID CMD_ID, float motor_torque);
-
-void lk9025_multi_torque_set(CanType can_type, float motor1_torque, float motor2_torque);
-
-void lk9025_clear_motor_errors(CanType can_type, Lk9025SendID CMD_ID);
 
 void lk9025_can_msg_unpack(uint32_t id, uint8_t data[]);
 
