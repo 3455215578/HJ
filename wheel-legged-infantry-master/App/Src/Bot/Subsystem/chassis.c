@@ -443,16 +443,16 @@ static void chassis_motor_cmd_send() {
 
 #else
 
-  set_joint_torque(-chassis.leg_L.joint_F_torque,
-                   -chassis.leg_L.joint_B_torque,
-                   chassis.leg_R.joint_F_torque,
-                   chassis.leg_R.joint_B_torque);
+//  set_joint_torque(-chassis.leg_L.joint_F_torque,
+//                   -chassis.leg_L.joint_B_torque,
+//                   chassis.leg_R.joint_F_torque,
+//                   chassis.leg_R.joint_B_torque);
 
-//  set_joint_torque(0, 0, 0, 0);
+  set_joint_torque(0, 0, 0, 0);
 
-  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+//  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
 
-//  set_wheel_torque(0, 0);
+  set_wheel_torque(0, 0);
 
 #endif
 }
