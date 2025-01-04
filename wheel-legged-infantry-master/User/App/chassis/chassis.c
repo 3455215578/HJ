@@ -307,6 +307,8 @@ Chassis *get_chassis() {
 
 /** Ê§ÄÜ **/
 static void chassis_disable_task() {
+
+    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
     chassis.leg_L.wheel_torque = 0;
     chassis.leg_R.wheel_torque = 0;
     chassis.leg_L.joint_F_torque = 0;
@@ -327,7 +329,10 @@ static void chassis_disable_task() {
     chassis.recover_finish = false;
     chassis.is_chassis_offground = false;
     chassis.jump_flag = false;
-    
+
+//    wheel_disable();
+    lk9025_disable(CAN_1,WHEEL_L_SEND);
+    lk9025_disable(CAN_1,WHEEL_R_SEND);
 }
 
 /** ³õÊ¼»¯ **/

@@ -4,6 +4,8 @@
 #include "can_device.h"
 #include "lk_9025.h"
 
+void wheel_disable();
+
 void wheel_init();
 
 void set_wheel_torque(float torque_nm_L, float torque_nm_R);

@@ -38,6 +38,31 @@ void lk9025_init(Lk9025 *motor, uint32_t device_id) {
     lk9025_register(motor);
 }
 
+// µç»úÊ§ÄÜ
+void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID) {
+    tx_msg.StdId = CMD_ID;
+    tx_msg.IDE = CAN_ID_STD;
+    tx_msg.RTR = CAN_RTR_DATA;
+    tx_msg.DLC = 0x08;
+
+    uint8_t tx_data[8] = {0};
+
+    tx_data[0] = 0x80;
+    tx_data[1] = 0;
+    tx_data[2] = 0;
+    tx_data[3] = 0;
+    tx_data[4] = 0;
+    tx_data[5] = 0;
+    tx_data[6] = 0;
+    tx_data[7] = 0;
+
+    uint32_t can1_send_mail_box = get_can1_free_mailbox();
+
+    if (can_type == CAN_1) {
+        HAL_CAN_AddTxMessage(&hcan1, &tx_msg, tx_data, &can1_send_mail_box);
+    }
+}
+
 void lk9025_set_enable(CanType can_type, Lk9025SendID CMD_ID) {
     tx_msg.StdId = CMD_ID;
     tx_msg.IDE = CAN_ID_STD;

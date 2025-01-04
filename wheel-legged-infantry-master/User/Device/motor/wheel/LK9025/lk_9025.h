@@ -13,6 +13,8 @@ typedef struct{
 
 void lk9025_init(Lk9025 *motor, uint32_t device_id);
 
+void lk9025_disable(CanType can_type, Lk9025SendID CMD_ID);
+
 void lk9025_set_enable(CanType can_type, Lk9025SendID CMD_ID);
 
 void lk9025_torque_set(CanType can_type, Lk9025SendID CMD_ID, float motor_torque);
