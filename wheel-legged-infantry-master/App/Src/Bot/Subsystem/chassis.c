@@ -258,101 +258,10 @@ static void get_IMU_info() {
 }
 
 
-static void is_chassis_ballanced() {
-    if(!chassis.is_chassis_offground)
-    {
-        if (ABS(chassis.imu_reference.pitch_angle) <= 0.17444f) { // 20°
-            chassis.is_chassis_balance = true;
-            if((ABS(chassis.imu_reference.pitch_angle) <= 0.05233f)) // 3°
-            {
-                chassis.recover_finish = true;
-            }
-            else{
-
-            }
-        } else {
-            chassis.is_chassis_balance = false;
-            chassis.recover_finish = false;
-        }
-    }
-//    if ((ABS(chassis.imu_reference.pitch_angle) <= 0.17444f)&&(!chassis.is_chassis_offground)) { // 20°
-//        chassis.is_chassis_balance = true;
-//        if((ABS(chassis.imu_reference.pitch_angle) <= 0.05233f)) // 3°
-//        {
-//            chassis.recover_finish = true;
-//        }
-//        else{
-//
-//        }
-//    } else {
-//        chassis.is_chassis_balance = false;
-//        chassis.recover_finish = false;
-//    }
-}
 
 
 
-static bool is_joints_reduced() {
-  if (ABS(get_joint_motors()[0].pos_r) <= 0.174533 &&
-      ABS(get_joint_motors()[1].pos_r) <= 0.174533 &&
-      ABS(get_joint_motors()[2].pos_r) <= 0.174533 &&
-      ABS(get_joint_motors()[3].pos_r) <= 0.174533) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
-// 倒地自救
-static void fall_selfhelp() {
-    // 当车的俯仰角不在正常范围内才起作用
-    // 运行逻辑：当车没离地且不平衡时，关闭关节输出，然后检查各个关节位置是否异常，若异常，则先执行关节复位，再进行轮毂输出
-    if (!chassis.is_chassis_balance) {
-
-        if ((!is_joints_reduced())){ // 如果关节电机位置异常并且没离地，则先进行关节复位，使关节回到正常位置
-
-        chassis.leg_L.wheel_torque = 0;
-        chassis.leg_R.wheel_torque = 0;
-        chassis.leg_L.joint_F_torque = 0;
-        chassis.leg_L.joint_B_torque = 0;
-        chassis.leg_R.joint_F_torque = 0;
-        chassis.leg_R.joint_B_torque = 0;
-
-        set_dm8009_MIT(CAN_2, JOINT_LF_SEND, 0, 0, 20, 5, 0);
-        set_dm8009_MIT(CAN_2, JOINT_LB_SEND, 0, 0, 20, 5, 0);
-        HAL_Delay(2);
-        set_dm8009_MIT(CAN_2, JOINT_RF_SEND, 0, 0, 20, 5, 0);
-        set_dm8009_MIT(CAN_2, JOINT_RB_SEND, 0, 0, 20, 5, 0);
-
-        }
-        else if (!chassis.recover_finish) { // 先用轮毂使机体平衡，再开启关节
-            chassis.leg_L.joint_F_torque = 0;
-            chassis.leg_L.joint_B_torque = 0;
-            chassis.leg_R.joint_F_torque = 0;
-            chassis.leg_R.joint_B_torque = 0;
-        }
-
-    }
-
-}
-
-bool is_chassis_off_ground() {
-
-    if(!chassis.recover_finish)
-    {
-        chassis.is_chassis_offground = false;
-    }
-    else{
-        if ((chassis.leg_L.Fn < 12.5f) && (chassis.leg_R.Fn < 12.5f)) {
-            chassis.is_chassis_offground = true;
-            return true;
-        } else{
-            chassis.is_chassis_offground = false;
-            return false;
-        }
-    }
-
-}
 
 //static void set_chassis_mode() {
 //  if (switch_is_down(get_rc_ctrl()->rc.s[RC_s_R])) {
@@ -443,16 +352,16 @@ static void chassis_motor_cmd_send() {
 
 #else
 
-  set_joint_torque(-chassis.leg_L.joint_F_torque,
-                   -chassis.leg_L.joint_B_torque,
-                   chassis.leg_R.joint_F_torque,
-                   chassis.leg_R.joint_B_torque);
+//  set_joint_torque(-chassis.leg_L.joint_F_torque,
+//                   -chassis.leg_L.joint_B_torque,
+//                   chassis.leg_R.joint_F_torque,
+//                   chassis.leg_R.joint_B_torque);
 
-//  set_joint_torque(0, 0, 0, 0);
+  set_joint_torque(0, 0, 0, 0);
 
-  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+//  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
 
-//  set_wheel_torque(0, 0);
+  set_wheel_torque(0, 0);
 
 #endif
 }
@@ -503,10 +412,6 @@ static void chassis_init_task() {
 
 static void chassis_enable_task() {
 
-  is_chassis_ballanced();
-
-  // 离地检测
-  is_chassis_off_ground();
 
   if(chassis.recover_finish == false) // 倒地自起没完成时用最低腿长
   {
@@ -531,7 +436,6 @@ static void chassis_enable_task() {
   vmc_ctrl(&chassis, &chassis_physical_config);
   chassis_vx_kalman_run();
 
-  fall_selfhelp();
 }
 
 static void chassis_disable_task() {

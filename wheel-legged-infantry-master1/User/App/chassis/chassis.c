@@ -327,9 +327,7 @@ static void chassis_disable_task() {
     chassis.recover_finish = false;
     chassis.is_chassis_offground = false;
     chassis.jump_flag = false;
-
-    lk9025_set_enable(CAN_1, WHEEL_L_SEND);
-    lk9025_set_enable(CAN_1, WHEEL_R_SEND);
+    
 }
 
 /** ≥ı ºªØ **/
