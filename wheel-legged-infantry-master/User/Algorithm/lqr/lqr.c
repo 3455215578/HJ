@@ -79,31 +79,31 @@ static void state_variable_update(Leg* leg_L, Leg* leg_R, float phi, float phi_d
   leg_R->state_variable_feedback.theta_last = leg_R->state_variable_feedback.theta;
 
   //1.theta
-    leg_L->state_variable_feedback.theta = cal_leg_theta(leg_L->vmc.forward_kinematics.fk_phi.phi0, phi);
-    leg_R->state_variable_feedback.theta = cal_leg_theta(leg_R->vmc.forward_kinematics.fk_phi.phi0, phi);
+  leg_L->state_variable_feedback.theta = cal_leg_theta(leg_L->vmc.forward_kinematics.fk_phi.phi0, phi);
+  leg_R->state_variable_feedback.theta = cal_leg_theta(leg_R->vmc.forward_kinematics.fk_phi.phi0, phi);
 
   chassis.theta_error = leg_L->state_variable_feedback.theta - leg_R->state_variable_feedback.theta;
 
   //theta_ddot
-    leg_L->state_variable_feedback.theta_dot_last = leg_L->state_variable_feedback.theta_dot;
-    leg_L->state_variable_feedback.theta_dot = (leg_L->state_variable_feedback.theta - leg_L->state_variable_feedback.theta_last) / (CHASSIS_PERIOD * 0.001f);
+  leg_L->state_variable_feedback.theta_dot_last = leg_L->state_variable_feedback.theta_dot;
+  leg_L->state_variable_feedback.theta_dot = (leg_L->state_variable_feedback.theta - leg_L->state_variable_feedback.theta_last) / (CHASSIS_PERIOD * 0.001f);
   float theta_ddot_raw_L = (leg_L->state_variable_feedback.theta_dot - leg_L->state_variable_feedback.theta_dot_last) / (CHASSIS_PERIOD * 0.001f);
-    update_moving_average_filter(&theta_ddot_filter_L, theta_ddot_raw_L);
-    leg_L->state_variable_feedback.theta_ddot = get_moving_average_filtered_value(&theta_ddot_filter_L);
+  update_moving_average_filter(&leg_L->theta_ddot_filter, theta_ddot_raw_L);
+  leg_L->state_variable_feedback.theta_ddot = get_moving_average_filtered_value(&leg_L->theta_ddot_filter);
 
-    leg_R->state_variable_feedback.theta_dot_last = leg_R->state_variable_feedback.theta_dot;
-    leg_R->state_variable_feedback.theta_dot = (leg_R->state_variable_feedback.theta - leg_R->state_variable_feedback.theta_last) / (CHASSIS_PERIOD * 0.001f);
+  leg_R->state_variable_feedback.theta_dot_last = leg_R->state_variable_feedback.theta_dot;
+  leg_R->state_variable_feedback.theta_dot = (leg_R->state_variable_feedback.theta - leg_R->state_variable_feedback.theta_last) / (CHASSIS_PERIOD * 0.001f);
   float theta_ddot_raw_R = (leg_R->state_variable_feedback.theta_dot - leg_R->state_variable_feedback.theta_dot_last) / (CHASSIS_PERIOD * 0.001f);
-    update_moving_average_filter(&theta_ddot_filter_R, theta_ddot_raw_R);
-    leg_R->state_variable_feedback.theta_ddot = get_moving_average_filtered_value(&theta_ddot_filter_R);
+  update_moving_average_filter(&leg_R->theta_ddot_filter, theta_ddot_raw_R);
+  leg_R->state_variable_feedback.theta_ddot = get_moving_average_filtered_value(&leg_R->theta_ddot_filter);
 
   //4.x_dot
-    leg_L->state_variable_feedback.x_dot = leg_L->kalman_result[0];
-    leg_R->state_variable_feedback.x_dot = leg_R->kalman_result[0];
+  leg_L->state_variable_feedback.x_dot = leg_L->kalman_result[0];
+  leg_R->state_variable_feedback.x_dot = leg_R->kalman_result[0];
 
   //3.x
-    leg_L->state_variable_feedback.x = leg_L-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_L->state_variable_feedback.x_dot;
-    leg_R->state_variable_feedback.x = leg_R-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_R->state_variable_feedback.x_dot;
+  leg_L->state_variable_feedback.x = leg_L-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_L->state_variable_feedback.x_dot;
+  leg_R->state_variable_feedback.x = leg_R-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_R->state_variable_feedback.x_dot;
 
   // x_ddot
   leg_L->state_variable_feedback.x_dot_last = leg_L->state_variable_feedback.x_dot;

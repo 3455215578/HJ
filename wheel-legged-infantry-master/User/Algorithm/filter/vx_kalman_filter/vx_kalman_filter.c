@@ -3,11 +3,10 @@
 #include "robot_def.h"
 #include "wheel.h"
 
-extern ChassisPhysicalConfig chassis_physical_config;
-
 uint16_t sizeof_float;
 
 extern Chassis chassis;
+extern ChassisPhysicalConfig chassis_physical_config;
 
 void kalman_Filter_Init(KalmanFilter* kf, uint8_t xSize, uint8_t uSize, uint8_t zSize, uint8_t ySize){
   sizeof_float = sizeof(float);

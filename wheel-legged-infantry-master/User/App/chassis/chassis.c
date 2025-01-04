@@ -24,20 +24,6 @@ extern CAN_HandleTypeDef hcan2;
 //int jump_finish = 0;
 
 extern Chassis chassis;
-const ChassisPhysicalConfig chassis_physical_config = {0.075f,
-                                                       5.486f,
-                                                       1.18f,
-                                                       0.2618f,
-                                                       0.15f,
-                                                       0.27f,
-                                                       0.27f,
-                                                       0.15f,
-                                                       0.15f};
-
-
-MovingAverageFilter robot_az_filter;
-
-extern MovingAverageFilter theta_ddot_filter_L, theta_ddot_filter_R;
 
 /*******************************************************************************
  *                                    Remote                                   *
@@ -147,8 +133,8 @@ static void get_IMU_info() {
                           + chassis.imu_reference.ay_filtered * sinf(-chassis.imu_reference.roll_angle) * cosf(chassis.imu_reference.pitch_angle)
                           + chassis.imu_reference.az_filtered * cosf(chassis.imu_reference.pitch_angle) * cosf(chassis.imu_reference.roll_angle);
 
-    update_moving_average_filter(&robot_az_filter, robot_az_raw);
-    chassis.imu_reference.robot_az = get_moving_average_filtered_value(&robot_az_filter);
+    update_moving_average_filter(&chassis.robot_az_filter, robot_az_raw);
+    chassis.imu_reference.robot_az = get_moving_average_filtered_value(&chassis.robot_az_filter);
 
 }
 
@@ -219,18 +205,17 @@ void chassis_init() {
     /** 关节电机使能 **/
     joint_enable();
 
-    chassis.leg_L.leg_index = L;
-    chassis.leg_R.leg_index = R;
-
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     /** 底盘pid初始化 **/
     chassis_pid_init();
 
     /** 移动平均滤波器初始化 **/
-    moving_average_filter_init(&robot_az_filter);
-    moving_average_filter_init(&theta_ddot_filter_L);
-    moving_average_filter_init(&theta_ddot_filter_R);
+    moving_average_filter_init(&chassis.robot_az_filter);
+    moving_average_filter_init(&chassis.leg_L.Fn_filter);
+    moving_average_filter_init(&chassis.leg_R.Fn_filter);
+    moving_average_filter_init(&chassis.leg_L.theta_ddot_filter);
+    moving_average_filter_init(&chassis.leg_R.theta_ddot_filter);
 
 //  chassis.chassis_ctrl_info.spin_speed = 5.0f;
 
@@ -303,7 +288,6 @@ static void chassis_disable_task() {
 
     /** 初始化标志位 **/
     chassis.is_joint_enable = false; // 关节电机使能标志位
-    chassis.is_wheel_enable = false; // 轮毂电机使能标志位
     chassis.init_flag = false; // 初始化成功标志位
 
     chassis.is_chassis_balance = false; // 平衡标志位
@@ -321,7 +305,6 @@ static void chassis_disable_task() {
 /*********************** 初始化任务 ***************************/
 static void chassis_init_task() {
 
-
     if (!chassis.is_joint_enable) {
         set_dm8009_enable(CAN_2, JOINT_LF_SEND);
         set_dm8009_enable(CAN_2, JOINT_LB_SEND);
@@ -335,12 +318,6 @@ static void chassis_init_task() {
     }
 
     chassis.init_flag = true;
-
-//    if(chassis.is_joint_enable && chassis.is_wheel_enable)
-//    {
-//        chassis.init_flag = true;
-//    }
-
 }
 
 /*********************** 使能任务 ****************************/

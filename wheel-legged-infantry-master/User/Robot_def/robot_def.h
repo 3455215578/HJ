@@ -4,8 +4,9 @@
 #include <stdbool.h>
 
 #include "pid.h"
-#include "vmc.h"
+//#include "vmc.h"
 #include "vx_kalman_filter.h"
+#include "moving_filter.h"
 
 /**  宏定义 宏定义 宏定义 宏定义 宏定义 宏定义 宏定义  **/
 //CHASSIS_REMOTE置1：底盘由遥控器控制
@@ -62,7 +63,6 @@
 /**********************************************/
 
 
-
 /****************** 变量约束 *********************/
 #define MAX_CHASSIS_VX_SPEED 1.8f
 #define MAX_PITCH 0.174533f
@@ -81,57 +81,56 @@
 
 
 
-/************** 遥控器路径、映射 *****************/
+/******************* 遥控器路径 *****************/
 #define CHASSIS_X_CHANNEL 1
 #define CHASSIS_Z_CHANNEL 2
 #define CHASSIS_PIT_CHANNEL 3
 #define CHASSIS_ROLL_CHANNEL 0
+
+/****************** 遥控器值映射 ****************/
 #define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
 #define MAX_CHASSIS_YAW_INCREMENT 0.02f
 #define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
 #define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
 #define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
-/**********************************************/
+/*********************************************/
 
+/****************** 底盘物理参数结构体 *******************/
 typedef struct{
-    float wheel_radius;
-    float body_weight;
-    float wheel_weight;
-    float mechanical_leg_limit_angle;
+    float wheel_radius; // 驱动轮半径
+    float body_weight; // 机体质量(有云台要算上云台)
+    float wheel_weight; // 驱动轮重量(算上电机)
 
-    float l1, l2, l3, l4, l5;
+    float l1, l2, l3, l4, l5; // 五连杆参数
 } ChassisPhysicalConfig;
 
+/****************** 底盘模式结构体 *******************/
 typedef enum{
-    CHASSIS_DISABLE = 1,
-    CHASSIS_ENABLE,
-    CHASSIS_INIT,
-    CHASSIS_JUMP,
-    CHASSIS_SPIN,
+    CHASSIS_DISABLE = 1, // 失能模式
+    CHASSIS_INIT, // 初始化模式
+    CHASSIS_ENABLE, // 使能模式
+    CHASSIS_JUMP, // 跳跃模式
+    CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
 
-typedef enum{
-    R = 1,
-    L = 0,
-} LegIndex;
-
+/****************** 跳跃状态结构体 *******************/
 typedef enum{
     NOT_READY,
-    READY,
-    STRETCHING,
-    SHRINKING,
-    STRETCHING_AGAIN,
-    LANDING,
+    READY, // 第一阶段：收腿蓄力
+    STRETCHING, // 第二阶段：伸腿蹬地
+    SHRINKING, // 第三阶段：空中收腿
+    LANDING, // 第四阶段：落地
 } JumpState;
 
 typedef struct{
     // 欧拉角
+    float roll_angle;
     float pitch_angle;
     float yaw_angle;
     float yaw_last_angle;
     float yaw_total_angle;
     float yaw_round_count;
-    float roll_angle;
+
 
     //三轴角速度
     float pitch_gyro;
@@ -154,36 +153,37 @@ typedef struct{
 } IMUReference;
 
 typedef struct{
-    float v_m_per_s;
-    float x; // 位移
+    float v_m_per_s; // 期望速度
+    float x; // 期望位移
     float pitch_angle_rad;
     float yaw_angle_rad;
     float roll_angle_rad;
-    float height_m;
+    float height_m; // 期望腿长
     float spin_speed;
 
 } ChassisCtrlInfo;
 
+/****************** 状态变量结构体 *******************/
 typedef struct{
-    float theta;
+    float theta; // 状态变量1
+    float theta_dot; // 状态变量2
     float theta_last;
-    float theta_dot;
     float theta_dot_last;
     float theta_ddot;
 
-    float x;
-    float x_dot;
+    float x; // 状态变量3
+    float x_dot; // 状态变量4
     float x_dot_last;
     float x_ddot;
 
-    float phi;
-    float phi_dot;
+    float phi; // 状态变量5
+    float phi_dot; // 状态变量6
 } StateVariable;
 
 /** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
 
-/** 正运动学解算 正运动学解算 正运动学解算 正运动学解算 **/
-typedef struct{
+/** 正运动学结构体  FK == Forward Kinematics(正运动学) **/
+typedef struct{// 腿长
     float L0;
     float L0_last;
     float L0_dot;
@@ -197,14 +197,14 @@ typedef struct{// 五连杆中的角度
     float phi3;
     float phi4;
 
-    float phi0;
+    float phi0; // 腿摆角
     float last_phi0;
     float d_phi0;// 摆角变化速度
     float last_d_phi0;
     float dd_phi0;
 } FKPhi;
 
-typedef struct{// 五连杆中的坐标
+typedef struct{// 五连杆中的点坐标(Coordinates)
     float a_x, a_y;
     float b_x, b_y;
     float c_x, c_y;
@@ -216,11 +216,11 @@ typedef struct{
     FKL0 fk_L0;
     FKPhi fk_phi;
     FKPointCoordinates fk_point_coordinates;
-    float d_alpha; //
+    float d_alpha; // ?
 
 /*******************************************/
 
-/** 正动力学解算 正动力学解算 正动力学解算 正动力学解算 **/
+/** 正动力学解算(Forward Dynamics)：从 末端力(F Tp) 到 末端执行器(T1 T4) **/
     union { // 自行学习联合体的特性: union
         float array[2][2];
         struct {
@@ -251,7 +251,7 @@ typedef struct{
 } ForwardKinematics;
 
 
-/** 逆动力学解算 逆动力学解算 逆动力学解算 逆动力学解算 **/
+/** 逆动力学解算(Inverse Dynamics): 从 末端执行器(T1 T4) 到 末端力(T Tp) **/
 typedef struct {
     union {
         float array[2][1];
@@ -279,6 +279,7 @@ typedef struct {
         } E;
     } Fxy_fdb;
 
+ /** 逆运动学解算(Inverse Dynamics): 从 末端执行器(w1 w4) 到 末端编码(d_L0 d_phi0) **/
     union {
         float array[2][1];
         struct {
@@ -320,27 +321,31 @@ typedef struct{
 
 /** Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg **/
 typedef struct{
-    LegIndex leg_index;
-    StateVariable state_variable_feedback;
-    StateVariable state_variable_set_point;
-    StateVariable state_variable_error;
-    StateVariable state_variable_wheel_out;
-    StateVariable state_variable_joint_out;
+    /** 状态变量 **/
+    StateVariable state_variable_feedback;  // 反馈状态变量
+    StateVariable state_variable_set_point; // 期望状态变量
+    StateVariable state_variable_error;     // 误差 = 反馈 - 期望
+    StateVariable state_variable_wheel_out; // 各个状态变量通过lqr计算的关于轮毂的输出
+    StateVariable state_variable_joint_out; // 各个状态变量通过lqr计算的关于关节的输出
 
+    /** dd_theta的移动平均滤波器 **/
+    MovingAverageFilter theta_ddot_filter; // theta_ddot用于计算竖直方向支持力Fn
+
+    /********* 腿部VMC **********/
     VMC vmc;
 
+    /********* 腿部PID **********/
     Pid leg_pos_pid; // 腿长位置环pid
-//    Pid leg_speed_pid; // 腿长速度环pid
-    Pid offground_leg_pid;
+    Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
 
     float* kalman_result; // 轮毂速度与加速度融合后的结果
-    float L0_set_point; // 期望腿长
 
-    float wheel_torque;
-    float joint_F_torque;
+    float wheel_torque; // 轮毂力矩
+    float joint_F_torque; // 关节力矩
     float joint_B_torque;
 
     float Fn; // 竖直方向支持力
+    MovingAverageFilter Fn_filter; // 竖直方向支持力的移动平均滤波器
 
 } Leg;
 
@@ -349,7 +354,8 @@ typedef struct{
 /** Chassis Chassis Chassis Chassis Chassis Chassis Chassis Chassis **/
 
 typedef struct{
-    /** Remote Remote Remote Remote **/
+
+    /** 遥控器信息 **/
     ChassisCtrlMode chassis_ctrl_mode;
     ChassisCtrlMode chassis_ctrl_mode_last;
     ChassisCtrlInfo chassis_ctrl_info;
@@ -362,21 +368,23 @@ typedef struct{
     Leg leg_R;
 
     KalmanFilter vx_kalman;
-    float kalman_measure[2];
+    float kalman_measure[2]; // 速度融合加速度的两个测量量：v和a
+
+    MovingAverageFilter robot_az_filter;
 
     /** PID PID PID PID PID PID PID PID PID PID **/
-//    Pid chassis_vw_speed_pid;
-//    Pid chassis_spin_pid;
     Pid chassis_turn_pid; // 转向pid
     float wheel_turn_torque; // 转向力矩
     float theta_error; // 两条腿之间theta的误差
     Pid chassis_leg_coordination_pid; // 防劈叉pid
     float steer_compensatory_torque; // 防劈叉力矩
     Pid chassis_roll_pid; // roll补偿pid
+//  Pid chassis_vw_speed_pid;
+//  Pid chassis_spin_pid;
+
 
     /** flag flag flag flag flag flag flag flag **/
     bool is_joint_enable; // 关节电机使能标志位
-    bool is_wheel_enable; // 轮毂电机使能标志位
     bool init_flag; // 底盘初始化完成标志位
 
     bool is_chassis_balance; // 平衡标志位

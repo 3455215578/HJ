@@ -7,9 +7,6 @@
 #include "joint.h"
 #include "moving_filter.h"
 
-
-MovingAverageFilter Fn_filter_L, Fn_filter_R;
-
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
 
@@ -29,7 +26,7 @@ extern ChassisPhysicalConfig chassis_physical_config;
  */
 
 
-static void vmc_phi_update(Leg *leg_L, Leg *leg_R, const ChassisPhysicalConfig *physical_config) {
+static void vmc_phi_update(Leg *leg_L, Leg *leg_R) {
 
     float RF_joint_pos = (get_joint_motors() + 3)->pos_r;
     float RB_joint_pos = (get_joint_motors() + 2)->pos_r;
@@ -43,7 +40,7 @@ static void vmc_phi_update(Leg *leg_L, Leg *leg_R, const ChassisPhysicalConfig *
 }
 
 // vmc正运动学解算
-static void forward_kinematics(Leg *leg_L, Leg *leg_R, const ChassisPhysicalConfig *physical_config) {
+static void forward_kinematics(Leg *leg_L, Leg *leg_R, ChassisPhysicalConfig *physical_config) {
   /***LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L***/
 
   leg_L->vmc.forward_kinematics.fk_point_coordinates.b_x = physical_config->l1 * cosf(leg_L->vmc.forward_kinematics.fk_phi.phi1);
@@ -224,7 +221,7 @@ chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_t
 }
 
 static void joint_motors_torque_set(Chassis *chassis,
-                                    const ChassisPhysicalConfig *chassis_physical_config) {
+                                    ChassisPhysicalConfig *chassis_physical_config) {
 
 /** Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp Tp **/
 
@@ -273,20 +270,14 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 /** Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy Fy **/
 
-  chassis->leg_L.L0_set_point = chassis->chassis_ctrl_info.height_m;
-  chassis->leg_R.L0_set_point = chassis->chassis_ctrl_info.height_m;
-
-  VAL_LIMIT(chassis->leg_L.L0_set_point, MIN_L0, MAX_L0);
-  VAL_LIMIT(chassis->leg_R.L0_set_point, MIN_L0, MAX_L0);
-
 // 计算腿长pid输出
   pid_calc(&chassis->leg_L.leg_pos_pid,
              chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
-             chassis->leg_L.L0_set_point);
+           chassis->chassis_ctrl_info.height_m);
 
   pid_calc(&chassis->leg_R.leg_pos_pid,
              chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
-             chassis->leg_R.L0_set_point);
+           chassis->chassis_ctrl_info.height_m);
 
 
 //  Roll pid
@@ -331,7 +322,7 @@ else{
 static void Inverse_Kinematics(VMC *vmc,
                                float w1,
                                float w4,
-                               const ChassisPhysicalConfig *chassis_physical_config) {
+                               ChassisPhysicalConfig *chassis_physical_config) {
   if (vmc == NULL) {
     return;
   }
@@ -362,7 +353,7 @@ static void Inverse_Kinematics(VMC *vmc,
 static void Inverse_Dynamics(VMC *vmc,
                              float T1, // phi1
                              float T4, // phi4
-                             const ChassisPhysicalConfig *chassis_physical_config) {
+                             ChassisPhysicalConfig *chassis_physical_config) {
   if (vmc == NULL) {
     return;
   }
@@ -392,7 +383,7 @@ static void Inverse_Dynamics(VMC *vmc,
 }
 
 // 计算竖直方向支持力
-static void fn_cal(Leg *leg, float az, const ChassisPhysicalConfig *chassis_physical_config) {
+static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_config) {
 
   if (leg == NULL) {
     return;
@@ -403,6 +394,7 @@ static void fn_cal(Leg *leg, float az, const ChassisPhysicalConfig *chassis_phys
           + leg->vmc.inverse_kinematics.Fxy_fdb.E.Tp_fdb * sinf(leg->state_variable_feedback.theta) / leg->vmc.forward_kinematics.fk_L0.L0;
 
   float leg_az;
+
   leg_az = az - leg->vmc.forward_kinematics.fk_L0.L0_ddot * cosf(leg->state_variable_feedback.theta)
       + 2.0f * leg->vmc.forward_kinematics.fk_L0.L0_dot * leg->state_variable_feedback.theta_dot
           * sinf(leg->state_variable_feedback.theta)
@@ -413,13 +405,9 @@ static void fn_cal(Leg *leg, float az, const ChassisPhysicalConfig *chassis_phys
 
   float Fn_raw = P + chassis_physical_config->wheel_weight * 9.8f + chassis_physical_config->wheel_weight * leg_az;
 
-  if (leg->leg_index == L) {
-    update_moving_average_filter(&Fn_filter_L, Fn_raw);
-    leg->Fn = get_moving_average_filtered_value(&Fn_filter_L);
-  } else if (leg->leg_index == R) {
-    update_moving_average_filter(&Fn_filter_R, Fn_raw);
-    leg->Fn = get_moving_average_filtered_value(&Fn_filter_R);
-  }
+  update_moving_average_filter(&leg->Fn_filter, Fn_raw);
+  leg->Fn = get_moving_average_filtered_value(&leg->Fn_filter);
+
 }
 /*******************************************************************************
  *                                     VMC                                     *
@@ -427,7 +415,7 @@ static void fn_cal(Leg *leg, float az, const ChassisPhysicalConfig *chassis_phys
 void vmc_ctrl(void) {
 
   // 更新phi1 phi4
-  vmc_phi_update(&chassis.leg_L, &chassis.leg_R, &chassis_physical_config);
+  vmc_phi_update(&chassis.leg_L, &chassis.leg_R);
 
   //*VMC 正解算 *//
   forward_kinematics(&chassis.leg_L, &chassis.leg_R, &chassis_physical_config);
