@@ -28,8 +28,7 @@
 #include "Atti.h"
 #include "Calibrate.h"
 #include "chassis.h"
-#include "robot_def.h"
-#include "gimbal.h"
+#include "gimbal_communication.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -135,13 +134,13 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(calibrateTask, calibrate_task, osPriorityNormal, 0, 512);
   calibrateTaskHandle = osThreadCreate(osThread(calibrateTask), NULL);
 
-  osThreadDef(attiTask, INS_task, osPriorityRealtime, 0, 1024);
+  osThreadDef(attiTask, INS_task, osPriorityNormal, 0, 1024);
   attiTaskHandle = osThreadCreate(osThread(attiTask), NULL);
 
-  osThreadDef(chassisTask, chassis_task, osPriorityAboveNormal, 0, 1024);
+  osThreadDef(chassisTask, chassis_task, osPriorityNormal, 0, 1024);
   chassisTaskHandle = osThreadCreate(osThread(chassisTask), NULL);
 
-  osThreadDef(gimbalTask, gimbal_task, osPriorityAboveNormal, 0, 1024);
+  osThreadDef(gimbalTask, gimbal_task, osPriorityNormal, 0, 1024);
   gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
 

@@ -49,67 +49,26 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(
-        Core/Inc
-        USB_DEVICE/App
-        USB_DEVICE/Target
-        Drivers/STM32F4xx_HAL_Driver/Inc
-        Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
-        Middlewares/Third_Party/FreeRTOS/Source/include
-        Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
-        Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-        Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-        Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-        Drivers/CMSIS/Device/ST/STM32F4xx/Include
-        Drivers/CMSIS/Include
-        Middlewares/ST/ARM/DSP/Inc
-
-        User/Algorithm/AHRS
-        User/Algorithm/delay
-        User/Algorithm/filter/moving_filter
-        User/Algorithm/filter/vx_kalman_filter
-        User/Algorithm/lqr
-        User/Algorithm/pid
-        User/Algorithm/user_lib
-        User/Algorithm/vmc
-
-        User/App/chassis
-        User/App/gimbal
-
-        User/Bsp/can
-        User/Bsp/flash
-
-        User/Device/bmi088
-        User/Device/buzzer
-        User/Device/ist8310
-        User/Device/key_board
-        User/Device/led
-        User/Device/motor/joint
-        User/Device/motor/joint/DM8009
-        User/Device/motor/joint/CyberGear
-        User/Device/motor/wheel
-        User/Device/motor/wheel/LK9025
-        User/Device/remote
-        User/Device/servo
-
-        User/Robot_def
-
+include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Middlewares/ST/ARM/DSP/Inc
+        bsp/
+                App/
+                App/Inc
+                App/Inc/Bot
+                App/Inc/Lib
+                App/Inc/Bot/Device
+                App/Inc/Bot/Driver
+                App/Inc/Bot/Driver/IMU
+                App/Inc/Bot/OI
+                App/Inc/Bot/Subsystem
+                App/Inc/Lib/Algorithm
+                App/Inc/Lib/Controller
+                App/Inc/Lib/Filter
+                App/Inc/Lib/Util
 )
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx)
 
-file(GLOB_RECURSE SOURCES
-        "Core/*.*"
-        "Middlewares/*.*"
-        "Drivers/*.*"
-        "USB_DEVICE/*.*"
-
-        "User/Algorithm/*.*"
-        "User/App/*.*"
-        "User/Bsp/*.*"
-        "User/Device/*.*"
-        "User/Robot_def/*.*"
-)
+file(GLOB_RECURSE SOURCES "Library/*.*" "Core/*.*" "Middlewares/*.*" "Drivers/*.*" "USB_DEVICE/*.*" "bsp/*.*" "App/*.*" )
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407IGHX_FLASH.ld)
 
