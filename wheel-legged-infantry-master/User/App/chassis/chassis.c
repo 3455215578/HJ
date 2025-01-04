@@ -60,10 +60,6 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_Z_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-//  chassis.chassis_ctrl_info.pitch_angle_rad = (float) (get_rc_ctrl()->rc.ch[CHASSIS_PIT_CHANNEL]) * RC_TO_PITCH;
-
-//  chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[3]) * RC_TO_L0;
-//  VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0)
 }
 
 /** 底盘根据遥控器设置模式 **/
@@ -77,24 +73,7 @@ static void set_chassis_mode() {
     } else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
-
-        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]))
-        {
-            chassis.chassis_ctrl_info.height_m = 0.15f;
-        }
-        else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L]))
-        {
-            chassis.chassis_ctrl_info.height_m = 0.245f;
-        }
-        else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L]))
-        {
-            chassis.chassis_ctrl_info.height_m = 0.35f;
-        }
     }
-    //else if ((chassis.chassis_ctrl_mode_last == CHASSIS_ENABLE) && (switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]) && (switch_is_up(get_rc_ctrl()->rc.s[RC_s_R])))) { // 跳跃
-//    chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
-//    chassis.chassis_ctrl_mode = CHASSIS_JUMP;
-//  }
 }
 
 /** 底盘通过板间通信接收云台的信息 **/
@@ -123,6 +102,57 @@ static void set_chassis_mode_from_gimbal_msg() {
  *                                 Function                                    *
  *******************************************************************************/
 
+/*********************** 获取底盘传感器信息 *************************/
+static void get_IMU_info() {
+
+    /** Yaw **/
+    chassis.imu_reference.yaw_angle = -*(get_ins_angle() + 0);
+
+    // 圈数检测
+    if (chassis.imu_reference.yaw_angle - chassis.imu_reference.yaw_last_angle > 3.1415926f)
+    {
+        chassis.imu_reference.yaw_round_count--;
+    }
+    else if (chassis.imu_reference.yaw_angle - chassis.imu_reference.yaw_last_angle < -3.1415926f)
+    {
+        chassis.imu_reference.yaw_round_count++;
+    }
+    chassis.imu_reference.yaw_total_angle = 6.283f * chassis.imu_reference.yaw_round_count + chassis.imu_reference.yaw_angle;
+    chassis.imu_reference.yaw_last_angle = chassis.imu_reference.yaw_angle;
+
+    /** Pitch **/
+    chassis.imu_reference.pitch_angle = -*(get_ins_angle() + 2);
+
+    /** Roll **/
+    chassis.imu_reference.roll_angle = -*(get_ins_angle() + 1);
+
+    /** 更新各轴加速度和角速度 **/
+    chassis.imu_reference.pitch_gyro = -*(get_ins_gyro() + 0);
+    chassis.imu_reference.yaw_gyro = -*(get_ins_gyro() + 2);
+    chassis.imu_reference.roll_gyro = -*(get_ins_gyro() + 1);
+
+    chassis.imu_reference.ax = -*(get_ins_accel() + 1);
+    chassis.imu_reference.ay = *(get_ins_accel() + 0);
+    chassis.imu_reference.az = *(get_ins_accel() + 2);
+
+    /** 去除重力影响的各轴加速度  旋转矩阵法 **/
+    chassis.imu_reference.ax_filtered = chassis.imu_reference.ax - GRAVITY * sinf(chassis.imu_reference.pitch_angle);
+    chassis.imu_reference.ay_filtered =  chassis.imu_reference.ay
+                                         - GRAVITY * cosf(chassis.imu_reference.pitch_angle) * sinf(chassis.imu_reference.roll_angle);
+    chassis.imu_reference.az_filtered =  chassis.imu_reference.az
+                                         - GRAVITY * cosf(chassis.imu_reference.pitch_angle) * cosf(chassis.imu_reference.roll_angle);
+
+    /** 机体竖直方向加速度 **/
+    float robot_az_raw =  chassis.imu_reference.ax_filtered * sinf(chassis.imu_reference.pitch_angle)
+                          + chassis.imu_reference.ay_filtered * sinf(-chassis.imu_reference.roll_angle) * cosf(chassis.imu_reference.pitch_angle)
+                          + chassis.imu_reference.az_filtered * cosf(chassis.imu_reference.pitch_angle) * cosf(chassis.imu_reference.roll_angle);
+
+    update_moving_average_filter(&robot_az_filter, robot_az_raw);
+    chassis.imu_reference.robot_az = get_moving_average_filtered_value(&robot_az_filter);
+
+}
+
+/************************ 底盘pid初始化 **********************/
 static void chassis_pid_init() {
 
     // 转向PID
@@ -180,24 +210,22 @@ static void chassis_pid_init() {
              CHASSIS_ROLL_PID_D);
 }
 
+/************************ 底盘初始化 **********************/
 void chassis_init() {
-    osDelay(2000);
+
+//    osDelay(2000);// 上电延时再进行关节电机使能，否则使能不了
 
     chassis.leg_L.leg_index = L;
     chassis.leg_R.leg_index = R;
 
-//    // 轮毂电机使能
-//    wheel_init();
+    // 轮毂电机在INIT模式再使能，避免疯转
 
-    // 关节电机使能
-    joint_init();
 
+
+    /** 底盘pid初始化 **/
     chassis_pid_init();
 
-    // 底盘状态位
-    chassis.is_chassis_offground = false;
-
-    //
+    /** 移动平均滤波器初始化 **/
     moving_average_filter_init(&robot_az_filter);
     moving_average_filter_init(&theta_ddot_filter_L);
     moving_average_filter_init(&theta_ddot_filter_R);
@@ -206,14 +234,15 @@ void chassis_init() {
 
     vTaskSuspendAll();
 
-    // 轮毂-速度融合加速度 卡尔曼滤波器 初始化
+    /** 轮毂-速度融合加速度 卡尔曼滤波器 初始化 **/
     chassis_kalman_init(&chassis.vx_kalman);
+
     xTaskResumeAll();
 }
 
-/************************ 向电机发送力矩 **********************/
+/************************ 向底盘电机发送力矩 **********************/
 static void chassis_motor_cmd_send() {
-#if DEBUG_MODE
+#if DEBUG_MODE // DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出
     set_joint_torque(0, 0, 0, 0);
     osDelay(2);
     set_wheel_torque(0, 0);
@@ -234,63 +263,14 @@ static void chassis_motor_cmd_send() {
 #endif
 }
 
-/*********************** 获取传感器信息 *************************/
-static void get_IMU_info() {
 
-  /** Yaw **/
-  chassis.imu_reference.yaw_angle = -*(get_ins_angle() + 0);
-
-  // 圈数检测
-  if (chassis.imu_reference.yaw_angle - chassis.imu_reference.yaw_last_angle > 3.1415926f)
-  {
-      chassis.imu_reference.yaw_round_count--;
-  }
-  else if (chassis.imu_reference.yaw_angle - chassis.imu_reference.yaw_last_angle < -3.1415926f)
-  {
-      chassis.imu_reference.yaw_round_count++;
-  }
-  chassis.imu_reference.yaw_total_angle = 6.283f * chassis.imu_reference.yaw_round_count + chassis.imu_reference.yaw_angle;
-  chassis.imu_reference.yaw_last_angle = chassis.imu_reference.yaw_angle;
-
-  /** Pitch **/
-  chassis.imu_reference.pitch_angle = -*(get_ins_angle() + 2);
-
-  /** Roll **/
-  chassis.imu_reference.roll_angle = -*(get_ins_angle() + 1);
-
-  /** 更新各轴加速度和角速度 **/
-  chassis.imu_reference.pitch_gyro = -*(get_ins_gyro() + 0);
-  chassis.imu_reference.yaw_gyro = -*(get_ins_gyro() + 2);
-  chassis.imu_reference.roll_gyro = -*(get_ins_gyro() + 1);
-
-  chassis.imu_reference.ax = -*(get_ins_accel() + 1);
-  chassis.imu_reference.ay = *(get_ins_accel() + 0);
-  chassis.imu_reference.az = *(get_ins_accel() + 2);
-
-  /** 去除重力影响的各轴加速度  旋转矩阵法 **/
-  chassis.imu_reference.ax_filtered = chassis.imu_reference.ax - GRAVITY * sinf(chassis.imu_reference.pitch_angle);
-  chassis.imu_reference.ay_filtered =  chassis.imu_reference.ay
-                                     - GRAVITY * cosf(chassis.imu_reference.pitch_angle) * sinf(chassis.imu_reference.roll_angle);
-  chassis.imu_reference.az_filtered =  chassis.imu_reference.az
-                                     - GRAVITY * cosf(chassis.imu_reference.pitch_angle) * cosf(chassis.imu_reference.roll_angle);
-
-  /** 机体竖直方向加速度 **/
-  float robot_az_raw =  chassis.imu_reference.ax_filtered * sinf(chassis.imu_reference.pitch_angle)
-                      + chassis.imu_reference.ay_filtered * sinf(-chassis.imu_reference.roll_angle) * cosf(chassis.imu_reference.pitch_angle)
-                      + chassis.imu_reference.az_filtered * cosf(chassis.imu_reference.pitch_angle) * cosf(chassis.imu_reference.roll_angle);
-
-  update_moving_average_filter(&robot_az_filter, robot_az_raw);
-  chassis.imu_reference.robot_az = get_moving_average_filtered_value(&robot_az_filter);
-
-}
 
 /*************************** 返回底盘结构体指针 *****************************/
 Chassis *get_chassis() {
   return &chassis;
 }
 
-
-/*************************************************************************/
+/*********************************************************************************/
 
 
 
@@ -300,7 +280,7 @@ Chassis *get_chassis() {
  *******************************************************************************/
 
 
-/** 失能 **/
+/************** 失能任务 ******************/
 static void chassis_disable_task() {
 
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
@@ -326,13 +306,16 @@ static void chassis_disable_task() {
     chassis.is_chassis_offground = false;
     chassis.jump_flag = false;
 
-//    wheel_disable();
-    lk9025_disable(CAN_1,WHEEL_L_SEND);
-    lk9025_disable(CAN_1,WHEEL_R_SEND);
+    wheel_disable();
 }
 
-/** 初始化 **/
+/************** 初始化任务 ******************/
 static void chassis_init_task() {
+
+    HAL_Delay(2000);
+
+    /** 关节电机使能 **/
+    joint_enable();
 
     if (!chassis.is_joint_enable) {
         set_dm8009_enable(CAN_2, JOINT_LF_SEND);
@@ -354,16 +337,20 @@ static void chassis_init_task() {
         return;
     }
 
-    chassis.init_flag = true;
+    if(chassis.is_joint_enable && chassis.is_wheel_enable)
+    {
+        chassis.init_flag = true;
+    }
+
 
 }
 
-/** 使能 **/
+/************** 使能任务 ******************/
 static void chassis_enable_task() {
 
 }
 
-/******************************** 总任务 *********************************/
+/************** 总任务 ******************/
 extern void chassis_task(void const *pvParameters) {
 
     chassis_init();
@@ -378,7 +365,7 @@ extern void chassis_task(void const *pvParameters) {
 #if CHASSIS_REMOTE
         set_chassis_mode();
 
-    set_chassis_ctrl_info();
+        set_chassis_ctrl_info();
 #else
         set_chassis_mode_from_gimbal_msg();
         set_chassis_ctrl_info_from_gimbal_msg();

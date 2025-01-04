@@ -12,7 +12,7 @@ enum JointMotorIndex{
     RF=3,
 };
 
-void joint_init();
+void joint_enable();
 
 void set_joint_torque(float joint_LF_torque, float joint_LB_torque, float joint_RF_torque, float joint_RB_torque);
 

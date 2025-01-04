@@ -3,14 +3,13 @@
 
 Dm8009 joint[4];
 
-void joint_init() {
+void joint_enable() {
     dm8009_init(&joint[LF], JOINT_LF_SEND);
     dm8009_init(&joint[LB], JOINT_LB_SEND);
     dm8009_init(&joint[RF], JOINT_RF_SEND);
     dm8009_init(&joint[RB], JOINT_RB_SEND);
     set_dm8009_enable(CAN_2, JOINT_LF_SEND);
     set_dm8009_enable(CAN_2, JOINT_LB_SEND);
-    osDelay(2);
     set_dm8009_enable(CAN_2, JOINT_RF_SEND);
     set_dm8009_enable(CAN_2, JOINT_RB_SEND);
 }
