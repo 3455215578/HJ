@@ -1,18 +1,22 @@
 #ifndef DM_8009_H
 #define DM_8009_H
 
-#include <stdint-gcc.h>
+#include "stdint-gcc.h"
 #include "can_device.h"
 
 typedef struct{
-  uint32_t id;
-  float pos_r;
-  float angular_vel;
-  float torque;
-  uint32_t last_heartbeat_timestamp_ms;
+    uint32_t id;
+    float pos_r;
+    float angular_vel;
+    float torque;
+    uint32_t last_heartbeat_timestamp_ms;
 } Dm8009;
 
 void dm8009_init(Dm8009 *motor, uint32_t device_id);
+
+void set_dm8009_torque(CanType can_type,
+                       Dm8009SendID CMD_ID,
+                       float torque);
 
 void set_dm8009_MIT(CanType can_type, Dm8009SendID CMD_ID, float pos, float speed, float kp, float kd, float torque);
 

@@ -85,7 +85,10 @@ include_directories(
         User/Device/key_board
         User/Device/led
         User/Device/motor/joint
+        User/Device/motor/joint/DM8009
+        User/Device/motor/joint/CyberGear
         User/Device/motor/wheel
+        User/Device/motor/wheel/LK9025
         User/Device/remote
         User/Device/servo
 
