@@ -65,7 +65,6 @@ include_directories(
         Middlewares/ST/ARM/DSP/Inc
 
         User/Algorithm/AHRS
-        User/Algorithm/delay
         User/Algorithm/filter/moving_filter
         User/Algorithm/filter/vx_kalman_filter
         User/Algorithm/lqr
@@ -77,6 +76,7 @@ include_directories(
         User/App/gimbal
 
         User/Bsp/can
+        User/Bsp/delay
         User/Bsp/flash
 
         User/Device/bmi088

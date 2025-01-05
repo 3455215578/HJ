@@ -4,11 +4,13 @@
 #include <stdbool.h>
 
 #include "pid.h"
-//#include "vmc.h"
 #include "vx_kalman_filter.h"
 #include "moving_filter.h"
 
-/**  宏定义 宏定义 宏定义 宏定义 宏定义 宏定义 宏定义  **/
+typedef float fp32; // 表明某个float类型变量是32位浮点数
+typedef double fp64;
+
+/** 宏定义 **/
 //CHASSIS_REMOTE置1：底盘由遥控器控制
 #define CHASSIS_REMOTE 1
 
@@ -17,47 +19,45 @@
 
 #define CHASSIS_PERIOD 5 // ms 控制频率: 200Hz
 
-/****************** PID参数 *********************/
-
-/** Wheel Wheel Wheel Wheel Wheel **/
-// 转向PID
+/** PID参数 **/
+/** 转向PID **/
 #define CHASSIS_TURN_PID_P 0.0f
 #define CHASSIS_TURN_PID_I 0.0f
 #define CHASSIS_TURN_PID_D 0.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_TURN_PID_OUT_LIMIT 0.0f
 
-
-/** Joint Joint Joint Joint Joint **/
-// 腿长位置环PID
+/** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 0.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
 #define CHASSIS_LEG_L0_POS_PID_D 0.0f
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 0.0f
 
-// 防劈叉PID
+/** 防劈叉PID **/
 #define CHASSIS_LEG_COORDINATION_PID_P 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_I 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_D 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 0.0f
 
-// Roll PID
+/** Roll PID **/
 #define CHASSIS_ROLL_PID_P 0.0f
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_ROLL_PID_OUT_LIMIT 0.0f
 
-// 离地后的腿长PID
+/** 离地后的腿长PID **/
 #define CHASSIS_OFFGROUND_LO_PID_P 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_I 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_D 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
 
-/****************** 变量约束 *********************/
+
+
+/** 变量约束 **/
 #define MAX_CHASSIS_VX_SPEED 1.8f
 #define MAX_PITCH 0.174533f
 #define MIN_PITCH (-0.174533f)
@@ -72,20 +72,25 @@
 #define MAX_L0 0.40f
 #define MID_L0 0.24f
 
-/******************* 遥控器路径 *****************/
+/** 遥控器路径 **/
 #define CHASSIS_X_CHANNEL 1
 #define CHASSIS_Z_CHANNEL 2
 #define CHASSIS_PIT_CHANNEL 3
 #define CHASSIS_ROLL_CHANNEL 0
 
-/****************** 遥控器值映射 ****************/
+/** 遥控器值映射 **/
 #define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
 #define MAX_CHASSIS_YAW_INCREMENT 0.02f
 #define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
 #define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
 #define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
 
-/****************** 底盘物理参数结构体 *******************/
+
+/*******************************************************************************
+ *                                    底盘                                     *
+ *******************************************************************************/
+
+/** 底盘物理参数结构体 **/
 typedef struct{
     float wheel_radius; // 驱动轮半径
     float body_weight; // 机体质量(有云台要算上云台)
@@ -94,7 +99,7 @@ typedef struct{
     float l1, l2, l3, l4, l5; // 五连杆参数
 } ChassisPhysicalConfig;
 
-/****************** 底盘模式结构体 *******************/
+/** 底盘模式结构体 **/
 typedef enum{
     CHASSIS_DISABLE = 1, // 失能模式
     CHASSIS_INIT, // 初始化模式
@@ -103,7 +108,7 @@ typedef enum{
     CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
 
-/****************** 跳跃状态结构体 *******************/
+/** 跳跃状态结构体 **/
 typedef enum{
     NOT_READY,
     READY, // 第一阶段：收腿蓄力
@@ -112,7 +117,7 @@ typedef enum{
     LANDING, // 第四阶段：落地
 } JumpState;
 
-/****************** 传感器结构体 *******************/
+/** 传感器结构体 **/
 typedef struct{
     // 欧拉角
     float roll_angle;
@@ -154,7 +159,7 @@ typedef struct{
 
 } ChassisCtrlInfo;
 
-/****************** 状态变量结构体 *******************/
+/** 状态变量结构体 **/
 typedef struct{
     float theta; // 状态变量1
     float theta_dot; // 状态变量2
@@ -171,9 +176,9 @@ typedef struct{
     float phi_dot; // 状态变量6
 } StateVariable;
 
-/** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
+/** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
 
-/** 正运动学结构体  FK == Forward Kinematics(正运动学) **/
+/** 正运动学解算  FK == Forward Kinematics(正运动学) **/
 typedef struct{// 腿长
     float L0;
     float L0_last;
@@ -209,8 +214,6 @@ typedef struct{
     FKPointCoordinates fk_point_coordinates;
     float d_alpha; // ?
 
-/********************************************************/
-
 /** 正动力学解算(Forward Dynamics)：从 末端力(F Tp) 到 末端执行器(T1 T4) **/
     union { // 自行学习联合体的特性: union
         float array[2][2];
@@ -237,7 +240,6 @@ typedef struct{
             float T4_set_point;
         } E;
     } T1_T4_set_point;
-/************************************************************************/
 
 } ForwardKinematics;
 
@@ -299,19 +301,18 @@ typedef struct {
 
 }InverseKinematics;
 
-/********************************************************************************/
-
+/** 腿部VMC结构体 **/
 typedef struct{
     ForwardKinematics forward_kinematics;
     InverseKinematics inverse_kinematics;
 } VMC;
-
-/*********************************************************************************************************/
-
+/*****************************************************************************/
 
 
-/****************** 腿部结构体 *******************/
+
+/** 腿部结构体 **/
 typedef struct{
+
     /** 状态变量 **/
     StateVariable state_variable_feedback;  // 反馈状态变量
     StateVariable state_variable_set_point; // 期望状态变量
@@ -322,10 +323,10 @@ typedef struct{
     /** dd_theta的移动平均滤波器 **/
     MovingAverageFilter theta_ddot_filter; // theta_ddot用于计算竖直方向支持力Fn
 
-    /********* 腿部VMC **********/
+    /** 腿部VMC **/
     VMC vmc;
 
-    /********* 腿部PID **********/
+    /** 腿部PID **/
     Pid leg_pos_pid; // 腿长位置环pid
     Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
 
@@ -340,7 +341,7 @@ typedef struct{
 
 } Leg;
 
-/****************** 底盘结构体 *******************/
+/** 底盘结构体 **/
 typedef struct{
 
     /** 传感器 **/
@@ -385,15 +386,75 @@ typedef struct{
 
 } Chassis;
 
-/** Chassis Chassis Chassis Chassis Chassis Chassis Chassis Chassis **/
 
 
-typedef struct{
+/*******************************************************************************
+ *                                    云台                                     *
+ *******************************************************************************/
 
-    ChassisCtrlMode chassis_ctrl_mode;
-    ChassisCtrlInfo chassis_ctrl_info;
 
-} GimbalMsg;
+//云台电机的反馈量
+typedef struct
+{
+    uint16_t ecd; // 编码器值
+    int16_t last_ecd;
+    int16_t speed_rpm; // 反馈回来的转速
+    int16_t feedback_current; // 施加在电机上的电流
+    uint8_t temperate; // 温度
+
+    int32_t round_cnt;   //电机旋转的总圈数
+    int32_t total_ecd;   //电机旋转的总编码器值
+
+    uint16_t offset_ecd;//电机的校准编码值
+} motor_measure_t;
+
+typedef struct
+{
+    const motor_measure_t *motor_measure;
+
+    fp32 speed;
+
+    fp32 rpm_set;
+
+    pid_t speed_p;
+
+    int16_t give_current;
+
+
+}motor_3508_t;
+
+typedef struct
+{
+    motor_measure_t *motor_measure;
+
+    pid_t angle_pos_pid; // 云台角度位置环pid
+    pid_t angle_speed_pid; // 云台角度速度环pid
+
+    fp32 relative_angle_get;
+    fp32 relative_angle_set; //°
+
+    fp32 absolute_angle_get;
+    fp32 absolute_angle_set;//rad
+
+    fp32 gyro_set;  //转速设置
+    int16_t give_current; //最终电流值
+
+}motor_6020_t;
+
+
+typedef struct
+{
+    motor_measure_t *motor_measure;
+
+    pid_t angle_p;//角度环pid
+
+    pid_t speed_p;//速度环pid
+
+    fp32 speed;//转速期望值
+
+    int16_t give_current;
+
+}motor_2006_t;
 
 
 
