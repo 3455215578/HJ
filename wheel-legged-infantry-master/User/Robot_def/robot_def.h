@@ -26,7 +26,6 @@
 #define CHASSIS_TURN_PID_D 0.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_TURN_PID_OUT_LIMIT 0.0f
-/************************************/
 
 
 /** Joint Joint Joint Joint Joint **/
@@ -57,11 +56,6 @@
 #define CHASSIS_OFFGROUND_L0_PID_D 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
-/*************************************/
-
-
-/**********************************************/
-
 
 /****************** 变量约束 *********************/
 #define MAX_CHASSIS_VX_SPEED 1.8f
@@ -77,9 +71,6 @@
 #define MIN_L0 0.13f
 #define MAX_L0 0.40f
 #define MID_L0 0.24f
-/**********************************************/
-
-
 
 /******************* 遥控器路径 *****************/
 #define CHASSIS_X_CHANNEL 1
@@ -93,7 +84,6 @@
 #define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
 #define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
 #define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
-/*********************************************/
 
 /****************** 底盘物理参数结构体 *******************/
 typedef struct{
@@ -122,6 +112,7 @@ typedef enum{
     LANDING, // 第四阶段：落地
 } JumpState;
 
+/****************** 传感器结构体 *******************/
 typedef struct{
     // 欧拉角
     float roll_angle;
@@ -180,7 +171,7 @@ typedef struct{
     float phi_dot; // 状态变量6
 } StateVariable;
 
-/** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
+/** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
 
 /** 正运动学结构体  FK == Forward Kinematics(正运动学) **/
 typedef struct{// 腿长
@@ -218,7 +209,7 @@ typedef struct{
     FKPointCoordinates fk_point_coordinates;
     float d_alpha; // ?
 
-/*******************************************/
+/********************************************************/
 
 /** 正动力学解算(Forward Dynamics)：从 末端力(F Tp) 到 末端执行器(T1 T4) **/
     union { // 自行学习联合体的特性: union
@@ -246,7 +237,7 @@ typedef struct{
             float T4_set_point;
         } E;
     } T1_T4_set_point;
-/************************************************/
+/************************************************************************/
 
 } ForwardKinematics;
 
@@ -308,18 +299,18 @@ typedef struct {
 
 }InverseKinematics;
 
-/************************************************/
+/********************************************************************************/
 
 typedef struct{
     ForwardKinematics forward_kinematics;
     InverseKinematics inverse_kinematics;
 } VMC;
 
-/** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
+/*********************************************************************************************************/
 
 
 
-/** Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg **/
+/****************** 腿部结构体 *******************/
 typedef struct{
     /** 状态变量 **/
     StateVariable state_variable_feedback;  // 反馈状态变量
@@ -349,53 +340,60 @@ typedef struct{
 
 } Leg;
 
-/** Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg Leg **/
-
-/** Chassis Chassis Chassis Chassis Chassis Chassis Chassis Chassis **/
-
+/****************** 底盘结构体 *******************/
 typedef struct{
+
+    /** 传感器 **/
+    IMUReference imu_reference;
+    MovingAverageFilter robot_az_filter;
 
     /** 遥控器信息 **/
     ChassisCtrlMode chassis_ctrl_mode;
     ChassisCtrlMode chassis_ctrl_mode_last;
     ChassisCtrlInfo chassis_ctrl_info;
 
-    JumpState jump_state;
-
-    IMUReference imu_reference;
-
+    /** 腿部 **/
     Leg leg_L;
     Leg leg_R;
 
+    /** 跳跃 **/
+    JumpState jump_state;
+
+    /** 卡尔曼滤波 **/
     KalmanFilter vx_kalman;
     float kalman_measure[2]; // 速度融合加速度的两个测量量：v和a
 
-    MovingAverageFilter robot_az_filter;
-
-    /** PID PID PID PID PID PID PID PID PID PID **/
-    Pid chassis_turn_pid; // 转向pid
-    float wheel_turn_torque; // 转向力矩
-    float theta_error; // 两条腿之间theta的误差
+    /** PID **/
+    Pid chassis_turn_pid;             // 转向pid
     Pid chassis_leg_coordination_pid; // 防劈叉pid
-    float steer_compensatory_torque; // 防劈叉力矩
-    Pid chassis_roll_pid; // roll补偿pid
+    Pid chassis_roll_pid;             // roll补偿pid
+    float wheel_turn_torque;          // 转向力矩
+    float steer_compensatory_torque;  // 防劈叉力矩
+    float theta_error;                // 两条腿之间theta的误差
 //  Pid chassis_vw_speed_pid;
 //  Pid chassis_spin_pid;
 
 
-    /** flag flag flag flag flag flag flag flag **/
-    bool is_joint_enable; // 关节电机使能标志位
-    bool init_flag; // 底盘初始化完成标志位
-
-    bool is_chassis_balance; // 平衡标志位
-    bool recover_finish; // 倒地自起完成标志位
+    /** flag **/
+    bool is_joint_enable;      // 关节电机使能标志位
+    bool init_flag;            // 底盘初始化完成标志位
+    bool is_chassis_balance;   // 平衡标志位
+    bool recover_finish;       // 倒地自起完成标志位
     bool is_chassis_offground; // 离地标志位
-    bool jump_flag; // 跳跃标志位
+    bool jump_flag;            // 跳跃标志位
 
 
 } Chassis;
 
 /** Chassis Chassis Chassis Chassis Chassis Chassis Chassis Chassis **/
+
+
+typedef struct{
+
+    ChassisCtrlMode chassis_ctrl_mode;
+    ChassisCtrlInfo chassis_ctrl_info;
+
+} GimbalMsg;
 
 
 
