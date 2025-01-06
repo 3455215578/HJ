@@ -280,8 +280,9 @@ static void chassis_disable_task() {
 
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
-    chassis.leg_L.state_variable_feedback.x = 0;
-    chassis.leg_R.state_variable_feedback.x = 0;
+
+    chassis.leg_L.state_variable_set_point.x = chassis.leg_L.state_variable_feedback.x;
+    chassis.leg_R.state_variable_set_point.x = chassis.leg_R.state_variable_feedback.x;
 
     chassis.chassis_ctrl_info.height_m = MIN_L0;
 

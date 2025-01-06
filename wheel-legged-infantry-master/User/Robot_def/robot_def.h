@@ -17,7 +17,7 @@ typedef double fp64;
 //DEBUG_MODE置1：进入调试模式，关闭关节和轮毂输出
 #define DEBUG_MODE 0
 
-#define CHASSIS_PERIOD 5 // ms 控制频率: 200Hz
+#define CHASSIS_PERIOD 2 // ms 控制频率: 500Hz
 
 /** PID参数 **/
 /** 转向PID **/
