@@ -3,6 +3,12 @@
 
 static Lk9025 wheel[2];
 
+void wheel_init()
+{
+    lk9025_init(&wheel[0], WHEEL_L_RECEIVE);
+    lk9025_init(&wheel[1], WHEEL_R_RECEIVE);
+}
+
 void wheel_stop()
 {
     lk9025_stop(CAN_1,WHEEL_L_SEND);

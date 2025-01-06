@@ -199,12 +199,13 @@ static void chassis_pid_init() {
 /************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
 
-    /** 上电延时1500ms再发关节电机使能报文，否则使能不了 **/
-    osDelay(1500);
+    /** 轮毂电机初始化 **/
+    wheel_init();
 
-    /** 关节电机使能 **/
-    joint_enable();
+    /** 关节电机初始化 **/
+    joint_init();
 
+    /** 初始化底盘模式 **/
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     /** 底盘pid初始化 **/
@@ -305,17 +306,19 @@ static void chassis_disable_task() {
 /*********************** 初始化任务 ***************************/
 static void chassis_init_task() {
 
-    if (!chassis.is_joint_enable) {
-        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
-        HAL_Delay(2);
-        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
-        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
-        HAL_Delay(2);
+    joint_enable();
 
-        chassis.is_joint_enable = true;
-        return;
-    }
+//    if (!chassis.is_joint_enable) {
+//        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
+//        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
+//        HAL_Delay(2);
+//        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
+//        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
+//        HAL_Delay(2);
+//
+//        chassis.is_joint_enable = true;
+//        return;
+//    }
 
     chassis.init_flag = true;
 }
@@ -323,9 +326,9 @@ static void chassis_init_task() {
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
-    lqr_ctrl();
-    vmc_ctrl();
-    chassis_vx_kalman_run();
+//    lqr_ctrl();
+//    vmc_ctrl();
+//    chassis_vx_kalman_run();
 
 }
 
@@ -339,8 +342,8 @@ extern void chassis_task(void const *pvParameters) {
 
     while (1) {
 
-        // ???
-        vTaskSuspendAll();
+//        // ???
+//        vTaskSuspendAll();
 
         get_IMU_info();
 
@@ -370,8 +373,8 @@ extern void chassis_task(void const *pvParameters) {
             default:break;
         }
 
-        // ???
-        xTaskResumeAll();
+//        // ???
+//        xTaskResumeAll();
 
         chassis_motor_cmd_send();
 
