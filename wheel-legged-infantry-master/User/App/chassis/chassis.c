@@ -308,18 +308,7 @@ static void chassis_disable_task() {
 static void chassis_init_task() {
 
     joint_enable();
-
-//    if (!chassis.is_joint_enable) {
-//        set_dm8009_enable(CAN_2, JOINT_LF_SEND);
-//        set_dm8009_enable(CAN_2, JOINT_LB_SEND);
-//        HAL_Delay(2);
-//        set_dm8009_enable(CAN_2, JOINT_RF_SEND);
-//        set_dm8009_enable(CAN_2, JOINT_RB_SEND);
-//        HAL_Delay(2);
-//
-//        chassis.is_joint_enable = true;
-//        return;
-//    }
+    wheel_enable();
 
     chassis.init_flag = true;
 }

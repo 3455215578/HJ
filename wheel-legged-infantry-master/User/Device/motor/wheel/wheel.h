@@ -6,6 +6,8 @@
 
 void wheel_init();
 
+void wheel_enable();
+
 void wheel_stop();
 
 void set_wheel_torque(float torque_nm_L, float torque_nm_R);

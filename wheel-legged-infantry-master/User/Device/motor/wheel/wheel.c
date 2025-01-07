@@ -9,6 +9,13 @@ void wheel_init()
     lk9025_init(&wheel[1], WHEEL_R_RECEIVE);
 }
 
+void wheel_enable()
+{
+    lk9025_set_enable(CAN_1, WHEEL_L_SEND);
+    lk9025_set_enable(CAN_1, WHEEL_R_SEND);
+}
+
+
 void wheel_stop()
 {
     lk9025_stop(CAN_1,WHEEL_L_SEND);
