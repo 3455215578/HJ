@@ -11,6 +11,7 @@
 #include "Atti.h"
 #include "user_lib.h"
 #include "moving_filter.h"
+#include "vx_kalman_filter.h"
 
 #include "joint.h"
 #include "wheel.h"
@@ -24,6 +25,8 @@ extern CAN_HandleTypeDef hcan2;
 //int jump_finish = 0;
 
 extern Chassis chassis;
+
+extern KalmanFilter_t vaEstimateKF;
 
 /*******************************************************************************
  *                                    Remote                                   *
@@ -42,7 +45,7 @@ static void chassis_device_offline_handle() {
 static void set_chassis_ctrl_info() {
     chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_X_CHANNEL]) * RC_TO_VX;
 
-    chassis.chassis_ctrl_info.x = (float) chassis.chassis_ctrl_info.x + chassis.chassis_ctrl_info.v_m_per_s * (CHASSIS_PERIOD * 0.001f);
+    chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_Z_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
@@ -223,7 +226,7 @@ void chassis_init() {
     vTaskSuspendAll();
 
     /** 轮毂-速度融合加速度 卡尔曼滤波器 初始化 **/
-    chassis_kalman_init(&chassis.vx_kalman);
+    xvEstimateKF_Init(&vaEstimateKF);//初始化卡尔曼滤波器的结构体，并把该开头定义的矩阵复制到结构体中的矩阵
 
     xTaskResumeAll();
 }
@@ -239,12 +242,12 @@ static void chassis_motor_cmd_send() {
 
 #else
 
-//    set_joint_torque(-chassis.leg_L.joint_F_torque,
-//                   -chassis.leg_L.joint_B_torque,
-//                   chassis.leg_R.joint_F_torque,
-//                   chassis.leg_R.joint_B_torque);
+    set_joint_torque(-chassis.leg_L.joint_F_torque,
+                     -chassis.leg_L.joint_B_torque,
+                     chassis.leg_R.joint_F_torque,
+                     chassis.leg_R.joint_B_torque);
 
-  set_joint_torque(0, 0, 0, 0);
+//  set_joint_torque(0, 0, 0, 0);
 
 //  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
 
@@ -280,9 +283,7 @@ static void chassis_disable_task() {
 
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
-
-    chassis.leg_L.state_variable_set_point.x = chassis.leg_L.state_variable_feedback.x;
-    chassis.leg_R.state_variable_set_point.x = chassis.leg_R.state_variable_feedback.x;
+    chassis.chassis_ctrl_info.x = chassis.leg_L.state_variable_feedback.x;
 
     chassis.chassis_ctrl_info.height_m = MIN_L0;
 
@@ -310,15 +311,18 @@ static void chassis_init_task() {
     joint_enable();
     wheel_enable();
 
+    chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
+    chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
+
     chassis.init_flag = true;
 }
 
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
-//    lqr_ctrl();
-//    vmc_ctrl();
-//    chassis_vx_kalman_run();
+    lqr_ctrl();
+    vmc_ctrl();
+    chassis_vx_kalman_run();
 
 }
 

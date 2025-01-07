@@ -5,12 +5,13 @@
 #include "lqr.h"
 #include "user_lib.h"
 #include "moving_filter.h"
+#include "vx_kalman_filter.h"
 
 #include "robot_def.h"
 
 extern Chassis chassis;
 
-MovingAverageFilter theta_ddot_filter_L, theta_ddot_filter_R;
+extern float vel_acc[2]; // 轮毂速度与加速度融合后的结果
 
 // 初始化K矩阵
 float wheel_K_L[6] = {0, 0, 0, 0, 0, 0};
@@ -21,23 +22,23 @@ float joint_K_R[6] = {0, 0, 0, 0, 0, 0};
 
 // K拟合系数矩阵
 float wheel_fitting_factor[6][4] = {
-        {-169.170549,181.637228,-91.948396,-2.498374},
-        {-7.557340,5.260738,-9.380363,-0.558334},
+        {-261.881748,314.647122,-224.367623,-3.838640},
+        {8.781955,-14.378039,-24.519131,0.096940},
 
-        {-18.355650,16.790592,-5.070429,-1.069684},
-        {-42.985695,39.104083,-12.281315,-3.021568},
+        {-212.905370,208.257960,-70.211142,-11.349362},
+        {-115.745120,118.875080,-51.048440,-9.743308},
 
-        {-1403.429691,1442.595783,-520.748777,71.339311},
-        {-30.798225,33.957859,-13.768371,2.656491}
+        {-739.852914,827.077579,-349.075631,70.059079},
+        {-24.616138,30.338548,-14.567432,4.442467}
 };float joint_fitting_factor[6][4] = {
-        {-127.117385,156.908432,-69.802780,13.324063},
-        {-36.697649,40.576464,-16.416814,2.664070},
+        {97.668580,-50.167553,-18.140797,30.141503},
+        {29.083838,-28.076142,9.687541,2.655319},
 
-        {-64.889867,66.531312,-23.874580,3.180600},
-        {-181.758676,185.222796,-65.980631,8.717958},
+        {-489.488896,546.682447,-229.195184,43.438212},
+        {-427.354592,460.453251,-185.123165,34.706456},
 
-        {1710.944945,-1570.814551,477.446559,86.946618},
-        {42.493041,-40.524228,13.250061,2.107847}
+        {1857.062005,-1818.684277,616.386308,67.498783},
+        {99.630806,-102.151410,37.494009,0.328902}
 };
 
 
@@ -98,12 +99,13 @@ static void state_variable_update(Leg* leg_L, Leg* leg_R, float phi, float phi_d
   leg_R->state_variable_feedback.theta_ddot = get_moving_average_filtered_value(&leg_R->theta_ddot_filter);
 
   //4.x_dot
-  leg_L->state_variable_feedback.x_dot = leg_L->kalman_result[0];
-  leg_R->state_variable_feedback.x_dot = leg_R->kalman_result[0];
+  leg_L->state_variable_feedback.x_dot = vel_acc[0];
+  leg_R->state_variable_feedback.x_dot = vel_acc[0];
 
   //3.x
-  leg_L->state_variable_feedback.x = leg_L-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_L->state_variable_feedback.x_dot;
-  leg_R->state_variable_feedback.x = leg_R-> state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_R->state_variable_feedback.x_dot;
+  leg_L->state_variable_feedback.x = leg_L->state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_L->state_variable_feedback.x_dot;
+  leg_R->state_variable_feedback.x = leg_R->state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_R->state_variable_feedback.x_dot;
+
 
   // x_ddot
   leg_L->state_variable_feedback.x_dot_last = leg_L->state_variable_feedback.x_dot;

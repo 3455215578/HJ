@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 #include "pid.h"
-#include "vx_kalman_filter.h"
 #include "moving_filter.h"
 
 typedef float fp32; // 表明某个float类型变量是32位浮点数
@@ -21,11 +20,11 @@ typedef double fp64;
 
 /** PID参数 **/
 /** 转向PID **/
-#define CHASSIS_TURN_PID_P 0.0f
+#define CHASSIS_TURN_PID_P 20.0f
 #define CHASSIS_TURN_PID_I 0.0f
-#define CHASSIS_TURN_PID_D 0.0f
+#define CHASSIS_TURN_PID_D 3.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_TURN_PID_OUT_LIMIT 0.0f
+#define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 0.0f
@@ -35,11 +34,11 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 0.0f
 
 /** 防劈叉PID **/
-#define CHASSIS_LEG_COORDINATION_PID_P 0.0f
+#define CHASSIS_LEG_COORDINATION_PID_P 100.0f
 #define CHASSIS_LEG_COORDINATION_PID_I 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_D 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 0.0f
+#define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 100.0f
 
 /** Roll PID **/
 #define CHASSIS_ROLL_PID_P 0.0f
@@ -326,11 +325,12 @@ typedef struct{
     /** 腿部VMC **/
     VMC vmc;
 
+    /** 轮毂速度与加速度融合的结果 **/
+    float kalman_result;
+
     /** 腿部PID **/
     Pid leg_pos_pid; // 腿长位置环pid
     Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
-
-    float* kalman_result; // 轮毂速度与加速度融合后的结果
 
     float wheel_torque; // 轮毂力矩
     float joint_F_torque; // 关节力矩
@@ -359,10 +359,6 @@ typedef struct{
 
     /** 跳跃 **/
     JumpState jump_state;
-
-    /** 卡尔曼滤波 **/
-    KalmanFilter vx_kalman;
-    float kalman_measure[2]; // 速度融合加速度的两个测量量：v和a
 
     /** PID **/
     Pid chassis_turn_pid;             // 转向pid
@@ -393,68 +389,68 @@ typedef struct{
  *******************************************************************************/
 
 
-//云台电机的反馈量
-typedef struct
-{
-    uint16_t ecd; // 编码器值
-    int16_t last_ecd;
-    int16_t speed_rpm; // 反馈回来的转速
-    int16_t feedback_current; // 施加在电机上的电流
-    uint8_t temperate; // 温度
-
-    int32_t round_cnt;   //电机旋转的总圈数
-    int32_t total_ecd;   //电机旋转的总编码器值
-
-    uint16_t offset_ecd;//电机的校准编码值
-} motor_measure_t;
-
-typedef struct
-{
-    const motor_measure_t *motor_measure;
-
-    fp32 speed;
-
-    fp32 rpm_set;
-
-    pid_t speed_p;
-
-    int16_t give_current;
-
-
-}motor_3508_t;
-
-typedef struct
-{
-    motor_measure_t *motor_measure;
-
-    pid_t angle_pos_pid; // 云台角度位置环pid
-    pid_t angle_speed_pid; // 云台角度速度环pid
-
-    fp32 relative_angle_get;
-    fp32 relative_angle_set; //°
-
-    fp32 absolute_angle_get;
-    fp32 absolute_angle_set;//rad
-
-    fp32 gyro_set;  //转速设置
-    int16_t give_current; //最终电流值
-
-}motor_6020_t;
-
-
-typedef struct
-{
-    motor_measure_t *motor_measure;
-
-    pid_t angle_p;//角度环pid
-
-    pid_t speed_p;//速度环pid
-
-    fp32 speed;//转速期望值
-
-    int16_t give_current;
-
-}motor_2006_t;
+////云台电机的反馈量
+//typedef struct
+//{
+//    uint16_t ecd; // 编码器值
+//    int16_t last_ecd;
+//    int16_t speed_rpm; // 反馈回来的转速
+//    int16_t feedback_current; // 施加在电机上的电流
+//    uint8_t temperate; // 温度
+//
+//    int32_t round_cnt;   //电机旋转的总圈数
+//    int32_t total_ecd;   //电机旋转的总编码器值
+//
+//    uint16_t offset_ecd;//电机的校准编码值
+//} motor_measure_t;
+//
+//typedef struct
+//{
+//    const motor_measure_t *motor_measure;
+//
+//    fp32 speed;
+//
+//    fp32 rpm_set;
+//
+//    pid_t speed_p;
+//
+//    int16_t give_current;
+//
+//
+//}motor_3508_t;
+//
+//typedef struct
+//{
+//    motor_measure_t *motor_measure;
+//
+//    pid_t angle_pos_pid; // 云台角度位置环pid
+//    pid_t angle_speed_pid; // 云台角度速度环pid
+//
+//    fp32 relative_angle_get;
+//    fp32 relative_angle_set; //°
+//
+//    fp32 absolute_angle_get;
+//    fp32 absolute_angle_set;//rad
+//
+//    fp32 gyro_set;  //转速设置
+//    int16_t give_current; //最终电流值
+//
+//}motor_6020_t;
+//
+//
+//typedef struct
+//{
+//    motor_measure_t *motor_measure;
+//
+//    pid_t angle_p;//角度环pid
+//
+//    pid_t speed_p;//速度环pid
+//
+//    fp32 speed;//转速期望值
+//
+//    int16_t give_current;
+//
+//}motor_2006_t;
 
 
 

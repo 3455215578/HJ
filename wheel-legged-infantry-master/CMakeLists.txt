@@ -66,7 +66,7 @@ include_directories(
 
         User/Algorithm/AHRS
         User/Algorithm/filter/moving_filter
-        User/Algorithm/filter/vx_kalman_filter
+        User/Algorithm/filter/kalman_filter
         User/Algorithm/lqr
         User/Algorithm/pid
         User/Algorithm/user_lib
