@@ -319,14 +319,8 @@ typedef struct{
     StateVariable state_variable_wheel_out; // 各个状态变量通过lqr计算的关于轮毂的输出
     StateVariable state_variable_joint_out; // 各个状态变量通过lqr计算的关于关节的输出
 
-    /** dd_theta的移动平均滤波器 **/
-    MovingAverageFilter theta_ddot_filter; // theta_ddot用于计算竖直方向支持力Fn
-
     /** 腿部VMC **/
     VMC vmc;
-
-    /** 轮毂速度与加速度融合的结果 **/
-    float kalman_result;
 
     /** 腿部PID **/
     Pid leg_pos_pid; // 腿长位置环pid
@@ -336,8 +330,11 @@ typedef struct{
     float joint_F_torque; // 关节力矩
     float joint_B_torque;
 
+
+    /** 竖直方向支持力 **/
+    MovingAverageFilter theta_ddot_filter; // dd_theta的移动平均滤波器, 用于计算竖直方向支持力Fn
+    MovingAverageFilter Fn_filter; // 竖直方向支持力Fn的移动平均滤波器
     float Fn; // 竖直方向支持力
-    MovingAverageFilter Fn_filter; // 竖直方向支持力的移动平均滤波器
 
 } Leg;
 
@@ -372,7 +369,6 @@ typedef struct{
 
 
     /** flag **/
-    bool is_joint_enable;      // 关节电机使能标志位
     bool init_flag;            // 底盘初始化完成标志位
     bool is_chassis_balance;   // 平衡标志位
     bool recover_finish;       // 倒地自起完成标志位

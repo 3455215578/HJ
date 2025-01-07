@@ -66,13 +66,15 @@ void chassis_vx_kalman_run(void)
     static float v_lb,v_rb=0.0f;//通过左右驱动轮算出的机体速度
     static float aver_v=0.0f;//通过取平均计算出机体速度
 
-//    xvEstimateKF_Init(&vaEstimateKF);//初始化卡尔曼滤波器的结构体，并把该开头定义的矩阵复制到结构体中的矩阵
+    // 左边驱动轮转子相对大地角速度，这里定义的是顺时针为正
+    w_l = -get_wheel_motors()->angular_vel + chassis.imu_reference.pitch_gyro + chassis.leg_L.vmc.forward_kinematics.d_alpha;
+    // 轮毂相对于机体(b系)的速度
+    v_lb = w_l * chassis_physical_config.wheel_radius + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_L.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_L.state_variable_feedback.theta) + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_L.state_variable_feedback.theta);
 
-    w_l = -get_wheel_motors()->angular_vel + chassis.imu_reference.pitch_gyro + chassis.leg_L.vmc.forward_kinematics.d_alpha;//左边驱动轮转子相对大地角速度，这里定义的是顺时针为正
-    v_lb = w_l * chassis_physical_config.wheel_radius + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_L.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_L.state_variable_feedback.theta) + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_L.state_variable_feedback.theta);//机体b系的速度
-
-    w_r = -(get_wheel_motors() + 1)->angular_vel - chassis.imu_reference.pitch_gyro + chassis.leg_R.vmc.forward_kinematics.d_alpha;//右边驱动轮转子相对大地角速度，这里定义的是顺时针为正
-    v_rb = w_r * chassis_physical_config.wheel_radius + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_R.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_R.state_variable_feedback.theta) + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_R.state_variable_feedback.theta);//机体b系的速度
+    // 右边驱动轮转子相对大地角速度，这里定义的是顺时针为正
+    w_r = -(get_wheel_motors() + 1)->angular_vel - chassis.imu_reference.pitch_gyro + chassis.leg_R.vmc.forward_kinematics.d_alpha;
+    // 轮毂相对于机体(b系)的速度
+    v_rb = w_r * chassis_physical_config.wheel_radius + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_R.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_R.state_variable_feedback.theta) + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_R.state_variable_feedback.theta);
 
     aver_v = (v_rb - v_lb) / 2.0f;//取平均
 

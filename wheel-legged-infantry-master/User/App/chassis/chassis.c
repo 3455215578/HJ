@@ -202,14 +202,14 @@ static void chassis_pid_init() {
 /************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
 
+    /** 初始化底盘模式 **/
+    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+
     /** 轮毂电机初始化 **/
     wheel_init();
 
     /** 关节电机初始化 **/
     joint_init();
-
-    /** 初始化底盘模式 **/
-    chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
     /** 底盘pid初始化 **/
     chassis_pid_init();
@@ -226,7 +226,7 @@ void chassis_init() {
     vTaskSuspendAll();
 
     /** 轮毂-速度融合加速度 卡尔曼滤波器 初始化 **/
-    xvEstimateKF_Init(&vaEstimateKF);//初始化卡尔曼滤波器的结构体，并把该开头定义的矩阵复制到结构体中的矩阵
+    xvEstimateKF_Init(&vaEstimateKF);
 
     xTaskResumeAll();
 }
@@ -283,14 +283,14 @@ static void chassis_disable_task() {
 
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
-    chassis.chassis_ctrl_info.x = chassis.leg_L.state_variable_feedback.x;
+    chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
+    chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
     chassis.chassis_ctrl_info.height_m = MIN_L0;
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
     /** 初始化标志位 **/
-    chassis.is_joint_enable = false; // 关节电机使能标志位
     chassis.init_flag = false; // 初始化成功标志位
 
     chassis.is_chassis_balance = false; // 平衡标志位
@@ -310,9 +310,6 @@ static void chassis_init_task() {
 
     joint_enable();
     wheel_enable();
-
-    chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
-    chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
     chassis.init_flag = true;
 }
@@ -335,9 +332,6 @@ extern void chassis_task(void const *pvParameters) {
     TickType_t last_wake_time = xTaskGetTickCount();
 
     while (1) {
-
-//        // ???
-//        vTaskSuspendAll();
 
         get_IMU_info();
 
@@ -366,9 +360,6 @@ extern void chassis_task(void const *pvParameters) {
 
             default:break;
         }
-
-//        // ???
-//        xTaskResumeAll();
 
         chassis_motor_cmd_send();
 
