@@ -50,9 +50,11 @@ function K = get_k_length(leg_length)
     B=subs(B,[R,L,LM,l,mw,mp,M,Iw,Ip,IM,g],[R1,L1,LM1,l1,mw1,mp1,M1,Iw1,Ip1,IM1,9.8]);
     B=double(B);
     
-   Q = diag([100 1 500 100 5000 1]);%theta d_theta x d_x phi d_phi
+%    Q = diag([10 1 500 100 5000 1]);%theta d_theta x d_x phi d_phi
+
+    Q = diag([1 1 70 10 5000 10]);%theta d_theta x d_x phi d_phi
   
-     R = [1.25 0;0 0.25]; %T Tp
+    R = [1.25 0;0 0.25]; %T Tp
     
     K = lqr(A,B,Q,R); % lqr函数返回一个 p x n 的矩阵
   

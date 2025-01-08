@@ -28,6 +28,8 @@ extern Chassis chassis;
 
 extern KalmanFilter_t vaEstimateKF;
 
+float remote_test;
+
 /*******************************************************************************
  *                                    Remote                                   *
  *******************************************************************************/
@@ -41,13 +43,16 @@ static void chassis_device_offline_handle() {
     }
 }
 
+
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
-    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_X_CHANNEL]) * RC_TO_VX;
-
+    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
     chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
 
-    chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_Z_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+    chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+
+    remote_test = remote_test + (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * 0.000001f;
+    VAL_LIMIT(remote_test, MIN_L0, MAX_L0);
 
 }
 
@@ -202,6 +207,8 @@ static void chassis_pid_init() {
 /************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
 
+    remote_test = MIN_L0;
+
     /** 初始化底盘模式 **/
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
@@ -249,9 +256,9 @@ static void chassis_motor_cmd_send() {
 
 //  set_joint_torque(0, 0, 0, 0);
 
-//  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
 
-  set_wheel_torque(0, 0);
+//  set_wheel_torque(0, 0);
 
 #endif
 }
