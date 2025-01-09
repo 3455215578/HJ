@@ -304,7 +304,7 @@ static void chassis_disable_task() {
 
 //    chassis.chassis_ctrl_info.height_m = MIN_L0;
 
-    chassis.chassis_ctrl_info.height_m = 0.16f;
+    chassis.chassis_ctrl_info.height_m = 0.18f;
 
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
