@@ -50,8 +50,16 @@ function K = get_k_length(leg_length)
     B=subs(B,[R,L,LM,l,mw,mp,M,Iw,Ip,IM,g],[R1,L1,LM1,l1,mw1,mp1,M1,Iw1,Ip1,IM1,9.8]);
     B=double(B);
     
-    Q = diag([1 1 70 10 5000 10]);
-  
+    % 板凳
+%     Q = diag([1 1 70 10 5000 10]);
+    
+    % 轮腿
+    %  Q = diag([100 10 70 10 5000 10]);
+    %  Q = diag([50 10 70 10 5000 10]);
+    %  Q = diag([100 1 70 10 5000 10]);
+    %  Q = diag([100 1 10 5 48000 1]); % 未调x x_dot 的一套不错的参数
+       Q = diag([100 3 20 5 48000 1]);
+
     R = [1.25 0;0 0.25]; %T Tp
     
     K = lqr(A,B,Q,R); % lqr函数返回一个 p x n 的矩阵

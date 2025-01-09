@@ -18,6 +18,21 @@ typedef double fp64;
 
 #define CHASSIS_PERIOD 2 // ms ¿ØÖÆÆµÂÊ: 500Hz
 
+/** Ò£¿ØÆ÷Â·¾¶ **/
+#define CHASSIS_SPEED_CHANNEL 1
+#define CHASSIS_YAW_CHANNEL 2
+#define TEST_CHASSIS_ROLL_CHANNEL 2
+#define TEST_CHASSIS_LEG_CHANNEL 3
+#define CHASSIS_PIT_CHANNEL 3
+#define CHASSIS_ROLL_CHANNEL 0
+
+/** Ò£¿ØÆ÷ÖµÓ³Éä **/
+#define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
+#define MAX_CHASSIS_YAW_INCREMENT 0.02f
+#define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
+#define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
+#define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
+
 /** PID²ÎÊý **/
 /** ×ªÏòPID **/
 #define CHASSIS_TURN_PID_P 20.0f
@@ -27,9 +42,9 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** ÍÈ³¤Î»ÖÃ»·PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 500.0f // 500
+#define CHASSIS_LEG_L0_POS_PID_P 380.0f // 500  420
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 600.0f // 1400
+#define CHASSIS_LEG_L0_POS_PID_D 1000.0f // 1400 500
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2000.0f
 
@@ -41,9 +56,9 @@ typedef double fp64;
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 100.0f
+#define CHASSIS_ROLL_PID_P 150.0f
 #define CHASSIS_ROLL_PID_I 0.0f
-#define CHASSIS_ROLL_PID_D 130.0f
+#define CHASSIS_ROLL_PID_D 230.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_ROLL_PID_OUT_LIMIT 1000.0f
 
@@ -71,19 +86,7 @@ typedef double fp64;
 #define MAX_L0 0.40f
 #define MID_L0 0.24f
 
-/** Ò£¿ØÆ÷Â·¾¶ **/
-#define CHASSIS_SPEED_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 0
-#define TEST_CHASSIS_ROLL_CHANNEL 2
-#define CHASSIS_PIT_CHANNEL 3
-#define CHASSIS_ROLL_CHANNEL 0
 
-/** Ò£¿ØÆ÷ÖµÓ³Éä **/
-#define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
-#define MAX_CHASSIS_YAW_INCREMENT 0.02f
-#define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
-#define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
-#define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
 
 
 /*******************************************************************************
