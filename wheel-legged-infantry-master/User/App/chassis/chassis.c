@@ -28,7 +28,6 @@ extern Chassis chassis;
 
 extern KalmanFilter_t vaEstimateKF;
 
-float remote_test;
 
 /*******************************************************************************
  *                                    Remote                                   *
@@ -51,8 +50,8 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-    remote_test = remote_test + (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * 0.000001f;
-    VAL_LIMIT(remote_test, MIN_L0, MAX_L0);
+//    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
+//    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
 }
 
@@ -73,6 +72,7 @@ static void set_chassis_mode() {
 /** 底盘通过板间通信接收云台的信息 **/
 static void set_chassis_ctrl_info_from_gimbal_msg() {
     chassis.chassis_ctrl_info.v_m_per_s = get_gimbal_msg()->chassis_ctrl_info.v_m_per_s;
+    chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
     chassis.chassis_ctrl_info.yaw_angle_rad = get_gimbal_msg()->chassis_ctrl_info.yaw_angle_rad;
     chassis.chassis_ctrl_info.roll_angle_rad = get_gimbal_msg()->chassis_ctrl_info.roll_angle_rad;
     chassis.chassis_ctrl_info.height_m = get_gimbal_msg()->chassis_ctrl_info.height_m;
@@ -207,8 +207,6 @@ static void chassis_pid_init() {
 /************************ 底盘相关参数初始化 **********************/
 void chassis_init() {
 
-    remote_test = MIN_L0;
-
     /** 初始化底盘模式 **/
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
 
@@ -238,6 +236,17 @@ void chassis_init() {
     xTaskResumeAll();
 }
 
+
+void fall_selfhelp(void)
+{
+    if(ABS(chassis.imu_reference.pitch_angle) > 0.0872f)
+    {
+        chassis.leg_L.joint_B_torque = 0.0f;
+        chassis.leg_L.joint_F_torque = 0.0f;
+        chassis.leg_R.joint_B_torque = 0.0f;
+        chassis.leg_R.joint_F_torque = 0.0f;
+    }
+}
 /************************ 向底盘电机发送力矩 **********************/
 static void chassis_motor_cmd_send() {
 
@@ -293,7 +302,10 @@ static void chassis_disable_task() {
     chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
     chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
-    chassis.chassis_ctrl_info.height_m = MIN_L0;
+//    chassis.chassis_ctrl_info.height_m = MIN_L0;
+
+    chassis.chassis_ctrl_info.height_m = 0.16f;
+
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
@@ -328,6 +340,8 @@ static void chassis_enable_task() {
     vmc_ctrl();
     chassis_vx_kalman_run();
 
+//    fall_selfhelp();
+
 }
 
 /*********************** 总任务 ******************************/
@@ -346,11 +360,13 @@ extern void chassis_task(void const *pvParameters) {
         set_chassis_mode();
 
         set_chassis_ctrl_info();
+
+        chassis_device_offline_handle();
 #else
         set_chassis_mode_from_gimbal_msg();
         set_chassis_ctrl_info_from_gimbal_msg();
 #endif
-        chassis_device_offline_handle();
+//        chassis_device_offline_handle();
 
         switch (chassis.chassis_ctrl_mode) {
             case CHASSIS_INIT:

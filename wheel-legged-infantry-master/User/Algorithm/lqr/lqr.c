@@ -22,23 +22,23 @@ float joint_K_R[6] = {0, 0, 0, 0, 0, 0};
 
 // K拟合系数矩阵
 float wheel_fitting_factor[6][4] = {
-        {-252.865301,273.608315,-139.669038,-3.952166},
-        {-4.024064,1.687319,-12.174304,-0.383981},
+        {-249.086510,270.177299,-116.702579,-2.411292},
+        {-7.691924,8.340473,-8.012965,-0.346925},
 
-        {-72.385158,66.352505,-20.184391,-5.405139},
-        {-44.652912,41.189984,-15.293056,-4.946078},
+        {-11.258136,10.600664,-3.342542,-0.533792},
+        {-21.085062,19.840095,-6.455910,-1.188925},
 
-        {-1240.852426,1252.671336,-448.332353,64.182961},
-        {-66.649838,69.709097,-26.535500,4.686597}
+        {-667.632339,726.822616,-287.136864,45.839083},
+        {-29.067231,33.867452,-14.895650,3.028022}
 };float joint_fitting_factor[6][4] = {
-        {-155.437692,179.807571,-77.326741,17.521502},
-        {-31.314637,33.321439,-13.317658,2.488411},
+        {15.825437,27.691505,-33.484621,12.916646},
+        {-23.859491,27.671226,-12.109134,2.251502},
 
-        {-316.503972,317.874501,-112.490720,15.343414},
-        {-287.161933,285.669595,-99.855768,13.447826},
+        {-32.041601,34.654385,-13.503680,2.057876},
+        {-71.981809,76.862853,-29.496898,4.419616},
 
-        {1579.017125,-1454.966741,446.944591,98.010911},
-        {106.189728,-100.270653,32.214034,4.685377}
+        {1278.343430,-1209.662796,384.994573,50.701281},
+        {59.417907,-58.523980,19.965917,2.359251}
 };
 
 
@@ -170,30 +170,30 @@ static void state_variable_error(Leg *leg_L, Leg *leg_R) {
 
 static void state_variable_out(Leg* leg_L, Leg* leg_R) {
 
-  leg_L->state_variable_wheel_out.theta = leg_L->state_variable_error.theta * wheel_K_L[0]; // 极性正确
-  leg_L->state_variable_wheel_out.theta_dot = leg_L->state_variable_error.theta_dot * wheel_K_L[1]; // 极性正确
+//  leg_L->state_variable_wheel_out.theta = leg_L->state_variable_error.theta * wheel_K_L[0]; // 极性正确
+//  leg_L->state_variable_wheel_out.theta_dot = leg_L->state_variable_error.theta_dot * wheel_K_L[1]; // 极性正确
   leg_L->state_variable_wheel_out.x = leg_L->state_variable_error.x * wheel_K_L[2];
   leg_L->state_variable_wheel_out.x_dot = leg_L->state_variable_error.x_dot * wheel_K_L[3];
   leg_L->state_variable_wheel_out.phi = leg_L->state_variable_error.phi * wheel_K_L[4]; // 极性正确
   leg_L->state_variable_wheel_out.phi_dot = leg_L->state_variable_error.phi_dot * wheel_K_L[5]; // 极性正确
 
-  leg_R->state_variable_wheel_out.theta = leg_R->state_variable_error.theta * wheel_K_R[0]; // 极性正确
-  leg_R->state_variable_wheel_out.theta_dot = leg_R->state_variable_error.theta_dot * wheel_K_R[1]; // 极性正确
+//  leg_R->state_variable_wheel_out.theta = leg_R->state_variable_error.theta * wheel_K_R[0]; // 极性正确
+//  leg_R->state_variable_wheel_out.theta_dot = leg_R->state_variable_error.theta_dot * wheel_K_R[1]; // 极性正确
   leg_R->state_variable_wheel_out.x = leg_R->state_variable_error.x * wheel_K_R[2];
   leg_R->state_variable_wheel_out.x_dot = leg_R->state_variable_error.x_dot * wheel_K_R[3];
   leg_R->state_variable_wheel_out.phi = leg_R->state_variable_error.phi * wheel_K_R[4]; // 极性正确
   leg_R->state_variable_wheel_out.phi_dot = leg_R->state_variable_error.phi_dot * wheel_K_R[5]; // 极性正确
 
   // -?  待测
-  leg_L->state_variable_joint_out.theta = leg_L->state_variable_error.theta * joint_K_L[0]; // 极性正确
-  leg_L->state_variable_joint_out.theta_dot = leg_L->state_variable_error.theta_dot * joint_K_L[1];
+//  leg_L->state_variable_joint_out.theta = leg_L->state_variable_error.theta * joint_K_L[0];
+//  leg_L->state_variable_joint_out.theta_dot = leg_L->state_variable_error.theta_dot * joint_K_L[1];
   leg_L->state_variable_joint_out.x = leg_L->state_variable_error.x * joint_K_L[2];
   leg_L->state_variable_joint_out.x_dot = leg_L->state_variable_error.x_dot * joint_K_L[3];
   leg_L->state_variable_joint_out.phi = leg_L->state_variable_error.phi * joint_K_L[4];
   leg_L->state_variable_joint_out.phi_dot = leg_L->state_variable_error.phi_dot * joint_K_L[5];
 
-  leg_R->state_variable_joint_out.theta = leg_R->state_variable_error.theta * joint_K_R[0];
-  leg_R->state_variable_joint_out.theta_dot = leg_R->state_variable_error.theta_dot * joint_K_R[1];
+//  leg_R->state_variable_joint_out.theta = leg_R->state_variable_error.theta * joint_K_R[0];
+//  leg_R->state_variable_joint_out.theta_dot = leg_R->state_variable_error.theta_dot * joint_K_R[1];
   leg_R->state_variable_joint_out.x = leg_R->state_variable_error.x * joint_K_R[2];
   leg_R->state_variable_joint_out.x_dot = leg_R->state_variable_error.x_dot * joint_K_R[3];
   leg_R->state_variable_joint_out.phi = leg_R->state_variable_error.phi * joint_K_R[4];

@@ -11,6 +11,7 @@ extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
 
 
+
 /*
  *              生而无畏
  *    phi4                      phi4
@@ -171,20 +172,10 @@ static void wheel_motors_torque_set(Chassis *chassis) {
   }
 
   if (chassis->chassis_ctrl_mode != CHASSIS_SPIN) {
+      // 计算转向力矩
+      chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_total_angle - chassis->chassis_ctrl_info.yaw_angle_rad)
+                                    + CHASSIS_TURN_PID_D * chassis->imu_reference.yaw_gyro;
 
-#if CHASSIS_REMOTE
-
-// 计算转向力矩
-chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_total_angle - chassis->chassis_ctrl_info.yaw_angle_rad)
-                            + CHASSIS_TURN_PID_D * chassis->imu_reference.yaw_gyro;
-
-#else
-    float turn_speed = pid_calc(&chassis->chassis_vw_speed_pid, chassis->chassis_ctrl_info.yaw_angle_rad, 0);
-
-    chassis->wheel_turn_torque = pid_calc(&chassis->chassis_spin_pid,
-                                           chassis->imu_reference.yaw_gyro,
-                                           turn_speed);
-#endif
   }else {
 //    chassis->wheel_turn_torque = pid_calc(&chassis->chassis_spin_pid,
 //                                          chassis->imu_reference.yaw_gyro,
@@ -197,16 +188,16 @@ chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_t
   if (chassis->is_chassis_offground == true) {
 
     }else{
-      chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.theta;//
-      chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.theta_dot;// √
+//      chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.theta;//
+//      chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.theta_dot;// √
       chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.x;
       chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.x_dot;
       chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.phi;//
       chassis->leg_L.wheel_torque += chassis->leg_L.state_variable_wheel_out.phi_dot;
       chassis->leg_L.wheel_torque += chassis->wheel_turn_torque;
 
-      chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.theta;
-      chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.theta_dot; // √
+//      chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.theta;
+//      chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.theta_dot; // √
       chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.x;
       chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.x_dot;
       chassis->leg_R.wheel_torque += chassis->leg_R.state_variable_wheel_out.phi;
@@ -293,13 +284,17 @@ if (chassis->is_chassis_offground == true) {
 }
 else{
 
-    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
-                                                                       + chassis->leg_L.leg_pos_pid.out
-                                                                       + chassis->chassis_roll_pid.out;
+    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 8.0f * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta);
 
-    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
-                                                                       + chassis->leg_R.leg_pos_pid.out
-                                                                       - chassis->chassis_roll_pid.out;
+    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 8.0f * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta);
+
+//    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.5f * chassis_physical_config->body_weight * GRAVITY
+//                                                                       + chassis->leg_L.leg_pos_pid.out
+//                                                                       + chassis->chassis_roll_pid.out;
+//
+//    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.5f * chassis_physical_config->body_weight * GRAVITY
+//                                                                       + chassis->leg_R.leg_pos_pid.out
+//                                                                       - chassis->chassis_roll_pid.out;
 }
 /***********************************************************************/
 

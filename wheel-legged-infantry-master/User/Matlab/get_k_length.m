@@ -52,7 +52,7 @@ function K = get_k_length(leg_length)
     
 %    Q = diag([10 1 500 100 5000 1]);%theta d_theta x d_x phi d_phi
 
-    Q = diag([1 1 70 10 5000 10]);%theta d_theta x d_x phi d_phi
+    Q = diag([1 1 70 10 5000 1]);%theta d_theta x d_x phi d_phi
   
     R = [1.25 0;0 0.25]; %T Tp
     
