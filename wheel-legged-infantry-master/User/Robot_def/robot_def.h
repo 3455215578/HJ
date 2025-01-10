@@ -42,7 +42,7 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** Õ»≥§Œª÷√ª∑PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 220.0f
+#define CHASSIS_LEG_L0_POS_PID_P 120.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
 #define CHASSIS_LEG_L0_POS_PID_D 1500.0f
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
