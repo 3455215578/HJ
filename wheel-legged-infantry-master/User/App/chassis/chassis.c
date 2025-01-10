@@ -49,8 +49,8 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-//    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
-//    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
+    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
+    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
 //    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
 
@@ -68,15 +68,15 @@ static void set_chassis_mode() {
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
-        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.13f;
-        }
-        else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.24f;
-        }
-        else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.35f;
-        }
+//        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
+//            chassis.chassis_ctrl_info.height_m = 0.13f;
+//        }
+//        else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
+//            chassis.chassis_ctrl_info.height_m = 0.24f;
+//        }
+//        else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
+//            chassis.chassis_ctrl_info.height_m = 0.35f;
+//        }
     }
 }
 
