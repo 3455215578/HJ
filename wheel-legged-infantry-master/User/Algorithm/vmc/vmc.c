@@ -287,7 +287,7 @@ static void joint_motors_torque_set(Chassis *chassis,
         chassis->left_forward = 0.8345f;
         chassis->right_forward = 0.75f;
 
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.905f * chassis_physical_config->body_weight * GRAVITY // 0.8345f
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.89f * chassis_physical_config->body_weight * GRAVITY // 0.8345f
                                                                              + chassis->leg_L.leg_pos_pid.out
                                                                              + chassis->chassis_roll_pid.out;
 
