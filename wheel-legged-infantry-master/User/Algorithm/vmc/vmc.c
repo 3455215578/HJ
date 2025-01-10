@@ -290,7 +290,7 @@ static void joint_motors_torque_set(Chassis *chassis,
                 + chassis->chassis_roll_pid.out;
 
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =
-                88.0f
+                90.0f
                 + chassis->leg_R.leg_pos_pid.out
                 - chassis->chassis_roll_pid.out;
 /***********************************************************************/
