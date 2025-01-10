@@ -1,12 +1,11 @@
 #ifndef GIMBAL_H
 #define GIMBAL_H
 
-#include <stdint-gcc.h>
-#include "chassis.h"
+#include "robot_def.h"
 
 typedef struct{
-    ChassisCtrlMode chassis_ctrl_mode;
-    ChassisCtrlInfo chassis_ctrl_info;
+  ChassisCtrlMode chassis_ctrl_mode;
+  ChassisCtrlInfo chassis_ctrl_info;
 } GimbalMsg;
 
 void gimbal_msg_unpack(uint32_t id, uint8_t data[]);

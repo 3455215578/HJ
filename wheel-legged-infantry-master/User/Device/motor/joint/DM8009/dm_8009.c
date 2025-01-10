@@ -1,9 +1,10 @@
-#include "dm_8009.h"
+#include <stm32f4xx_hal.h>
+#include <stm32f4xx_hal_can.h>
+
 #include "can_device.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_can.h"
+
+#include "dm_8009.h"
+
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;

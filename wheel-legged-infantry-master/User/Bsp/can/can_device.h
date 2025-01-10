@@ -25,9 +25,11 @@ typedef enum{
 } GimbalSendID;
 
 typedef enum{
+  /** 轮毂反馈报文的ID **/
   WHEEL_L_RECEIVE = 0x141,
   WHEEL_R_RECEIVE = 0x142,
 
+  /** 关节反馈报文的ID **/
   JOINT_LF_RECEIVE = 0x00,
   JOINT_LB_RECEIVE = 0x01,
   JOINT_RF_RECEIVE = 0x02,
