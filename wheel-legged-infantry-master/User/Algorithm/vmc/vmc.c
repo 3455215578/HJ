@@ -40,7 +40,7 @@ static void vmc_phi_update(Leg *leg_L, Leg *leg_R) {
 }
 
 // vmc正运动学解算
-static void forward_kinematics(Leg *leg_L, Leg *leg_R, ChassisPhysicalConfig *physical_config) {
+static void forward_kinematics(Leg* leg_L, Leg* leg_R, ChassisPhysicalConfig *physical_config) {
     /***LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L LEG_L***/
 
     leg_L->vmc.forward_kinematics.fk_point_coordinates.b_x = physical_config->l1 * cosf(leg_L->vmc.forward_kinematics.fk_phi.phi1);
@@ -172,19 +172,10 @@ static void wheel_motors_torque_set(Chassis *chassis) {
 
     if (chassis->chassis_ctrl_mode != CHASSIS_SPIN) {
 
-#if CHASSIS_REMOTE
-
-// 计算转向力矩
+        // 计算转向力矩
         chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_total_angle - chassis->chassis_ctrl_info.yaw_angle_rad)
                                       + CHASSIS_TURN_PID_D * chassis->imu_reference.yaw_gyro;
 
-#else
-        float turn_speed = pid_calc(&chassis->chassis_vw_speed_pid, chassis->chassis_ctrl_info.yaw_angle_rad, 0);
-
-    chassis->wheel_turn_torque = pid_calc(&chassis->chassis_spin_pid,
-                                           chassis->imu_reference.yaw_gyro,
-                                           turn_speed);
-#endif
     }else {
 //    chassis->wheel_turn_torque = pid_calc(&chassis->chassis_spin_pid,
 //                                          chassis->imu_reference.yaw_gyro,
@@ -273,11 +264,11 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 // Leg pid
     pid_calc(&chassis->leg_L.leg_pos_pid,
-             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
+             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_L.state_variable_feedback.theta),
              chassis->chassis_ctrl_info.height_m);
 
     pid_calc(&chassis->leg_R.leg_pos_pid,
-             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
+             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_R.state_variable_feedback.theta),
              chassis->chassis_ctrl_info.height_m);
 
 
@@ -293,11 +284,14 @@ static void joint_motors_torque_set(Chassis *chassis,
     }
     else{
 
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.70f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
+        chassis->left_forward = 0.8345f;
+        chassis->right_forward = 0.75f;
+
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.905f * chassis_physical_config->body_weight * GRAVITY // 0.8345f
                                                                              + chassis->leg_L.leg_pos_pid.out
                                                                              + chassis->chassis_roll_pid.out;
 
-        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.70f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.805f * chassis_physical_config->body_weight * GRAVITY // 0.75f
                                                                              + chassis->leg_R.leg_pos_pid.out
                                                                              - chassis->chassis_roll_pid.out;
 

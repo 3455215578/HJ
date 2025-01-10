@@ -49,8 +49,8 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
-    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
+//    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.000005f;
+//    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
 //    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
 
@@ -67,6 +67,16 @@ static void set_chassis_mode() {
     } else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
+
+        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.13f;
+        }
+        else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.24f;
+        }
+        else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.35f;
+        }
     }
 }
 
@@ -74,9 +84,10 @@ static void set_chassis_mode() {
 static void set_chassis_ctrl_info_from_gimbal_msg() {
     chassis.chassis_ctrl_info.v_m_per_s = get_gimbal_msg()->chassis_ctrl_info.v_m_per_s;
     chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
-    chassis.chassis_ctrl_info.yaw_angle_rad = get_gimbal_msg()->chassis_ctrl_info.yaw_angle_rad;
-    chassis.chassis_ctrl_info.roll_angle_rad = get_gimbal_msg()->chassis_ctrl_info.roll_angle_rad;
-    chassis.chassis_ctrl_info.height_m = get_gimbal_msg()->chassis_ctrl_info.height_m;
+//    chassis.chassis_ctrl_info.yaw_angle_rad = get_gimbal_msg()->chassis_ctrl_info.yaw_angle_rad;
+//    chassis.chassis_ctrl_info.roll_angle_rad = get_gimbal_msg()->chassis_ctrl_info.roll_angle_rad;
+//    chassis.chassis_ctrl_info.height_m = get_gimbal_msg()->chassis_ctrl_info.height_m;
+//    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 }
 
 /** 底盘根据云台信息设置模式 **/
@@ -278,11 +289,6 @@ static void chassis_motor_cmd_send() {
 #endif
 }
 
-/*************************** 返回底盘结构体指针 *****************************/
-Chassis *get_chassis() {
-  return &chassis;
-}
-
 /*********************************************************************************/
 
 
@@ -308,7 +314,7 @@ static void chassis_disable_task() {
     chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
     chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
-    chassis.chassis_ctrl_info.height_m = MIN_L0;
+    chassis.chassis_ctrl_info.height_m = 0.16f;
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
@@ -376,6 +382,11 @@ extern void chassis_task(void const *pvParameters) {
         }
 
         switch (chassis.chassis_ctrl_mode) {
+
+            case CHASSIS_DISABLE:
+                chassis_disable_task();
+                break;
+
             case CHASSIS_INIT:
                 chassis_init_task();
                 break;
@@ -384,16 +395,11 @@ extern void chassis_task(void const *pvParameters) {
                 chassis_enable_task();
                 break;
 
-            case CHASSIS_DISABLE:
-                chassis_disable_task();
-                break;
-
             default:break;
         }
 
         chassis_motor_cmd_send();
 
-        // ???
         vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
     }
 }

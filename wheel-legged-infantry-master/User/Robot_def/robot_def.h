@@ -42,9 +42,9 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 380.0f // 500  420
+#define CHASSIS_LEG_L0_POS_PID_P 0.0f // 500  420 550 200(不错，但不够)
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 1000.0f // 1400 500
+#define CHASSIS_LEG_L0_POS_PID_D 0.0f // 1400 500 1050 1050(不错，但不够)
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2000.0f
 
@@ -56,11 +56,11 @@ typedef double fp64;
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 150.0f
+#define CHASSIS_ROLL_PID_P 0.0f
 #define CHASSIS_ROLL_PID_I 0.0f
-#define CHASSIS_ROLL_PID_D 230.0f
+#define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_ROLL_PID_OUT_LIMIT 1000.0f
+#define CHASSIS_ROLL_PID_OUT_LIMIT 2000.0f
 
 /** 离地后的腿长PID **/
 #define CHASSIS_OFFGROUND_LO_PID_P 0.0f
@@ -82,9 +82,9 @@ typedef double fp64;
 #define MAX_JOINT_TORQUE 40.f
 #define MIN_JOINT_TORQUE (-40.f)
 
-#define MIN_L0 0.13f
+#define MIN_L0 0.10f
 #define MAX_L0 0.40f
-#define MID_L0 0.24f
+#define DEFALUT_L0 0.24f
 
 
 
@@ -103,10 +103,18 @@ typedef struct{
 } ChassisPhysicalConfig;
 
 /** 底盘模式结构体 **/
+//typedef enum{
+//    CHASSIS_DISABLE = 1, // 失能模式
+//    CHASSIS_INIT, // 初始化模式
+//    CHASSIS_ENABLE, // 使能模式
+//    CHASSIS_JUMP, // 跳跃模式
+//    CHASSIS_SPIN, // 小陀螺
+//} ChassisCtrlMode;
+
 typedef enum{
     CHASSIS_DISABLE = 1, // 失能模式
-    CHASSIS_INIT, // 初始化模式
     CHASSIS_ENABLE, // 使能模式
+    CHASSIS_INIT, // 初始化模式
     CHASSIS_JUMP, // 跳跃模式
     CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
@@ -379,6 +387,8 @@ typedef struct{
     bool is_chassis_offground; // 离地标志位
     bool jump_flag;            // 跳跃标志位
 
+    float left_forward;
+    float right_forward;
 
 } Chassis;
 

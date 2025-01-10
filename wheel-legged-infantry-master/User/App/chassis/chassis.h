@@ -6,8 +6,6 @@
 
 void chassis_init();
 
-Chassis *get_chassis();
-
 void is_chassis_off_ground();
 
 extern void chassis_task(void const *pvParameters);
