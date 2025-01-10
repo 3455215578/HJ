@@ -234,7 +234,7 @@ static void joint_motors_torque_set(Chassis *chassis,
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta; // √
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta_dot;
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->steer_compensatory_torque;
-    }else {
+    } else {
         //Left
         chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta; // √
         chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta_dot; // √
@@ -281,46 +281,37 @@ static void joint_motors_torque_set(Chassis *chassis,
     if (chassis->is_chassis_offground == true) {
         chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_L.offground_leg_pid.out;
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_R.offground_leg_pid.out;
-    }
-    else{
-
-        chassis->left_forward = 0.8345f;
-        chassis->right_forward = 0.75f;
-
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.89f * chassis_physical_config->body_weight * GRAVITY // 0.8345f
-                                                                             + chassis->leg_L.leg_pos_pid.out
-                                                                             + chassis->chassis_roll_pid.out;
-
-        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.805f * chassis_physical_config->body_weight * GRAVITY // 0.75f
-                                                                             + chassis->leg_R.leg_pos_pid.out
-                                                                             - chassis->chassis_roll_pid.out;
+    } else {
 
 
-//        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
-//                                                                             + chassis->leg_L.leg_pos_pid.out
-//                                                                             + chassis->chassis_roll_pid.out;
-//
-//        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
-//                                                                             + chassis->leg_R.leg_pos_pid.out
-//                                                                             - chassis->chassis_roll_pid.out;
-    }
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =
+                95.0f
+                + chassis->leg_L.leg_pos_pid.out
+                + chassis->chassis_roll_pid.out;
+
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =
+                90.0f
+                + chassis->leg_R.leg_pos_pid.out
+                - chassis->chassis_roll_pid.out;
 /***********************************************************************/
 
 // 计算关节电机力矩
-    forward_dynamics(&chassis->leg_L.vmc, chassis_physical_config);
-    forward_dynamics(&chassis->leg_R.vmc, chassis_physical_config);
+        forward_dynamics(&chassis->leg_L.vmc, chassis_physical_config);
+        forward_dynamics(&chassis->leg_R.vmc, chassis_physical_config);
 
-    chassis->leg_L.joint_F_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
-    chassis->leg_L.joint_B_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
+        chassis->leg_L.joint_F_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
+        chassis->leg_L.joint_B_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
 
-    chassis->leg_R.joint_F_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
-    chassis->leg_R.joint_B_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
+        chassis->leg_R.joint_F_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
+        chassis->leg_R.joint_B_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
 
-    // 输出限幅
-    VAL_LIMIT(chassis->leg_R.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-    VAL_LIMIT(chassis->leg_R.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-    VAL_LIMIT(chassis->leg_L.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-    VAL_LIMIT(chassis->leg_L.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+        // 输出限幅
+        VAL_LIMIT(chassis->leg_R.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+        VAL_LIMIT(chassis->leg_R.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+        VAL_LIMIT(chassis->leg_L.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+        VAL_LIMIT(chassis->leg_L.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    }
+
 }
 
 // 逆解算腿长变化速度、摆角变化速度

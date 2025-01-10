@@ -42,18 +42,11 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 0.0f // 500  420 550 200(不错，但不够)
+#define CHASSIS_LEG_L0_POS_PID_P 300.0f // 500  420 550 200(不错，但不够)
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 0.0f // 1400 500 1050 1050(不错，但不够)
+#define CHASSIS_LEG_L0_POS_PID_D 1000.0f // 1400 500 1050 1050(不错，但不够)
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2000.0f
-
-/** 防劈叉PID **/
-#define CHASSIS_LEG_COORDINATION_PID_P 110.0f
-#define CHASSIS_LEG_COORDINATION_PID_I 0.0f
-#define CHASSIS_LEG_COORDINATION_PID_D 20.0f
-#define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
 
 /** Roll PID **/
 #define CHASSIS_ROLL_PID_P 200.0f
@@ -69,7 +62,12 @@ typedef double fp64;
 #define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
 
-
+/** 防劈叉PID **/
+#define CHASSIS_LEG_COORDINATION_PID_P 110.0f
+#define CHASSIS_LEG_COORDINATION_PID_I 0.0f
+#define CHASSIS_LEG_COORDINATION_PID_D 20.0f
+#define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
 
 /** 变量约束 **/
 #define MAX_CHASSIS_VX_SPEED 1.8f
@@ -83,7 +81,7 @@ typedef double fp64;
 #define MIN_JOINT_TORQUE (-40.f)
 
 #define MIN_L0 0.10f
-#define MAX_L0 0.40f
+#define MAX_L0 0.385f
 #define DEFALUT_L0 0.24f
 
 
@@ -323,6 +321,8 @@ typedef struct{
 
 /** 腿部结构体 **/
 typedef struct{
+
+    ChassisCtrlInfo chassis_ctrl_info;
 
     /** 状态变量 **/
     StateVariable state_variable_feedback;  // 反馈状态变量
