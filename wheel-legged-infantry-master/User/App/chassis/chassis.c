@@ -49,7 +49,7 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-//    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.000005f;
+//    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
 //    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
 //    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
@@ -314,7 +314,7 @@ static void chassis_disable_task() {
     chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
     chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
-    chassis.chassis_ctrl_info.height_m = 0.16f;
+    chassis.chassis_ctrl_info.height_m = 0.10f;
 
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
@@ -375,11 +375,6 @@ extern void chassis_task(void const *pvParameters) {
         set_chassis_mode_from_gimbal_msg();
         set_chassis_ctrl_info_from_gimbal_msg();
 #endif
-
-        if(!chassis.is_chassis_balance)
-        {
-            chassis.chassis_ctrl_info.height_m = MIN_L0;
-        }
 
         switch (chassis.chassis_ctrl_mode) {
 
