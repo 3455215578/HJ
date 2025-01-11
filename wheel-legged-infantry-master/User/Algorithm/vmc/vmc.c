@@ -265,11 +265,11 @@ static void joint_motors_torque_set(Chassis *chassis,
 // Leg pid
     pid_calc(&chassis->leg_L.leg_pos_pid,
              chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
-             chassis->chassis_ctrl_info.height_m + 0.04f);
+             chassis->chassis_ctrl_info.height_m + 0.08f);
 
     pid_calc(&chassis->leg_R.leg_pos_pid,
              chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
-             chassis->chassis_ctrl_info.height_m + 0.03f);
+             chassis->chassis_ctrl_info.height_m + 0.08f);
 
 
 //  Roll pid
@@ -284,11 +284,11 @@ static void joint_motors_torque_set(Chassis *chassis,
     }
     else{
 
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.71f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.65f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
                                                                              + chassis->leg_L.leg_pos_pid.out
                                                                              + chassis->chassis_roll_pid.out;
 
-        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.70f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.65f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
                                                                              + chassis->leg_R.leg_pos_pid.out
                                                                              - chassis->chassis_roll_pid.out;
 
