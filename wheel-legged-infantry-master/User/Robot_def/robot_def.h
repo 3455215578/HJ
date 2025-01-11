@@ -44,9 +44,9 @@ typedef double fp64;
 /** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 10.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 30.0f
+#define CHASSIS_LEG_L0_POS_PID_D 15.0f
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 50.0f
+#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 20.0f
 
 /** 腿长速度环PID **/
 #define CHASSIS_LEG_L0_SPEED_PID_P 50.0f // 50.0f
