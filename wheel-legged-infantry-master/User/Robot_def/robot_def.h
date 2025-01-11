@@ -79,7 +79,7 @@ typedef double fp64;
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
 
 /** ±äÁ¿Ô¼Êø **/
-#define MAX_CHASSIS_VX_SPEED 1.8f
+#define MAX_CHASSIS_VX_SPEED 2.0f //1.8f
 #define MAX_PITCH 0.174533f
 #define MIN_PITCH (-0.174533f)
 #define MAX_ROLL 0.12f
