@@ -47,12 +47,12 @@ static void set_chassis_ctrl_info() {
     chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
     chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
 
-//    chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+    chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
 //    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
 //    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
-    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
+//    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
 
 }
 
@@ -183,6 +183,20 @@ static void chassis_pid_init() {
              CHASSIS_LEG_L0_POS_PID_P,
              CHASSIS_LEG_L0_POS_PID_I,
              CHASSIS_LEG_L0_POS_PID_D);
+
+    pid_init(&chassis.leg_L.leg_speed_pid,
+             CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT,
+             CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT,
+             CHASSIS_LEG_L0_SPEED_PID_P,
+             CHASSIS_LEG_L0_SPEED_PID_I,
+             CHASSIS_LEG_L0_SPEED_PID_D);
+
+    pid_init(&chassis.leg_R.leg_speed_pid,
+             CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT,
+             CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT,
+             CHASSIS_LEG_L0_SPEED_PID_P,
+             CHASSIS_LEG_L0_SPEED_PID_I,
+             CHASSIS_LEG_L0_SPEED_PID_D);
 
     // 离地后的腿长PID
     pid_init(&chassis.leg_L.offground_leg_pid,

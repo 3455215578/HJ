@@ -42,16 +42,23 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 90.0f // 500  420
+#define CHASSIS_LEG_L0_POS_PID_P 50.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 1800.0f // 1400 500
+#define CHASSIS_LEG_L0_POS_PID_D 0.0f
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2000.0f
+#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 50.0f
+
+/** 腿长速度环PID **/
+#define CHASSIS_LEG_L0_SPEED_PID_P 25.0f
+#define CHASSIS_LEG_L0_SPEED_PID_I 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_D 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 100.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 350.0f
+#define CHASSIS_ROLL_PID_P 200.0f
 #define CHASSIS_ROLL_PID_I 0.0f
-#define CHASSIS_ROLL_PID_D 2000.0f
+#define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_ROLL_PID_OUT_LIMIT 2000.0f
 
@@ -334,8 +341,11 @@ typedef struct{
     /** 腿部VMC **/
     VMC vmc;
 
-    /** 腿部PID **/
-    Pid leg_pos_pid; // 腿长位置环pid
+    /** 腿长串级PID **/
+    Pid leg_pos_pid; // 腿长位置环
+    Pid leg_speed_pid; // 腿长速度环
+
+    /** 离地后的腿长PID **/
     Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
 
     float wheel_torque; // 轮毂力矩
@@ -387,8 +397,6 @@ typedef struct{
     bool is_chassis_offground; // 离地标志位
     bool jump_flag;            // 跳跃标志位
 
-    float forward;
-    float leg_offset; // 丑陋的设计
 
 } Chassis;
 
