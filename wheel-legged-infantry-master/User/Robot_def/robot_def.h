@@ -42,9 +42,9 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 100.0f // 500  420
+#define CHASSIS_LEG_L0_POS_PID_P 90.0f // 500  420
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 400.0f // 1400 500
+#define CHASSIS_LEG_L0_POS_PID_D 1800.0f // 1400 500
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2000.0f
 
@@ -387,7 +387,8 @@ typedef struct{
     bool is_chassis_offground; // 离地标志位
     bool jump_flag;            // 跳跃标志位
 
-    float leg_offset;
+    float forward;
+    float leg_offset; // 丑陋的设计
 
 } Chassis;
 

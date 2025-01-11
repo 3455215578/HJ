@@ -264,13 +264,13 @@ static void joint_motors_torque_set(Chassis *chassis,
 
     if(chassis->chassis_ctrl_info.height_m == 0.13f)
     {
-        chassis->leg_offset = 0.08f;
+        chassis->leg_offset = 0.12f;
     }else if(chassis->chassis_ctrl_info.height_m == 0.24f)
     {
-        chassis->leg_offset = 0.14f;
+        chassis->leg_offset = 0.23f;
     }else if(chassis->chassis_ctrl_info.height_m == 0.35f)
     {
-        chassis->leg_offset = 0.22f;
+        chassis->leg_offset = 0.30f;
     }
 
 // Leg pid
@@ -295,11 +295,11 @@ static void joint_motors_torque_set(Chassis *chassis,
     }
     else{
 
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = (0.65f * chassis_physical_config->body_weight * GRAVITY + 10.0f)
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = (0.60f * chassis_physical_config->body_weight * GRAVITY + 10.0f)
                                                                              + chassis->leg_L.leg_pos_pid.out
                                                                              + chassis->chassis_roll_pid.out;
 
-        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.65f * chassis_physical_config->body_weight * GRAVITY
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.60f * chassis_physical_config->body_weight * GRAVITY
                                                                              + chassis->leg_R.leg_pos_pid.out
                                                                              - chassis->chassis_roll_pid.out;
 
