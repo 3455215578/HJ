@@ -264,11 +264,11 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 // Leg pid
     pid_calc(&chassis->leg_L.leg_pos_pid,
-             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_L.state_variable_feedback.theta),
-             chassis->chassis_ctrl_info.height_m + 0.03f);
+             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
+             chassis->chassis_ctrl_info.height_m + 0.04f);
 
     pid_calc(&chassis->leg_R.leg_pos_pid,
-             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_R.state_variable_feedback.theta),
+             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
              chassis->chassis_ctrl_info.height_m + 0.03f);
 
 
@@ -281,18 +281,17 @@ static void joint_motors_torque_set(Chassis *chassis,
     if (chassis->is_chassis_offground == true) {
         chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_L.offground_leg_pid.out;
         chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_R.offground_leg_pid.out;
-    } else {
+    }
+    else{
 
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.71f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
+                                                                             + chassis->leg_L.leg_pos_pid.out
+                                                                             + chassis->chassis_roll_pid.out;
 
-        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =
-                95.0f
-                + chassis->leg_L.leg_pos_pid.out
-                + chassis->chassis_roll_pid.out;
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.70f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
+                                                                             + chassis->leg_R.leg_pos_pid.out
+                                                                             - chassis->chassis_roll_pid.out;
 
-        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =
-                85.0f
-                + chassis->leg_R.leg_pos_pid.out
-                - chassis->chassis_roll_pid.out;
 /***********************************************************************/
 
 // 计算关节电机力矩
