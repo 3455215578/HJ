@@ -273,6 +273,7 @@ static void joint_motors_torque_set(Chassis *chassis,
         chassis->leg_offset = 0.30f;
     }
 
+    
 // Leg pid
     pid_calc(&chassis->leg_L.leg_pos_pid,
              chassis->leg_L.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_L.state_variable_feedback.theta),
