@@ -397,6 +397,7 @@ typedef struct{
     bool is_chassis_offground; // 离地标志位
     bool jump_flag;            // 跳跃标志位
 
+    float leg_offset;
 
 } Chassis;
 
