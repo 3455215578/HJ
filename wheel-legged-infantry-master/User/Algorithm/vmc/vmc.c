@@ -264,11 +264,11 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 // Leg pid
     pid_calc(&chassis->leg_L.leg_pos_pid,
-             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
+             chassis->leg_L.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_L.state_variable_feedback.theta),
              chassis->chassis_ctrl_info.height_m + 0.08f);
 
     pid_calc(&chassis->leg_R.leg_pos_pid,
-             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
+             chassis->leg_R.vmc.forward_kinematics.fk_L0.L0 * cosf(chassis->leg_R.state_variable_feedback.theta),
              chassis->chassis_ctrl_info.height_m + 0.08f);
 
 
