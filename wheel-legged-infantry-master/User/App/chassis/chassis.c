@@ -52,7 +52,7 @@ static void set_chassis_ctrl_info() {
 //    chassis.chassis_ctrl_info.height_m = chassis.chassis_ctrl_info.height_m + (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_LEG_CHANNEL]) * 0.00001f;
 //    VAL_LIMIT(chassis.chassis_ctrl_info.height_m, MIN_L0, MAX_L0);
 
-//    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.0001f;
+//    chassis.chassis_ctrl_info.roll_angle_rad = (float) (get_rc_ctrl()->rc.ch[TEST_CHASSIS_ROLL_CHANNEL]) * 0.001f;
 
 }
 

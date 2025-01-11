@@ -19,8 +19,10 @@ typedef double fp64;
 #define CHASSIS_PERIOD 2 // ms 控制频率: 500Hz
 
 /** 遥控器路径 **/
+// x : 2-左手 ; 0-右手
+// y : 3-左手 ; 1-右手
 #define CHASSIS_SPEED_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 2 // 0: 右手x
+#define CHASSIS_YAW_CHANNEL 2
 #define TEST_CHASSIS_ROLL_CHANNEL 2
 #define TEST_CHASSIS_LEG_CHANNEL 3
 #define CHASSIS_PIT_CHANNEL 3
@@ -56,7 +58,7 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 1000.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 200.0f
+#define CHASSIS_ROLL_PID_P 150.0f
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f

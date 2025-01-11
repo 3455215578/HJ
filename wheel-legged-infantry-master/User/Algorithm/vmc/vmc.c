@@ -264,6 +264,7 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 
 // Leg pid
+// 丑陋的“面对结果编程”
     if(chassis->chassis_ctrl_info.height_m == 0.13f)
     {
         chassis->leg_offset = -0.07f;

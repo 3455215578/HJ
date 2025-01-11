@@ -36,21 +36,21 @@ a26=polyfit(leg,k26,3);
 
 
 fprintf('float wheel_fitting_factor[6][4] = {\n');
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a11(1,1),a11(1,2),a11(1,3),a11(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n\n',a12(1,1),a12(1,2),a12(1,3),a12(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a13(1,1),a13(1,2),a13(1,3),a13(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n\n',a14(1,1),a14(1,2),a14(1,3),a14(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a15(1,1),a15(1,2),a15(1,3),a15(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f}\n',a16(1,1),a16(1,2),a16(1,3),a16(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a11(1,1),a11(1,2),a11(1,3),a11(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n\n',a12(1,1),a12(1,2),a12(1,3),a12(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a13(1,1),a13(1,2),a13(1,3),a13(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n\n',a14(1,1),a14(1,2),a14(1,3),a14(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a15(1,1),a15(1,2),a15(1,3),a15(1,4));
+fprintf('{%ff,%ff,%ff,%ff}\n',a16(1,1),a16(1,2),a16(1,3),a16(1,4));
 fprintf('};');
 
 fprintf('float joint_fitting_factor[6][4] = {\n');
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a21(1,1),a21(1,2),a21(1,3),a21(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n\n',a22(1,1),a22(1,2),a22(1,3),a22(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a23(1,1),a23(1,2),a23(1,3),a23(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n\n',a24(1,1),a24(1,2),a24(1,3),a24(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f},\n',a25(1,1),a25(1,2),a25(1,3),a25(1,4));
-fprintf('{%f.f,%f.f,%f.f,%f.f}\n',a26(1,1),a26(1,2),a26(1,3),a26(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a21(1,1),a21(1,2),a21(1,3),a21(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n\n',a22(1,1),a22(1,2),a22(1,3),a22(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a23(1,1),a23(1,2),a23(1,3),a23(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n\n',a24(1,1),a24(1,2),a24(1,3),a24(1,4));
+fprintf('{%ff,%ff,%ff,%ff},\n',a25(1,1),a25(1,2),a25(1,3),a25(1,4));
+fprintf('{%ff,%ff,%ff,%ff}\n',a26(1,1),a26(1,2),a26(1,3),a26(1,4));
 fprintf('};');
 
 % x0=leg;              %步长为0.1
