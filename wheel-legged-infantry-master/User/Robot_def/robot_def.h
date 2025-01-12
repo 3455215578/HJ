@@ -346,6 +346,7 @@ typedef struct{
     /** 腿长串级PID **/
     Pid leg_pos_pid; // 腿长位置环
     Pid leg_speed_pid; // 腿长速度环
+    float leg_offset; // “面对结果编程”
 
     /** 离地后的腿长PID **/
     Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
@@ -359,6 +360,8 @@ typedef struct{
     MovingAverageFilter theta_ddot_filter; // dd_theta的移动平均滤波器, 用于计算竖直方向支持力Fn
     MovingAverageFilter Fn_filter; // 竖直方向支持力Fn的移动平均滤波器
     float Fn; // 竖直方向支持力
+
+    bool leg_is_offground;
 
 } Leg;
 
@@ -394,12 +397,12 @@ typedef struct{
 
     /** flag **/
     bool init_flag;            // 底盘初始化完成标志位
+
     bool is_chassis_balance;   // 平衡标志位
     bool recover_finish;       // 倒地自起完成标志位
-    bool is_chassis_offground; // 离地标志位
-    bool jump_flag;            // 跳跃标志位
 
-    float leg_offset;
+    bool chassis_is_offground; // 离地标志位
+    bool jump_flag;            // 跳跃标志位
 
 } Chassis;
 

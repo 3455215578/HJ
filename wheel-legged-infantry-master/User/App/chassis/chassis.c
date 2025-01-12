@@ -158,10 +158,35 @@ static void get_IMU_info() {
 
 }
 
+/************************ 向底盘电机发送力矩 **********************/
+static void chassis_motor_cmd_send() {
+
+/** DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出 **/
+#if DEBUG_MODE
+    set_joint_torque(0, 0, 0, 0);
+    osDelay(2);
+    set_wheel_torque(0, 0);
+
+#else
+
+//    set_joint_torque(-chassis.leg_L.joint_F_torque,
+//                     -chassis.leg_L.joint_B_torque,
+//                     chassis.leg_R.joint_F_torque,
+//                     chassis.leg_R.joint_B_torque);
+
+  set_joint_torque(0, 0, 0, 0);
+
+//    set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+
+  set_wheel_torque(0, 0);
+
+#endif
+}
+
 /************************ 底盘pid初始化 **********************/
 static void chassis_pid_init() {
 
-    // 转向PID
+    /** 转向PID **/
     pid_init(&chassis.chassis_turn_pid,
              CHASSIS_TURN_PID_OUT_LIMIT,
              CHASSIS_TURN_PID_IOUT_LIMIT,
@@ -169,7 +194,7 @@ static void chassis_pid_init() {
              CHASSIS_TURN_PID_I,
              CHASSIS_TURN_PID_D);
 
-    // 腿长PID
+    /** 腿长PID **/
     pid_init(&chassis.leg_L.leg_pos_pid,
              CHASSIS_LEG_L0_POS_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT,
@@ -213,7 +238,7 @@ static void chassis_pid_init() {
              CHASSIS_OFFGROUND_L0_PID_I,
              CHASSIS_OFFGROUND_L0_PID_D);
 
-    // 防劈叉PID
+    /** 防劈叉PID **/
     pid_init(&chassis.chassis_leg_coordination_pid,
              CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT,
              CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT,
@@ -221,7 +246,7 @@ static void chassis_pid_init() {
              CHASSIS_LEG_COORDINATION_PID_I,
              CHASSIS_LEG_COORDINATION_PID_D);
 
-    // Roll PID
+    /** Roll PID **/
     pid_init(&chassis.chassis_roll_pid,
              CHASSIS_ROLL_PID_OUT_LIMIT,
              CHASSIS_ROLL_PID_IOUT_LIMIT,
@@ -231,7 +256,7 @@ static void chassis_pid_init() {
 }
 
 /************************ 底盘相关参数初始化 **********************/
-void chassis_init() {
+static void chassis_init() {
 
     /** 初始化底盘模式 **/
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
@@ -262,15 +287,12 @@ void chassis_init() {
     xTaskResumeAll();
 }
 
-
-void fall_selfhelp(void)
+// 倒地后以最低腿长起身
+static void chassis_selfhelp(void)
 {
-    if(ABS(chassis.imu_reference.pitch_angle) > 0.0872f)
+    if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8°~ 8°
     {
-        chassis.leg_L.joint_B_torque = 0.0f;
-        chassis.leg_L.joint_F_torque = 0.0f;
-        chassis.leg_R.joint_B_torque = 0.0f;
-        chassis.leg_R.joint_F_torque = 0.0f;
+        chassis.chassis_ctrl_info.height_m = MIN_L0;
 
         chassis.is_chassis_balance = false;
     }
@@ -278,29 +300,15 @@ void fall_selfhelp(void)
         chassis.is_chassis_balance = true;
     }
 }
-/************************ 向底盘电机发送力矩 **********************/
-static void chassis_motor_cmd_send() {
 
-/** DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出 **/
-#if DEBUG_MODE
-    set_joint_torque(0, 0, 0, 0);
-    osDelay(2);
-    set_wheel_torque(0, 0);
-
-#else
-
-    set_joint_torque(-chassis.leg_L.joint_F_torque,
-                     -chassis.leg_L.joint_B_torque,
-                     chassis.leg_R.joint_F_torque,
-                     chassis.leg_R.joint_B_torque);
-
-//  set_joint_torque(0, 0, 0, 0);
-
-  set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
-
-//  set_wheel_torque(0, 0);
-
-#endif
+static void is_chassis_offground(void)
+{
+    if(chassis.leg_L.leg_is_offground && chassis.leg_R.leg_is_offground)
+    {
+        chassis.chassis_is_offground = true;
+    }else{
+        chassis.chassis_is_offground = false;
+    }
 }
 
 /*********************************************************************************/
@@ -328,17 +336,27 @@ static void chassis_disable_task() {
     chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
     chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
 
-    chassis.chassis_ctrl_info.height_m = 0.10f;
-
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
-    /** 初始化标志位 **/
-    chassis.init_flag = false; // 初始化成功标志位
+    chassis.chassis_ctrl_info.height_m = MIN_L0;
 
-    chassis.is_chassis_balance = false; // 平衡标志位
-    chassis.recover_finish = false; // 倒地自救成功标志位
-    chassis.is_chassis_offground = false; // 离地标志位
-    chassis.jump_flag = false; // 跳跃标志位 置1时进入跳跃模式
+
+    /** 初始化标志位 **/
+    // 底盘初始化标志位
+    chassis.init_flag = false;
+
+    // 平衡标志位
+    chassis.is_chassis_balance = false;
+    // 倒地自救成功标志位
+    chassis.recover_finish = false;
+
+    // 离地标志位
+    chassis.leg_L.leg_is_offground =
+    chassis.leg_R.leg_is_offground =
+    chassis.chassis_is_offground   = false;
+
+    // 跳跃标志位
+    chassis.jump_flag = false;
 
     /**
      * 因为LK电机上电默认使能，之前有过遥控器失能后轮毂电机依然疯转的现象，
@@ -359,11 +377,13 @@ static void chassis_init_task() {
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
+    chassis_selfhelp();
+
     lqr_ctrl();
     vmc_ctrl();
     chassis_vx_kalman_run();
 
-    fall_selfhelp();
+
 
 }
 
