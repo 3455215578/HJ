@@ -259,8 +259,8 @@ static void joint_motors_torque_set(Chassis *chassis,
         chassis->leg_R.leg_offset = -0.07f;
     }else if(chassis->chassis_ctrl_info.height_m == 0.18f)
     {
-        chassis->leg_L.leg_offset = -0.045f;
-        chassis->leg_R.leg_offset = -0.05f;
+        chassis->leg_L.leg_offset = -0.033f;
+        chassis->leg_R.leg_offset = -0.038f;
     }else if(chassis->chassis_ctrl_info.height_m == 0.35f)
     {
         chassis->leg_L.leg_offset = -0.02f;
