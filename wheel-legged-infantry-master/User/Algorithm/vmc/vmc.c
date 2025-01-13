@@ -10,6 +10,7 @@
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
 
+float L_L0_dot_test, R_L0_dot_test;
 
 /*               正方向
  *    phi4                      phi4
@@ -252,35 +253,22 @@ static void joint_motors_torque_set(Chassis *chassis,
     /****** Leg pid ******/
     // 正常运动 -- 串级pid
     // 丑陋的“面对结果编程”
-    if(chassis->chassis_ctrl_info.height_m == 0.13f)
-    {
-        chassis->leg_L.leg_offset = -0.07f;
-        chassis->leg_R.leg_offset = -0.08f;
-    }else if(chassis->chassis_ctrl_info.height_m == 0.24f)
-    {
-        chassis->leg_L.leg_offset = -0.03f;
-        chassis->leg_R.leg_offset = -0.04f;
-    }else if(chassis->chassis_ctrl_info.height_m == 0.35f)
-    {
-        chassis->leg_L.leg_offset = 0.0f;
-        chassis->leg_R.leg_offset = 0.0f;
-    }
 
-    float L_L0_speed = pid_calc(&chassis->leg_L.leg_pos_pid,
+    float L_L0_dot_set = pid_calc(&chassis->leg_L.leg_pos_pid,
                                   chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
                                   chassis->chassis_ctrl_info.height_m + chassis->leg_L.leg_offset);
 
-    float R_L0_speed = pid_calc(&chassis->leg_R.leg_pos_pid,
+    float R_L0_dot_set = pid_calc(&chassis->leg_R.leg_pos_pid,
                                   chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
                                   chassis->chassis_ctrl_info.height_m + chassis->leg_R.leg_offset);
 
     pid_calc(&chassis->leg_L.leg_speed_pid,
              chassis->leg_L.vmc.forward_kinematics.fk_L0.L0_dot,
-             L_L0_speed);
+             L_L0_dot_set);
 
     pid_calc(&chassis->leg_R.leg_speed_pid,
              chassis->leg_R.vmc.forward_kinematics.fk_L0.L0_dot,
-             R_L0_speed);
+             R_L0_dot_set);
 
     // 离地腿长pid
     pid_calc(&chassis->leg_L.offground_leg_pid,
@@ -297,11 +285,11 @@ static void joint_motors_torque_set(Chassis *chassis,
              chassis->chassis_ctrl_info.roll_angle_rad);
 
 
-    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY
+    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
                                                                         + chassis->leg_L.leg_speed_pid.out
                                                                         + chassis->chassis_roll_pid.out;
 
-    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY
+    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
                                                                         + chassis->leg_R.leg_speed_pid.out
                                                                         - chassis->chassis_roll_pid.out;
 
@@ -489,6 +477,6 @@ void vmc_ctrl(void) {
   fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
   fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
 
-  // 腿部离地检测
-  leg_is_offground(&chassis);
+//  // 腿部离地检测
+//  leg_is_offground(&chassis);
 }

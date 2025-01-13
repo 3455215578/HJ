@@ -28,6 +28,21 @@ typedef double fp64;
 #define CHASSIS_PIT_CHANNEL 3
 #define CHASSIS_ROLL_CHANNEL 0
 
+/** 变量约束 **/
+#define MAX_CHASSIS_VX_SPEED 2.0f
+#define MAX_PITCH 0.174533f
+#define MIN_PITCH (-0.174533f)
+#define MAX_ROLL 0.12f
+#define MIN_ROLL (-0.12f)
+#define MAX_WHEEL_TORQUE 10.f
+#define MIN_WHEEL_TORQUE (-10.f)
+#define MAX_JOINT_TORQUE 40.f
+#define MIN_JOINT_TORQUE (-40.f)
+
+#define MIN_L0 0.10f
+#define MAX_L0 0.40f
+
+
 /** 遥控器值映射 **/
 #define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
 #define MAX_CHASSIS_YAW_INCREMENT 0.02f
@@ -77,23 +92,6 @@ typedef double fp64;
 #define CHASSIS_LEG_COORDINATION_PID_D 20.0f
 #define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 50.0f
-
-/** 变量约束 **/
-#define MAX_CHASSIS_VX_SPEED 2.0f //1.8f
-#define MAX_PITCH 0.174533f
-#define MIN_PITCH (-0.174533f)
-#define MAX_ROLL 0.12f
-#define MIN_ROLL (-0.12f)
-#define MAX_WHEEL_TORQUE 10.f
-#define MIN_WHEEL_TORQUE (-10.f)
-#define MAX_JOINT_TORQUE 40.f
-#define MIN_JOINT_TORQUE (-40.f)
-
-#define MIN_L0 0.10f
-#define MAX_L0 0.40f
-#define DEFALUT_L0 0.24f
-
-
 
 
 /*******************************************************************************

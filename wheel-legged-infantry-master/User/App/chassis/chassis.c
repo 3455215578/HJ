@@ -69,10 +69,10 @@ static void set_chassis_mode() {
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
         if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.13f;
+            chassis.chassis_ctrl_info.height_m = 0.10f;
         }
         else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.24f;
+            chassis.chassis_ctrl_info.height_m = 0.18f;
         }
         else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
             chassis.chassis_ctrl_info.height_m = 0.35f;
@@ -169,16 +169,18 @@ static void chassis_motor_cmd_send() {
 
 #else
 
-//    set_joint_torque(-chassis.leg_L.joint_F_torque,
-//                     -chassis.leg_L.joint_B_torque,
-//                     chassis.leg_R.joint_F_torque,
-//                     chassis.leg_R.joint_B_torque);
+    //  set_joint_torque(0, 0, 0, 0);
 
-  set_joint_torque(0, 0, 0, 0);
+    //  set_wheel_torque(0, 0);
 
-//    set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+    set_joint_torque(-chassis.leg_L.joint_F_torque,
+                     -chassis.leg_L.joint_B_torque,
+                     chassis.leg_R.joint_F_torque,
+                     chassis.leg_R.joint_B_torque);
 
-  set_wheel_torque(0, 0);
+    set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+
+
 
 #endif
 }
@@ -292,13 +294,28 @@ static void chassis_selfhelp(void)
 {
     if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8°~ 8°
     {
-        chassis.chassis_ctrl_info.height_m = MIN_L0;
+        chassis.leg_L.joint_F_torque = 0.0f;
+        chassis.leg_L.joint_B_torque = 0.0f;
+        chassis.leg_R.joint_F_torque = 0.0f;
+        chassis.leg_R.joint_B_torque = 0.0f;
 
         chassis.is_chassis_balance = false;
     }
     else{
         chassis.is_chassis_balance = true;
     }
+
+
+
+//    if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8°~ 8°
+//    {
+//        chassis.chassis_ctrl_info.height_m = MIN_L0;
+//
+//        chassis.is_chassis_balance = false;
+//    }
+//    else{
+//        chassis.is_chassis_balance = true;
+//    }
 }
 
 static void is_chassis_offground(void)
@@ -351,8 +368,8 @@ static void chassis_disable_task() {
     chassis.recover_finish = false;
 
     // 离地标志位
-    chassis.leg_L.leg_is_offground =
-    chassis.leg_R.leg_is_offground =
+    chassis.leg_L.leg_is_offground = false;
+    chassis.leg_R.leg_is_offground = false;
     chassis.chassis_is_offground   = false;
 
     // 跳跃标志位
@@ -377,13 +394,11 @@ static void chassis_init_task() {
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
-    chassis_selfhelp();
-
     lqr_ctrl();
     vmc_ctrl();
     chassis_vx_kalman_run();
 
-
+    chassis_selfhelp();
 
 }
 
