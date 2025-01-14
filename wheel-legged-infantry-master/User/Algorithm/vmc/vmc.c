@@ -301,11 +301,11 @@ static void joint_motors_torque_set(Chassis *chassis,
              chassis->chassis_ctrl_info.roll_angle_rad);
 
 
-    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
+    chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
                                                                         + chassis->leg_L.leg_speed_pid.out
                                                                         + chassis->chassis_roll_pid.out;
 
-    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
+    chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
                                                                         + chassis->leg_R.leg_speed_pid.out
                                                                         - chassis->chassis_roll_pid.out;
 
