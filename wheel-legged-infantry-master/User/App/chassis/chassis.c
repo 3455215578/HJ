@@ -291,7 +291,7 @@ static void chassis_init() {
     xTaskResumeAll();
 }
 
-// 倒地后以最低腿长起身
+// 倒地自救
 static void chassis_selfhelp(void)
 {
     if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8°~ 8°
@@ -306,20 +306,9 @@ static void chassis_selfhelp(void)
     else{
         chassis.is_chassis_balance = true;
     }
-
-
-
-//    if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8°~ 8°
-//    {
-//        chassis.chassis_ctrl_info.height_m = MIN_L0;
-//
-//        chassis.is_chassis_balance = false;
-//    }
-//    else{
-//        chassis.is_chassis_balance = true;
-//    }
 }
 
+// 底盘离地检测
 static void is_chassis_offground(void)
 {
     if(chassis.leg_L.leg_is_offground && chassis.leg_R.leg_is_offground)
@@ -327,6 +316,18 @@ static void is_chassis_offground(void)
         chassis.chassis_is_offground = true;
     }else{
         chassis.chassis_is_offground = false;
+    }
+}
+
+// 跨越台阶
+static void span_steps(void)
+{
+    if((chassis.chassis_ctrl_info.height_m == 0.35f) && (chassis.step_flag == true))
+    {
+        if(chassis.imu_reference.pitch_angle < -2.0f)
+        {
+            chassis.chassis_ctrl_info.height_m = 0.10f;
+        }
     }
 }
 
@@ -351,6 +352,7 @@ static void chassis_disable_task() {
     chassis.leg_R.joint_B_torque = 0;
 
     chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+    chassis.jump_state = NOT_READY;
 
     chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
     chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
@@ -401,6 +403,40 @@ static void chassis_enable_task() {
     chassis_vx_kalman_run();
 
     chassis_selfhelp();
+
+}
+
+/*********************** 跳跃任务 ****************************/
+static void chassis_jump_task(){
+
+    if(chassis.jump_state == NOT_READY)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.10f;
+        chassis.jump_state = READY;
+        chassis.jump_flag = true;
+
+    }else if(chassis.jump_state == READY)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.40f;
+
+        if((chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 > 0.35f) && (chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 > 0.35f)){
+            chassis.jump_state = STRETCHING;
+        }
+    }else if(chassis.jump_state == STRETCHING)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.10f;
+
+        if((chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 < 0.12f) && (chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 < 0.12f)){
+            chassis.jump_state = SHRINKING;
+        }
+    }else if((chassis.jump_state == SHRINKING) && (chassis.leg_L.leg_is_offground == false) && (chassis.leg_R.leg_is_offground == false))
+    {
+        chassis.chassis_ctrl_info.height_m = 0.18f;
+        chassis.jump_state = LANDING;
+        chassis.jump_flag = false;
+    }
+
+
 
 }
 

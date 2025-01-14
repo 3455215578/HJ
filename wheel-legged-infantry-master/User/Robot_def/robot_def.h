@@ -400,6 +400,9 @@ typedef struct{
     bool recover_finish;       // 倒地自起完成标志位
 
     bool chassis_is_offground; // 离地标志位
+
+    bool step_flag;            // 跨越台阶标志位
+
     bool jump_flag;            // 跳跃标志位
 
 } Chassis;
