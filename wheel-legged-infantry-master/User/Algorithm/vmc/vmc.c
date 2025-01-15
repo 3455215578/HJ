@@ -250,6 +250,20 @@ static void joint_motors_torque_set(Chassis *chassis,
 
     /****** Leg pid ******/
     // 正常运动 -- 串级pid
+    // 丑陋的“面对结果编程”
+    if(chassis->chassis_ctrl_info.height_m == 0.10f)
+    {
+        chassis->leg_L.leg_offset = -0.07f;
+        chassis->leg_R.leg_offset = -0.07f;
+    }else if(chassis->chassis_ctrl_info.height_m == 0.18f)
+    {
+        chassis->leg_L.leg_offset = -0.033f;
+        chassis->leg_R.leg_offset = -0.038f;
+    }else if(chassis->chassis_ctrl_info.height_m == 0.35f)
+    {
+        chassis->leg_L.leg_offset = -0.02f;
+        chassis->leg_R.leg_offset = -0.03f;
+    }
 
     float L_L0_dot_set = pid_calc(&chassis->leg_L.leg_pos_pid,
                                   chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,

@@ -68,10 +68,8 @@ static void set_chassis_mode() {
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
-//        chassis.chassis_ctrl_info.height_m = 0.18f;
-
         if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.10f;
+            chassis.chassis_ctrl_info.height_m = 0.13f;
         }
         else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
             chassis.chassis_ctrl_info.height_m = 0.18f;
