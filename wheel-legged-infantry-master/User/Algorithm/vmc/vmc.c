@@ -194,18 +194,24 @@ static void wheel_motors_torque_set(Chassis *chassis) {
     chassis->leg_R.wheel_torque *= -1;
 
     // 离地处理
-    if (chassis->leg_L.leg_is_offground || chassis->leg_R.leg_is_offground) {
+    if (chassis->chassis_is_offground) {
 
-        if(chassis->leg_L.leg_is_offground)
-        {
-            chassis->leg_L.wheel_torque = 0.0f;
-        }
-
-        if(chassis->leg_R.leg_is_offground)
-        {
-            chassis->leg_R.wheel_torque = 0.0f;
-        }
+        chassis->leg_L.wheel_torque = 0.0f;
+        chassis->leg_R.wheel_torque = 0.0f;
     }
+
+//    if (chassis->leg_L.leg_is_offground || chassis->leg_R.leg_is_offground) {
+//
+//        if(chassis->leg_L.leg_is_offground)
+//        {
+//            chassis->leg_L.wheel_torque = 0.0f;
+//        }
+//
+//        if(chassis->leg_R.leg_is_offground)
+//        {
+//            chassis->leg_R.wheel_torque = 0.0f;
+//        }
+//    }
 
     VAL_LIMIT(chassis->leg_L.wheel_torque, MIN_WHEEL_TORQUE, MAX_WHEEL_TORQUE);
     VAL_LIMIT(chassis->leg_R.wheel_torque, MIN_WHEEL_TORQUE, MAX_WHEEL_TORQUE);
@@ -307,10 +313,8 @@ static void joint_motors_torque_set(Chassis *chassis,
     /***********************************************************************/
 
     // 离地处理
-    if (chassis->leg_L.leg_is_offground || chassis->leg_R.leg_is_offground) {
+    if (chassis->chassis_is_offground) {
 
-        if(chassis->leg_L.leg_is_offground)
-        {
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0.0f;
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta; // √
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta_dot;
@@ -318,10 +322,7 @@ static void joint_motors_torque_set(Chassis *chassis,
 
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.0f;
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_L.offground_leg_pid.out;
-        }
 
-        if(chassis->leg_R.leg_is_offground)
-        {
             chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0.0f;
             chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta; // √
             chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta_dot;
@@ -329,8 +330,33 @@ static void joint_motors_torque_set(Chassis *chassis,
 
             chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.0f;
             chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_R.offground_leg_pid.out;
-        }
+
     }
+
+//    if (chassis->leg_L.leg_is_offground || chassis->leg_R.leg_is_offground) {
+//
+//        if(chassis->leg_L.leg_is_offground)
+//        {
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0.0f;
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta; // √
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta_dot;
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point -= chassis->steer_compensatory_torque;
+//
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.0f;
+//            chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_L.offground_leg_pid.out;
+//        }
+//
+//        if(chassis->leg_R.leg_is_offground)
+//        {
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0.0f;
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta; // √
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta_dot;
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->steer_compensatory_torque;
+//
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.0f;
+//            chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = chassis->leg_R.offground_leg_pid.out;
+//        }
+//    }
 
 
 // 计算关节电机力矩
@@ -443,18 +469,25 @@ static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_c
 
 static void leg_is_offground(Chassis* chassis)
 {
-    if(chassis->leg_L.Fn < 233.0f)
+    if(!chassis->recover_finish)
     {
-        chassis->leg_L.leg_is_offground = true;
-    }else{
         chassis->leg_L.leg_is_offground = false;
-    }
-
-    if(chassis->leg_R.Fn < 233.0f)
-    {
-        chassis->leg_R.leg_is_offground = true;
-    }else{
         chassis->leg_R.leg_is_offground = false;
+    }else
+    {
+        if(chassis->leg_L.Fn < 50.0f)
+        {
+            chassis->leg_L.leg_is_offground = true;
+        }else{
+            chassis->leg_L.leg_is_offground = false;
+        }
+
+        if(chassis->leg_R.Fn < 50.0f)
+        {
+            chassis->leg_R.leg_is_offground = true;
+        }else{
+            chassis->leg_R.leg_is_offground = false;
+        }
     }
 }
 
@@ -488,6 +521,6 @@ void vmc_ctrl(void) {
     fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
     fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
 
-//  // 腿部离地检测
-//  leg_is_offground(&chassis);
+  // 腿部离地检测
+  leg_is_offground(&chassis);
 }

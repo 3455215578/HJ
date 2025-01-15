@@ -169,16 +169,35 @@ static void chassis_motor_cmd_send() {
 
 #else
 
-//      set_joint_torque(0, 0, 0, 0);
+    if(chassis.chassis_ctrl_mode != CHASSIS_DISABLE)
+    {
+//        set_joint_torque(0, 0, 0, 0);
 //
-//      set_wheel_torque(0, 0);
+//        set_wheel_torque(0, 0);
 
-    set_joint_torque(-chassis.leg_L.joint_F_torque,
-                     -chassis.leg_L.joint_B_torque,
-                     chassis.leg_R.joint_F_torque,
-                     chassis.leg_R.joint_B_torque);
+        set_joint_torque(-chassis.leg_L.joint_F_torque,
+                         -chassis.leg_L.joint_B_torque,
+                         chassis.leg_R.joint_F_torque,
+                         chassis.leg_R.joint_B_torque);
 
-    set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+        set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+    }
+    else
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            set_joint_torque(0, 0, 0, 0);
+            osDelay(1);
+        }
+        for(int i = 0; i < 10; i++)
+        {
+            set_wheel_torque(0, 0);
+            osDelay(1);
+        }
+
+
+    }
+
 
 
 
@@ -292,7 +311,7 @@ static void chassis_init() {
 // µ¹µØ×Ô¾È
 static void chassis_selfhelp(void)
 {
-    if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // -8¡ã~ 8¡ã
+    if(ABS(chassis.imu_reference.pitch_angle) > 0.1395f) // < -8¡ã,  >8¡ã
     {
         chassis.leg_L.joint_F_torque = 0.0f;
         chassis.leg_L.joint_B_torque = 0.0f;
@@ -300,9 +319,16 @@ static void chassis_selfhelp(void)
         chassis.leg_R.joint_B_torque = 0.0f;
 
         chassis.is_chassis_balance = false;
+        chassis.recover_finish = false;
     }
-    else{
+    else if(ABS(chassis.imu_reference.pitch_angle) < 0.1395f) // -8¡ã ~ 8¡ã
+    {
         chassis.is_chassis_balance = true;
+
+        if(ABS(chassis.imu_reference.pitch_angle) < 0.0523f) // -3¡ã ~ 3¡ã
+        {
+            chassis.recover_finish = true;
+        }
     }
 }
 
@@ -401,6 +427,7 @@ static void chassis_enable_task() {
     chassis_vx_kalman_run();
 
     chassis_selfhelp();
+    is_chassis_offground();
 
 }
 
