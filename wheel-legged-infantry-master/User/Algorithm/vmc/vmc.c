@@ -10,8 +10,6 @@
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
 
-float L_L0_dot_test, R_L0_dot_test;
-
 /*               正方向
  *    phi4                      phi4
  *
@@ -252,20 +250,6 @@ static void joint_motors_torque_set(Chassis *chassis,
 
     /****** Leg pid ******/
     // 正常运动 -- 串级pid
-    // 丑陋的“面对结果编程”
-    if(chassis->chassis_ctrl_info.height_m == 0.10f)
-    {
-        chassis->leg_L.leg_offset = -0.07f;
-        chassis->leg_R.leg_offset = -0.07f;
-    }else if(chassis->chassis_ctrl_info.height_m == 0.18f)
-    {
-        chassis->leg_L.leg_offset = -0.033f;
-        chassis->leg_R.leg_offset = -0.038f;
-    }else if(chassis->chassis_ctrl_info.height_m == 0.35f)
-    {
-        chassis->leg_L.leg_offset = -0.02f;
-        chassis->leg_R.leg_offset = -0.03f;
-    }
 
     float L_L0_dot_set = pid_calc(&chassis->leg_L.leg_pos_pid,
                                   chassis->leg_L.vmc.forward_kinematics.fk_L0.L0,
@@ -274,9 +258,6 @@ static void joint_motors_torque_set(Chassis *chassis,
     float R_L0_dot_set = pid_calc(&chassis->leg_R.leg_pos_pid,
                                   chassis->leg_R.vmc.forward_kinematics.fk_L0.L0,
                                   chassis->chassis_ctrl_info.height_m + chassis->leg_R.leg_offset);
-
-    L_L0_dot_test = L_L0_dot_set;
-    R_L0_dot_test = R_L0_dot_set;
 
     pid_calc(&chassis->leg_L.leg_speed_pid,
              chassis->leg_L.vmc.forward_kinematics.fk_L0.L0_dot,
@@ -302,12 +283,12 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 
     chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)
-                                                                        + chassis->leg_L.leg_speed_pid.out
-                                                                        + chassis->chassis_roll_pid.out;
+                                                                          + chassis->leg_L.leg_speed_pid.out
+                                                                          + chassis->chassis_roll_pid.out;
 
     chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
-                                                                        + chassis->leg_R.leg_speed_pid.out
-                                                                        - chassis->chassis_roll_pid.out;
+                                                                          + chassis->leg_R.leg_speed_pid.out
+                                                                          - chassis->chassis_roll_pid.out;
 
     /***********************************************************************/
 
@@ -339,20 +320,20 @@ static void joint_motors_torque_set(Chassis *chassis,
 
 
 // 计算关节电机力矩
-        forward_dynamics(&chassis->leg_L.vmc, chassis_physical_config);
-        forward_dynamics(&chassis->leg_R.vmc, chassis_physical_config);
+    forward_dynamics(&chassis->leg_L.vmc, chassis_physical_config);
+    forward_dynamics(&chassis->leg_R.vmc, chassis_physical_config);
 
-        chassis->leg_L.joint_F_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
-        chassis->leg_L.joint_B_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
+    chassis->leg_L.joint_F_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
+    chassis->leg_L.joint_B_torque = chassis->leg_L.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
 
-        chassis->leg_R.joint_F_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
-        chassis->leg_R.joint_B_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
+    chassis->leg_R.joint_F_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T1_set_point;//F
+    chassis->leg_R.joint_B_torque = chassis->leg_R.vmc.forward_kinematics.T1_T4_set_point.E.T4_set_point;//B
 
-        // 输出限幅
-        VAL_LIMIT(chassis->leg_R.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-        VAL_LIMIT(chassis->leg_R.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-        VAL_LIMIT(chassis->leg_L.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
-        VAL_LIMIT(chassis->leg_L.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    // 输出限幅
+    VAL_LIMIT(chassis->leg_R.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    VAL_LIMIT(chassis->leg_R.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    VAL_LIMIT(chassis->leg_L.joint_F_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
+    VAL_LIMIT(chassis->leg_L.joint_B_torque, MIN_JOINT_TORQUE, MAX_JOINT_TORQUE);
 
 }
 
@@ -432,12 +413,12 @@ static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_c
               + leg->vmc.inverse_kinematics.Fxy_fdb.E.Tp_fdb * sinf(leg->state_variable_feedback.theta) / leg->vmc.forward_kinematics.fk_L0.L0;
 
     float leg_az = az - leg->vmc.forward_kinematics.fk_L0.L0_ddot * cosf(leg->state_variable_feedback.theta)
-             + 2.0f * leg->vmc.forward_kinematics.fk_L0.L0_dot * leg->state_variable_feedback.theta_dot
-               * sinf(leg->state_variable_feedback.theta)
-             + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_ddot
-               * sinf(leg->state_variable_feedback.theta)
-             + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_dot
-               * leg->state_variable_feedback.theta_dot * cosf(leg->state_variable_feedback.theta);
+                   + 2.0f * leg->vmc.forward_kinematics.fk_L0.L0_dot * leg->state_variable_feedback.theta_dot
+                     * sinf(leg->state_variable_feedback.theta)
+                   + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_ddot
+                     * sinf(leg->state_variable_feedback.theta)
+                   + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_dot
+                     * leg->state_variable_feedback.theta_dot * cosf(leg->state_variable_feedback.theta);
 
     float Fn_raw = P + chassis_physical_config->wheel_weight * 9.8f + chassis_physical_config->wheel_weight * leg_az;
 
@@ -480,18 +461,18 @@ void vmc_ctrl(void) {
 
     // VMC 逆动力学解算
     // 根据关节反馈力矩逆解算出虚拟力(F Tp)
-  Inverse_Dynamics(&chassis.leg_L.vmc,
-                   (get_joint_motors() + 1)->torque,
-                   get_joint_motors()->torque,
-                   &chassis_physical_config);
-  Inverse_Dynamics(&chassis.leg_R.vmc,
-                   -(get_joint_motors() + 2)->torque,
-                   -(get_joint_motors() + 3)->torque,
-                   &chassis_physical_config);
+    Inverse_Dynamics(&chassis.leg_L.vmc,
+                     (get_joint_motors() + 1)->torque,
+                     get_joint_motors()->torque,
+                     &chassis_physical_config);
+    Inverse_Dynamics(&chassis.leg_R.vmc,
+                     -(get_joint_motors() + 2)->torque,
+                     -(get_joint_motors() + 3)->torque,
+                     &chassis_physical_config);
 
-  // 竖直方向支持力解算
-  fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
-  fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
+    // 竖直方向支持力解算
+    fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
+    fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
 
 //  // 腿部离地检测
 //  leg_is_offground(&chassis);

@@ -59,9 +59,9 @@ typedef double fp64;
 #define CHASSIS_TURN_PID_OUT_LIMIT 100.0f
 
 /** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 15.0f
+#define CHASSIS_LEG_L0_POS_PID_P 10.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 50.0f
+#define CHASSIS_LEG_L0_POS_PID_D 15.0f
 #define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 20.0f
 
@@ -386,6 +386,7 @@ typedef struct{
     Pid chassis_turn_pid;             // 转向pid
     Pid chassis_leg_coordination_pid; // 防劈叉pid
     Pid chassis_roll_pid;             // roll补偿pid
+
     float wheel_turn_torque;          // 转向力矩
     float steer_compensatory_torque;  // 防劈叉力矩
     float theta_error;                // 两条腿之间theta的误差
