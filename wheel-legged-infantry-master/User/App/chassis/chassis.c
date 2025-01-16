@@ -22,7 +22,7 @@
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
-//int jump_finish = 0;
+int jump_finish = 0;
 
 extern Chassis chassis;
 
@@ -61,10 +61,12 @@ static void set_chassis_mode() {
     if (switch_is_down(get_rc_ctrl()->rc.s[RC_s_R])) { // 失能
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
-    } else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == false) { // 初始化模式
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == false) { // 初始化模式
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_INIT;
-    } else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
@@ -77,7 +79,12 @@ static void set_chassis_mode() {
         else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
             chassis.chassis_ctrl_info.height_m = 0.35f;
         }
+
     }
+//    else if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]) && switch_is_up(get_rc_ctrl()->rc.s[RC_s_R])){
+//        chassis.chassis_ctrl_mode = CHASSIS_JUMP;
+//    }
+
 }
 
 /** 底盘通过板间通信接收云台的信息 **/
@@ -346,10 +353,12 @@ static void is_chassis_offground(void)
 // 跨越台阶
 static void span_steps(void)
 {
-    if((chassis.chassis_ctrl_info.height_m == 0.35f) && (chassis.step_flag == true))
+    if(chassis.chassis_ctrl_info.height_m == 0.35f)
     {
-        if(chassis.imu_reference.pitch_angle < -2.0f)
+        if(chassis.imu_reference.pitch_angle < -0.1744f)
         {
+            chassis.step_flag = true;
+
             chassis.chassis_ctrl_info.height_m = 0.10f;
         }
     }
@@ -403,6 +412,9 @@ static void chassis_disable_task() {
     // 跳跃标志位
     chassis.jump_flag = false;
 
+    // 跨越标志位
+    chassis.step_flag = false;
+
     /**
      * 因为LK电机上电默认使能，之前有过遥控器失能后轮毂电机依然疯转的现象，
      * 因此选择在INIT模式再使能，并且失能后停止轮毂电机，但此时轮毂仍可以接受信息并产生动作
@@ -422,6 +434,10 @@ static void chassis_init_task() {
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
+    chassis.jump_state = NOT_READY;
+
+    span_steps();
+
     lqr_ctrl();
     vmc_ctrl();
     chassis_vx_kalman_run();
@@ -432,35 +448,42 @@ static void chassis_enable_task() {
 }
 
 /*********************** 跳跃任务 ****************************/
-static void chassis_jump_task(){
+static void chassis_jump_task() {
 
-    if(chassis.jump_state == NOT_READY)
+    if ((chassis.jump_state == NOT_READY) && (jump_finish == 0) && (chassis.chassis_ctrl_info.height_m == 0.10f)) // 最低腿长时视为准备就绪
     {
-        chassis.chassis_ctrl_info.height_m = 0.10f;
         chassis.jump_state = READY;
-        chassis.jump_flag = true;
+        chassis.jump_flag = true; // 进入跳跃状态
 
-    }else if(chassis.jump_state == READY)
+    }
+    else if (chassis.jump_state == READY) // 伸腿蹬地
     {
+        chassis.jump_state = STRETCHING;
         chassis.chassis_ctrl_info.height_m = 0.40f;
 
-        if((chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 > 0.35f) && (chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 > 0.35f)){
-            chassis.jump_state = STRETCHING;
-        }
-    }else if(chassis.jump_state == STRETCHING)
+    }
+    else if ((chassis.jump_state == STRETCHING) && (chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 > 0.35f) && (chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 > 0.35f)) // 收腿腾空，保持姿态
     {
+        chassis.jump_state = SHRINKING;
         chassis.chassis_ctrl_info.height_m = 0.10f;
 
-        if((chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 < 0.12f) && (chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 < 0.12f)){
-            chassis.jump_state = SHRINKING;
-        }
-    }else if((chassis.jump_state == SHRINKING) && (chassis.leg_L.leg_is_offground == false) && (chassis.leg_R.leg_is_offground == false))
+    }
+    else if ((chassis.jump_state == SHRINKING) && (chassis.leg_L.Fn > 12.5f) && (chassis.leg_R.Fn > 12.5f)) // 落地
     {
-        chassis.chassis_ctrl_info.height_m = 0.18f;
         chassis.jump_state = LANDING;
+        chassis.chassis_ctrl_info.height_m = 0.18f;
         chassis.jump_flag = false;
+        jump_finish = 1;
+
+    }
+    else if(chassis.jump_state == LANDING)
+    {
+        chassis.jump_state = NOT_READY;
     }
 
+    lqr_ctrl();
+    vmc_ctrl();
+    chassis_vx_kalman_run();
 
 
 }
@@ -501,6 +524,10 @@ extern void chassis_task(void const *pvParameters) {
             case CHASSIS_ENABLE:
                 chassis_enable_task();
                 break;
+
+//            case CHASSIS_JUMP:
+//                chassis_jump_task();
+//                break;
 
             default:break;
         }

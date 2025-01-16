@@ -194,7 +194,7 @@ static void wheel_motors_torque_set(Chassis *chassis) {
     chassis->leg_R.wheel_torque *= -1;
 
     // 离地处理
-    if (chassis->chassis_is_offground) {
+    if ((!chassis->jump_flag) && chassis->chassis_is_offground && (!chassis->step_flag)) {
 
         chassis->leg_L.wheel_torque = 0.0f;
         chassis->leg_R.wheel_torque = 0.0f;
@@ -313,7 +313,7 @@ static void joint_motors_torque_set(Chassis *chassis,
     /***********************************************************************/
 
     // 离地处理
-    if (chassis->chassis_is_offground) {
+    if ((!chassis->jump_flag) && chassis->chassis_is_offground&& (!chassis->step_flag)) {
 
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0.0f;
             chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta; // √
@@ -475,14 +475,14 @@ static void leg_is_offground(Chassis* chassis)
         chassis->leg_R.leg_is_offground = false;
     }else
     {
-        if(chassis->leg_L.Fn < 50.0f)
+        if(chassis->leg_L.Fn < 30.0f)
         {
             chassis->leg_L.leg_is_offground = true;
         }else{
             chassis->leg_L.leg_is_offground = false;
         }
 
-        if(chassis->leg_R.Fn < 50.0f)
+        if(chassis->leg_R.Fn < 30.0f)
         {
             chassis->leg_R.leg_is_offground = true;
         }else{
@@ -521,6 +521,6 @@ void vmc_ctrl(void) {
     fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
     fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
 
-  // 腿部离地检测
-  leg_is_offground(&chassis);
+    // 腿部离地检测
+    leg_is_offground(&chassis);
 }
