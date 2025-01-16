@@ -70,20 +70,10 @@ static void set_chassis_mode() {
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
-        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.10f;
-        }
-        else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.18f;
-        }
-        else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
-            chassis.chassis_ctrl_info.height_m = 0.35f;
-        }
-
     }
-//    else if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]) && switch_is_up(get_rc_ctrl()->rc.s[RC_s_R])){
-//        chassis.chassis_ctrl_mode = CHASSIS_JUMP;
-//    }
+    else if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]) && switch_is_up(get_rc_ctrl()->rc.s[RC_s_R])){
+        chassis.chassis_ctrl_mode = CHASSIS_STEP;
+    }
 
 }
 
@@ -435,7 +425,30 @@ static void chassis_init_task() {
 static void chassis_enable_task() {
 
     chassis.jump_state = NOT_READY;
+    chassis.step_flag = false;
 
+    if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
+        chassis.chassis_ctrl_info.height_m = 0.10f;
+    }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
+        chassis.chassis_ctrl_info.height_m = 0.18f;
+    }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
+        chassis.chassis_ctrl_info.height_m = 0.35f;
+    }
+
+    lqr_ctrl();
+    vmc_ctrl();
+    chassis_vx_kalman_run();
+
+    chassis_selfhelp();
+//    is_chassis_offground();
+
+}
+
+static void chassis_span_task(){
+    if(chassis.step_flag == false)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.35f;
+    }
     span_steps();
 
     lqr_ctrl();
@@ -443,8 +456,6 @@ static void chassis_enable_task() {
     chassis_vx_kalman_run();
 
     chassis_selfhelp();
-    is_chassis_offground();
-
 }
 
 /*********************** ÌøÔ¾ÈÎÎñ ****************************/
@@ -525,9 +536,9 @@ extern void chassis_task(void const *pvParameters) {
                 chassis_enable_task();
                 break;
 
-//            case CHASSIS_JUMP:
-//                chassis_jump_task();
-//                break;
+            case CHASSIS_STEP:
+                chassis_span_task();
+                break;
 
             default:break;
         }

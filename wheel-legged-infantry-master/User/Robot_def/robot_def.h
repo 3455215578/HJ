@@ -121,6 +121,7 @@ typedef enum{
     CHASSIS_ENABLE, // 使能模式
     CHASSIS_INIT, // 初始化模式
     CHASSIS_JUMP, // 跳跃模式
+    CHASSIS_STEP,
     CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
 
