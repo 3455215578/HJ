@@ -22,6 +22,7 @@ void update_moving_average_filter(MovingAverageFilter *filter, float newValue) {
 
   // ¸üÐÂË÷Òý
   filter->index = (filter->index + 1) % WINDOW_SIZE;
+
 }
 
 float get_moving_average_filtered_value(const MovingAverageFilter *filter) {

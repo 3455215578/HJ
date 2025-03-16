@@ -73,7 +73,7 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 40.0f
+#define CHASSIS_ROLL_PID_P 140.0f
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f

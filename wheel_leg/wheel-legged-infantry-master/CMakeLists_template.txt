@@ -51,6 +51,7 @@ endif ()
 include_directories(${includes}
         User/Algorithm/AHRS
         User/Algorithm/filter/moving_filter
+        User/Algorithm/filter/low_pass_filter
         User/Algorithm/filter/kalman_filter
         User/Algorithm/lqr
         User/Algorithm/pid

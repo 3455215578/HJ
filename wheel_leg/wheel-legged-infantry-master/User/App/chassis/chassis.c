@@ -417,7 +417,7 @@ static void chassis_enable_task() {
     if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.10f;
     }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
-        chassis.chassis_ctrl_info.height_m = 0.18f;
+        chassis.chassis_ctrl_info.height_m = 0.20f;
     }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.35f;
     }
