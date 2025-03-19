@@ -302,7 +302,7 @@ static void chassis_init() {
 
 static void chassis_is_balanced() {
 
-    if(!chassis.chassis_is_offground) // 跳跃时不进行平衡判断
+    if(!chassis.chassis_is_offground)
     {
         if (ABS(chassis.imu_reference.pitch_angle) <= 0.1744f) // -10° ~ 10°
         {
@@ -335,9 +335,9 @@ static void chassis_selfhelp(void)
 }
 
 // 底盘离地检测
-static void is_chassis_offground(void)
+static void chassis_is_offground(void)
 {
-    if(chassis.leg_L.leg_is_offground && chassis.leg_R.leg_is_offground)
+    if(chassis.leg_L.leg_is_offground || chassis.leg_R.leg_is_offground)
     {
         chassis.chassis_is_offground = true;
     }else{
@@ -412,7 +412,8 @@ static void chassis_init_task() {
 /*********************** 使能任务 ****************************/
 static void chassis_enable_task() {
 
-    chassis.jump_state = NOT_READY;
+    chassis_is_balanced();
+    chassis_is_offground();
 
     if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.10f;
@@ -426,9 +427,7 @@ static void chassis_enable_task() {
     vmc_ctrl();
     chassis_vx_kalman_run();
 
-    chassis_is_balanced();
     chassis_selfhelp();
-//    is_chassis_offground();
 
 }
 

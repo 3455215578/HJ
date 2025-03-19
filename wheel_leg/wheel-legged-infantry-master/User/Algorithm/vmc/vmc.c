@@ -194,6 +194,12 @@ static void wheel_motors_torque_set(Chassis *chassis) {
     chassis->leg_R.wheel_torque *= -1;
 
 
+    if(chassis->chassis_is_offground)
+    {
+        chassis->leg_L.wheel_torque = 0;
+        chassis->leg_R.wheel_torque = 0;
+    }
+
     VAL_LIMIT(chassis->leg_L.wheel_torque, MIN_WHEEL_TORQUE, MAX_WHEEL_TORQUE);
     VAL_LIMIT(chassis->leg_R.wheel_torque, MIN_WHEEL_TORQUE, MAX_WHEEL_TORQUE);
 }
@@ -266,6 +272,22 @@ static void joint_motors_torque_set(Chassis *chassis,
     chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta)
                                                                           + chassis->leg_R.leg_speed_pid.out
                                                                           - chassis->chassis_roll_pid.out;
+
+    // 离地检测
+    if(chassis->chassis_is_offground)
+    {
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0;
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta;
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_L.state_variable_joint_out.theta_dot;
+
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point = 0;
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta;
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point += chassis->leg_R.state_variable_joint_out.theta_dot;
+
+        chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta);
+
+        chassis->leg_R.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point = 0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_R.state_variable_feedback.theta);
+    }
 
     // 计算关节电机力矩
     forward_dynamics(&chassis->leg_L.vmc, chassis_physical_config);
@@ -429,6 +451,6 @@ void vmc_ctrl(void) {
     fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
     fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
 
-//    // 腿部离地检测
+    // 腿部离地检测
 //    leg_is_offground(&chassis);
 }
