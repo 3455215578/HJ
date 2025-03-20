@@ -1,5 +1,22 @@
 #include "user_lib.h"
 
+void slope_following(float *target,float *set,float acc)
+{
+    if(*target > *set)
+    {
+        *set = *set + acc;
+        if(*set >= *target)
+            *set = *target;
+    }
+    else if(*target < *set)
+    {
+        *set = *set - acc;
+        if(*set <= *target)
+            *set = *target;
+    }
+
+}
+
 // ¾ØÕó³Ë·¨
 void Matrix_multiply(int rows1, int cols1, float matrix1[rows1][cols1],
                             int rows2, int cols2, float matrix2[rows2][cols2],

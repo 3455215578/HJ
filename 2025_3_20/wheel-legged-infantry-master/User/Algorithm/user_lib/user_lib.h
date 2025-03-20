@@ -26,6 +26,8 @@ void Matrix_multiply(int rows1, int cols1, float matrix1[rows1][cols1],
                      int rows2, int cols2, float matrix2[rows2][cols2],
                      float result[rows1][cols2]);
 
+void slope_following(float *target,float *set,float acc);
+
 //快速开方
 extern float invSqrt(float num);
 extern float my_sqrt(float number);

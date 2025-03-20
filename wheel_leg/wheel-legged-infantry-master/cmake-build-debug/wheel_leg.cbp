@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="wheel_leg"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="wheel_leg.elf">
+				<Option output="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/wheel_leg.elf" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DARM_MATH_CM4"/>
+					<Add option="-DARM_MATH_MATRIX_CHECK"/>
+					<Add option="-DARM_MATH_ROUNDING"/>
+					<Add option="-DDEBUG"/>
+					<Add option="-DUSE_HAL_DRIVER"/>
+					<Add option="-DSTM32F407xx"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/Target"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/ARM/DSP/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/moving_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/low_pass_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/lqr"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/pid"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/user_lib"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/vmc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/chassis"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/gimbal"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/can"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/delay"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/flash"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/buzzer"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/ist8310"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/key_board"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/led"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/DM8009"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/CyberGear"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/LK9025"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/servo"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Robot_def"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/arm-none-eabi"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/backward"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/include"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/include-fixed"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 wheel_leg.elf"/>
+					<CompileFile command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="wheel_leg.elf/fast">
+				<Option output="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/wheel_leg.elf" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DARM_MATH_CM4"/>
+					<Add option="-DARM_MATH_MATRIX_CHECK"/>
+					<Add option="-DARM_MATH_ROUNDING"/>
+					<Add option="-DDEBUG"/>
+					<Add option="-DUSE_HAL_DRIVER"/>
+					<Add option="-DSTM32F407xx"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/Target"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/ARM/DSP/Inc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/moving_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/low_pass_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/lqr"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/pid"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/user_lib"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/vmc"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/chassis"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/gimbal"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/can"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/delay"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/flash"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/buzzer"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/ist8310"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/key_board"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/led"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/DM8009"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/CyberGear"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/LK9025"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/servo"/>
+					<Add directory="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Robot_def"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/arm-none-eabi"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/backward"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/include"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/include-fixed"/>
+					<Add directory="d:\jetbrains\gcc-arm-none-eabi\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 wheel_leg.elf/fast"/>
+					<CompileFile command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/JetBrains/mingw64/bin/mingw32-make.exe -f &quot;D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/FreeRTOSConfig.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/can.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/dma.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/gpio.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/i2c.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/main.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/spi.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/stm32f4xx_hal_conf.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/stm32f4xx_it.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/tim.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Inc/usart.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/can.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/dma.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/freertos.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/gpio.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/i2c.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/main.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/spi.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/stm32f4xx_hal_msp.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/stm32f4xx_hal_timebase_tim.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/stm32f4xx_it.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/syscalls.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/sysmem.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/system_stm32f4xx.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/tim.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Src/usart.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Core/Startup/startup_stm32f407ighx.s">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Device/ST/STM32F4xx/LICENSE.txt">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cachel1_armv7.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_armcc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_armclang.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_armclang_ltm.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_compiler.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_gcc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_iccarm.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/cmsis_version.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_armv81mml.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_armv8mbl.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_armv8mml.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm0.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm0plus.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm1.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm23.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm3.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm33.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm35p.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm4.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm55.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm7.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_cm85.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_sc000.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_sc300.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/core_starmc1.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/mpu_armv7.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/mpu_armv8.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/pac_armv81.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/pmu_armv8.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/Include/tz_context.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/CMSIS/LICENSE.txt">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_bus.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_cortex.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_dma.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_exti.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_pwr.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_rcc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_spi.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_system.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_tim.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_utils.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/LICENSE.txt">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/ARM/DSP/Inc/arm_math.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/ARM/DSP/Lib/libarm_cortexM4lf_math.a">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/ST/STM32_USB_Device_Library/LICENSE.txt">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/croutine.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/StackMacros.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/atomic.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/croutine.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/list.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/message_buffer.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_prototypes.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/portable.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/queue.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/task.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/include/timers.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/list.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/queue.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/tasks.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/Middlewares/Third_Party/FreeRTOS/Source/timers.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/STM32F407IGHX_FLASH.ld">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usb_device.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usb_device.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usbd_cdc_if.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usbd_cdc_if.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usbd_desc.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/App/usbd_desc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/Target/usbd_conf.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/USB_DEVICE/Target/usbd_conf.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS/AHRS.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS/AHRS.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS/AHRS_MiddleWare.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/AHRS/AHRS_MiddleWare.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter/kalman_filter.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter/kalman_filter.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter/vx_kalman_filter.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/kalman_filter/vx_kalman_filter.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/low_pass_filter/low_pass_filter.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/low_pass_filter/low_pass_filter.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/moving_filter/moving_filter.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/filter/moving_filter/moving_filter.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/lqr/lqr.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/lqr/lqr.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/pid/pid.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/pid/pid.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/user_lib/user_lib.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/user_lib/user_lib.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/vmc/vmc.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Algorithm/vmc/vmc.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/chassis/chassis.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/chassis/chassis.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/gimbal/gimbal.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/App/gimbal/gimbal.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/can/can_device.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/can/can_device.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/delay/delay.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/delay/delay.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/flash/flash.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Bsp/flash/flash.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088/Atti.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088/Atti.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088/BMI088driver.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/bmi088/BMI088driver.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/buzzer/buzzer.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/buzzer/buzzer.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/ist8310/ist8310driver.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/ist8310/ist8310driver.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/key_board/key_board.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/key_board/key_board.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/led/led.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/led/led.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/CyberGear/cybergear.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/CyberGear/cybergear.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/DM8009/dm_8009.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/DM8009/dm_8009.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/joint.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/joint/joint.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/LK9025/lk_9025.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/LK9025/lk_9025.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/wheel.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/motor/wheel/wheel.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/Calibrate.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/Calibrate.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/error.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/error.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/remote.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/remote/remote.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/servo/servo.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Device/servo/servo.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Robot_def/robot_def.c">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/User/Robot_def/robot_def.h">
+			<Option target="wheel_leg.elf"/>
+		</Unit>
+		<Unit filename="D:/GitHub/Code/HJ/wheel_leg/wheel-legged-infantry-master/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
