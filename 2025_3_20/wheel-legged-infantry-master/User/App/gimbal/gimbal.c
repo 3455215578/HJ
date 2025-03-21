@@ -2,7 +2,7 @@
 #include <stm32f4xx_hal.h>
 #include <stm32f4xx_hal_can.h>
 
-#include "can_device.h"
+#include "bsp_can.h"
 
 #include "gimbal.h"
 

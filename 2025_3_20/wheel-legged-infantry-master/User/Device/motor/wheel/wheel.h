@@ -1,7 +1,7 @@
 #ifndef WHEEL_H
 #define WHEEL_H
 
-#include "can_device.h"
+#include "bsp_can.h"
 #include "lk_9025.h"
 
 void wheel_init();

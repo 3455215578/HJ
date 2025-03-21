@@ -1,7 +1,7 @@
 #ifndef JOINT_H
 #define JOINT_H
 
-#include "can_device.h"
+#include "bsp_can.h"
 #include "dm_8009.h"
 #include "cybergear.h"
 

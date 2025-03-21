@@ -21,7 +21,7 @@
 #include "ist8310driver.h"
 #include <main.h>
 #include <cmsis_os.h>
-#include <delay.h>
+#include <bsp_delay.h>
 
 #define MAG_SEN 0.3f //转换成 uT
 

@@ -1,6 +1,6 @@
 #include <main.h>
 #include <cmsis_os.h>
-#include <delay.h>
+#include <bsp_delay.h>
 #include "BMI088driver.h"
 
 extern SPI_HandleTypeDef hspi1;

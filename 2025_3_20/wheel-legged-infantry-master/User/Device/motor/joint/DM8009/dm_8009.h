@@ -2,7 +2,7 @@
 #define DM_8009_H
 
 #include "stdint-gcc.h"
-#include "can_device.h"
+#include "bsp_can.h"
 
 typedef struct{
     uint32_t id;

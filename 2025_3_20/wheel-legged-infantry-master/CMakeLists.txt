@@ -57,13 +57,16 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
         User/Algorithm/pid
         User/Algorithm/user_lib
         User/Algorithm/vmc
+        User/Algorithm/crc
 
         User/App/chassis
         User/App/gimbal
+        User/App/referee
 
         User/Bsp/can
         User/Bsp/delay
         User/Bsp/flash
+        User/Bsp/usart
 
         User/Device/bmi088
         User/Device/buzzer
@@ -83,7 +86,7 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx)
 
-file(GLOB_RECURSE SOURCES "Library/*.*" "Core/*.*" "Middlewares/*.*" "Drivers/*.*" "USB_DEVICE/*.*"
+file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*" "USB_DEVICE/*.*"
         "User/Algorithm/*.*"
         "User/App/*.*"
         "User/Bsp/*.*"

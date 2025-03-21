@@ -1,5 +1,5 @@
-#ifndef CAN_DEVICE_H
-#define CAN_DEVICE_H
+#ifndef BSP_CAN_H
+#define BSP_CAN_H
 
 #include <stdint-gcc.h>
 

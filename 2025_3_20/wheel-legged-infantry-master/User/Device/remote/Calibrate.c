@@ -100,7 +100,7 @@
 #include <cmsis_os.h>
 
 #include "buzzer.h"
-#include "flash.h"
+#include "bsp_flash.h"
 
 #include "remote.h"
 #include "Atti.h"

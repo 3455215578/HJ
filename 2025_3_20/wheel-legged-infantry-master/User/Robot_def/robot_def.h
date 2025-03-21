@@ -1,13 +1,17 @@
 #ifndef ROBOT_DEF_H
 #define ROBOT_DEF_H
 
+#include <main.h>
 #include <stdbool.h>
+
 
 #include "pid.h"
 #include "moving_filter.h"
 
-typedef float fp32; // 表明某个float类型变量是32位浮点数
+typedef unsigned char bool_t;
+typedef float fp32;
 typedef double fp64;
+
 
 /** 宏定义 **/
 //CHASSIS_REMOTE置1：底盘由遥控器控制
@@ -73,11 +77,11 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 40.0f
+#define CHASSIS_ROLL_PID_P 400.0f // 40.0f
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_ROLL_PID_OUT_LIMIT 20.0f
+#define CHASSIS_ROLL_PID_OUT_LIMIT 30.0f // 20.0f
 
 /** 离地后的腿长PID **/
 #define CHASSIS_OFFGROUND_LO_PID_P 0.0f

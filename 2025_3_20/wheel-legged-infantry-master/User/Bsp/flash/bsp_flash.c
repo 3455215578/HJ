@@ -1,6 +1,6 @@
 #include <main.h>
 #include <string.h>
-#include "flash.h"
+#include "bsp_flash.h"
 
 /**
   * @brief          get the sector number of flash

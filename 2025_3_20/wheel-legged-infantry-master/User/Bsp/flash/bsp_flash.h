@@ -1,5 +1,5 @@
-#ifndef FLASH_H
-#define FLASH_H
+#ifndef BSP_FLASH_H
+#define BSP_FLASH_H
 
 #include <stdint-gcc.h>
 
