@@ -1,0 +1,19 @@
+CMakeFiles/wheel_leg.elf.dir/User/Algorithm/pid/pid.c.obj: \
+ D:\GitHub\Code\HJ\2025_3_20\wheel-legged-infantry-chassis\User\Algorithm\pid\pid.c \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\math.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\reent.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\_ansi.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\newlib.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\_newlib_version.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\config.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\machine\ieeefp.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\features.h \
+ d:\jetbrains\gcc-arm-none-eabi\lib\gcc\arm-none-eabi\10.3.1\include\stddef.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\_types.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\machine\_types.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\machine\_default_types.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\lock.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\sys\cdefs.h \
+ d:\jetbrains\gcc-arm-none-eabi\arm-none-eabi\include\_ansi.h \
+ D:\GitHub\Code\HJ\2025_3_20\wheel-legged-infantry-chassis\User\Algorithm\pid\pid.h \
+ d:\jetbrains\gcc-arm-none-eabi\lib\gcc\arm-none-eabi\10.3.1\include\stdint-gcc.h
