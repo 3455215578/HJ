@@ -43,38 +43,8 @@ static void chassis_device_offline_handle() {
 
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
-    float target_speed = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
 
-    // 加速
-    if(target_speed != 0.0f)
-    {
-        if(target_speed > 0.0f) // 正向加速
-        {
-            if(target_speed > vel_acc[0])
-            {
-                slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.01f);
-            }
-        }
-        else // 反向加速
-        {
-            if(target_speed < vel_acc[0])
-            {
-                slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.01f);
-            }
-        }
-    }
-    else // 减速
-    {
-        if(vel_acc[0] > 0.0f) // 正向减速
-        {
-            slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.06f);
-        }
-        else // 反向减速
-        {
-            slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.02f);
-        }
-
-    }
+    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
 
     chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
 
@@ -358,6 +328,15 @@ static void chassis_is_balanced() {
 // 倒地自救
 static void chassis_selfhelp(void)
 {
+//    if ((!chassis.recover_finish) && (!chassis.chassis_is_offground)) {
+//
+//        chassis.leg_L.joint_F_torque = 0;
+//        chassis.leg_L.joint_B_torque = 0;
+//        chassis.leg_R.joint_F_torque = 0;
+//        chassis.leg_R.joint_B_torque = 0;
+//    }
+
+
     if (!chassis.recover_finish) {
 
         chassis.leg_L.joint_F_torque = 0;

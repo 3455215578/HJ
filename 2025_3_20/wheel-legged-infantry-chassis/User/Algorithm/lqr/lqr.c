@@ -20,23 +20,23 @@ float joint_K_R[6] = {0, 0, 0, 0, 0, 0};
 
 // KÄâºÏÏµÊı¾ØÕó
 float wheel_fitting_factor[6][4] = {
-        {-130.165318f,158.451767f,-94.905023f,-8.062704f},
-        {-2.161498f,2.408507f,-9.411482f,-0.602114f},
+        {-142.962062f,170.691501f,-97.702468f,-8.522781f},
+        {-3.035372f,3.417258f,-9.540017f,-0.628202f},
 
-        {-6.150089f,6.905605f,-2.629596f,-3.311019f},
-        {63.641480f,-62.429787f,21.276519f,-8.258331f},
+        {-6.029695f,6.904771f,-2.664329f,-3.502159f},
+        {69.586498f,-68.654501f,23.745717f,-8.688708f},
 
-        {-1015.790523f,1232.084150f,-585.447125f,121.239876f},
-        {-41.247701f,47.946208f,-22.513881f,7.401870f}
+        {-1005.441687f,1235.413165f,-594.578507f,123.227386f},
+        {-42.767256f,49.958388f,-23.590138f,7.568442f}
 };float joint_fitting_factor[6][4] = {
-        {-85.364292f,117.803154f,-61.698095f,40.074686f},
-        {19.706616f,-15.504239f,-2.571569f,2.134273f},
+        {-107.315526f,151.403484f,-80.651573f,43.627222f},
+        {21.384137f,-16.324261f,-2.919092f,2.207695f},
 
-        {-7.065733f,30.650713f,-25.634249f,5.970062f},
-        {-143.699353f,172.558958f,-78.792933f,13.233646f},
+        {0.821094f,25.505793f,-25.430769f,6.132719f},
+        {-141.532317f,173.345494f,-80.469832f,13.511360f},
 
-        {3852.797269f,-3899.974057f,1385.099461f,299.804297f},
-        {105.365610f,-120.841200f,54.235343f,4.945279f}
+        {4006.102759f,-4060.315937f,1441.510068f,293.294522f},
+        {110.493678f,-126.711978f,56.480147f,4.710050f}
 };
 
 
@@ -101,7 +101,7 @@ static void state_variable_update(Leg* leg_L, Leg* leg_R, float phi, float phi_d
   leg_R->state_variable_feedback.x_dot = vel_acc[0];
 
   //3.x
-    if(chassis.chassis_ctrl_info.v_m_per_s != 0.0f)
+    if((chassis.chassis_ctrl_info.v_m_per_s != 0.0f) || chassis.chassis_is_offground)
     {
         leg_L->state_variable_feedback.x = 0.0f;
         leg_R->state_variable_feedback.x = 0.0f;
@@ -141,9 +141,18 @@ static void state_variable_set(Leg* leg_L, Leg* leg_R) {
     }
     else
     {
-        leg_L->state_variable_set_point.x = chassis.chassis_ctrl_info.x;
+        if(chassis.chassis_is_offground)
+        {
+            leg_L->state_variable_set_point.x = 0.0f;
+            leg_R->state_variable_set_point.x = 0.0f;
+        }
+        else
+        {
+            leg_L->state_variable_set_point.x = chassis.chassis_ctrl_info.x;
+            leg_R->state_variable_set_point.x = chassis.chassis_ctrl_info.x;
+        }
+
         leg_L->state_variable_set_point.x_dot = chassis.chassis_ctrl_info.v_m_per_s;
-        leg_R->state_variable_set_point.x = chassis.chassis_ctrl_info.x;
         leg_R->state_variable_set_point.x_dot = chassis.chassis_ctrl_info.v_m_per_s;
     }
 

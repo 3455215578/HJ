@@ -409,14 +409,14 @@ static void leg_is_offground(Chassis* chassis)
         chassis->leg_R.leg_is_offground = false;
     }else
     {
-        if(chassis->leg_L.Fn < 50.0f)
+        if(chassis->leg_L.Fn < 55.0f)
         {
             chassis->leg_L.leg_is_offground = true;
         }else{
             chassis->leg_L.leg_is_offground = false;
         }
 
-        if(chassis->leg_R.Fn < 50.0f)
+        if(chassis->leg_R.Fn < 55.0f)
         {
             chassis->leg_R.leg_is_offground = true;
         }else{
