@@ -77,11 +77,15 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
 
 /** Roll PID **/
+<<<<<<< HEAD
 <<<<<<< HEAD:2025_3_20/wheel-legged-infantry-chassis/User/Robot_def/robot_def.h
 #define CHASSIS_ROLL_PID_P 800.0f // 40.0f
 =======
 #define CHASSIS_ROLL_PID_P 400.0f // 40.0f
 >>>>>>> parent of 0e1931f (能用):2025_3_20/wheel-legged-infantry-master/User/Robot_def/robot_def.h
+=======
+#define CHASSIS_ROLL_PID_P 400.0f // 40.0f
+>>>>>>> parent of 0e1931f (能用)
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f

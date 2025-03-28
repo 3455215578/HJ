@@ -51,6 +51,7 @@ function K = get_k_length(leg_length)
 
 %     Q = diag([230 0.1 20 3 20000 1]);
 % Q = diag([230 0.1 25 3 20000 1]);
+<<<<<<< HEAD
 <<<<<<< HEAD:2025_3_20/wheel-legged-infantry-chassis/User/Matlab/get_k_length.m
 %   Q = diag([1 0.1 18 15 20000 1]);
 %    Q = diag([1 0.1 100 0.5 20000 1]);
@@ -58,6 +59,9 @@ function K = get_k_length(leg_length)
 =======
 Q = diag([350 0.1 25 3 20000 1]);
 >>>>>>> parent of 0e1931f (能用):2025_3_20/wheel-legged-infantry-master/User/Matlab/get_k_length.m
+=======
+Q = diag([350 0.1 25 3 20000 1]);
+>>>>>>> parent of 0e1931f (能用)
 
     R = [1.35 0;0 0.1];
     

@@ -388,22 +388,30 @@ static void leg_is_offground(Chassis* chassis)
         chassis->leg_R.leg_is_offground = false;
     }else
     {
+<<<<<<< HEAD
 <<<<<<< HEAD:2025_3_20/wheel-legged-infantry-chassis/User/Algorithm/vmc/vmc.c
         if(chassis->leg_L.Fn < 55.0f)
 =======
         if(chassis->leg_L.Fn < 20.0f)
 >>>>>>> parent of 0e1931f (能用):2025_3_20/wheel-legged-infantry-master/User/Algorithm/vmc/vmc.c
+=======
+        if(chassis->leg_L.Fn < 20.0f)
+>>>>>>> parent of 0e1931f (能用)
         {
             chassis->leg_L.leg_is_offground = true;
         }else{
             chassis->leg_L.leg_is_offground = false;
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:2025_3_20/wheel-legged-infantry-chassis/User/Algorithm/vmc/vmc.c
         if(chassis->leg_R.Fn < 55.0f)
 =======
         if(chassis->leg_R.Fn < 20.0f)
 >>>>>>> parent of 0e1931f (能用):2025_3_20/wheel-legged-infantry-master/User/Algorithm/vmc/vmc.c
+=======
+        if(chassis->leg_R.Fn < 20.0f)
+>>>>>>> parent of 0e1931f (能用)
         {
             chassis->leg_R.leg_is_offground = true;
         }else{
