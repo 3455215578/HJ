@@ -492,7 +492,7 @@ static void chassis_enable_task() {
     if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.10f;
     }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
-        chassis.chassis_ctrl_info.height_m = 0.24f;
+        chassis.chassis_ctrl_info.height_m = 0.22f;
     }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.35f;
     }
@@ -508,7 +508,7 @@ static void chassis_enable_task() {
     chassis_vx_kalman_run();
 
 
-    chassis_is_offground();
+//    chassis_is_offground();
 
 }
 
