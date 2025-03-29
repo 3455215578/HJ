@@ -53,7 +53,7 @@ typedef double fp64;
 
 /** PID参数 **/
 /** 转向PID **/
-#define CHASSIS_TURN_PID_P 5.0f
+#define CHASSIS_TURN_PID_P 10.0f
 #define CHASSIS_TURN_PID_I 0.0f
 #define CHASSIS_TURN_PID_D 3.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
@@ -140,9 +140,7 @@ typedef struct{
     float roll_angle;
     float pitch_angle;
     float yaw_angle;
-    float yaw_last_angle;
     float yaw_total_angle;
-    float yaw_round_count;
 
 
     //三轴角速度
