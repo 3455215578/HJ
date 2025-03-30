@@ -8,7 +8,6 @@
 #include "robot_def.h"
 
 extern Chassis chassis;
-extern Joint App_joint;
 
 extern float vel_acc[2]; // 轮毂速度与加速度融合后的结果
 

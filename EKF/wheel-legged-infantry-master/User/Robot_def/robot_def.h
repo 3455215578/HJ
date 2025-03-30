@@ -117,22 +117,6 @@ typedef enum{
     CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
 
-<<<<<<< HEAD
-typedef enum{
-    JOINT_DISABLE = 1, // 失能模式
-    JOINT_ENABLE, // 使能模式
-    JOINT_INIT, // 初始化模式
-    JOINT_JUMP, // 跳跃模式
-} JointCtrlMode;
-
-typedef enum{
-    WHEEL_DISABLE = 1, // 失能模式
-    WHEEL_ENABLE, // 使能模式
-    WHEEL_INIT, // 初始化模式
-    WHEEL_JUMP, // 跳跃模式
-    WHEEL_SPIN, // 小陀螺
-} WheelCtrlMode;
-
 typedef struct{
     float v_m_per_s; // 期望速度
     float x; // 期望位移
@@ -144,21 +128,7 @@ typedef struct{
 
 } ChassisCtrlInfo;
 
-typedef struct{
-    float v_m_per_s; // 期望速度
-    float roll_angle_rad;
-    float height_m; // 期望腿长
 
-} JointCtrlInfo;
-
-typedef struct{
-    float v_m_per_s; // 期望速度
-    float yaw_angle_rad;
-    float spin_speed;
-} WheelCtrlInfo;
-
-=======
->>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
 /** 跳跃状态结构体 **/
 typedef enum{
     NOT_READY,
@@ -194,11 +164,6 @@ typedef struct{
 
 } IMUReference;
 
-
-<<<<<<< HEAD
-=======
-} ChassisCtrlInfo;
->>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
 
 /** 状态变量结构体 **/
 typedef struct{
@@ -380,7 +345,6 @@ typedef struct{
     float joint_F_torque; // 关节力矩
     float joint_B_torque;
 
-
     /** 竖直方向支持力 **/
     MovingAverageFilter theta_ddot_filter; // dd_theta的移动平均滤波器, 用于计算竖直方向支持力Fn
     MovingAverageFilter Fn_filter; // 竖直方向支持力Fn的移动平均滤波器
@@ -436,130 +400,5 @@ typedef struct{
 
 } Chassis;
 
-
-
-/*******************************************************************************
- *                                    云台                                     *
- *******************************************************************************/
-
-<<<<<<< HEAD
-    /** 跳跃 **/
-    JumpState jump_state;
-
-    /** PID **/
-    Pid chassis_leg_coordination_pid; // 防劈叉pid
-    Pid chassis_roll_pid;             // roll补偿pid
-
-    float steer_compensatory_torque;  // 防劈叉力矩
-    float phi0_error;
-
-    /** flag **/
-    bool init_flag;            // 关节初始化完成标志位
-
-    bool chassis_is_balance;   // 平衡标志位
-    bool recover_finish;       // 倒地自起完成标志位
-
-    bool chassis_is_offground; // 离地标志位
-
-    bool jump_flag;            // 跳跃标志位
-
-} Joint;
-
-/** 轮毂结构体 **/
-typedef struct{
-=======
-
-////云台电机的反馈量
-//typedef struct
-//{
-//    uint16_t ecd; // 编码器值
-//    int16_t last_ecd;
-//    int16_t speed_rpm; // 反馈回来的转速
-//    int16_t feedback_current; // 施加在电机上的电流
-//    uint8_t temperate; // 温度
-//
-//    int32_t round_cnt;   //电机旋转的总圈数
-//    int32_t total_ecd;   //电机旋转的总编码器值
-//
-//    uint16_t offset_ecd;//电机的校准编码值
-//} motor_measure_t;
-//
-//typedef struct
-//{
-//    const motor_measure_t *motor_measure;
-//
-//    fp32 speed;
-//
-//    fp32 rpm_set;
-//
-//    pid_t speed_p;
-//
-//    int16_t give_current;
-//
-//
-//}motor_3508_t;
-//
-//typedef struct
-//{
-//    motor_measure_t *motor_measure;
-//
-//    pid_t angle_pos_pid; // 云台角度位置环pid
-//    pid_t angle_speed_pid; // 云台角度速度环pid
-//
-//    fp32 relative_angle_get;
-//    fp32 relative_angle_set; //°
-//
-//    fp32 absolute_angle_get;
-//    fp32 absolute_angle_set;//rad
-//
-//    fp32 gyro_set;  //转速设置
-//    int16_t give_current; //最终电流值
-//
-//}motor_6020_t;
-//
-//
-//typedef struct
-//{
-//    motor_measure_t *motor_measure;
-//
-//    pid_t angle_p;//角度环pid
-//
-//    pid_t speed_p;//速度环pid
-//
-//    fp32 speed;//转速期望值
-//
-//    int16_t give_current;
-//
-//}motor_2006_t;
->>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
-
-    /** 传感器 **/
-    IMUReference imu_reference;
-
-    /** 遥控器信息 **/
-    WheelCtrlMode wheel_ctrl_mode;
-    WheelCtrlMode wheel_ctrl_mode_last;
-    WheelCtrlInfo wheel_ctrl_info;
-
-    /** PID **/
-    Pid chassis_turn_pid;             // 转向pid
-
-    float wheel_turn_torque;          // 转向力矩
-//  Pid chassis_vw_speed_pid;
-//  Pid chassis_spin_pid;
-
-    /** flag **/
-
-    bool init_flag;            // 轮毂初始化完成标志位
-
-    bool chassis_is_balance;   // 平衡标志位
-    bool recover_finish;       // 倒地自起完成标志位
-
-    bool chassis_is_offground; // 离地标志位
-
-} Wheel;
-
-extern Leg leg_L;
-extern Leg leg_R;
 
 #endif
