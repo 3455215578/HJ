@@ -13,8 +13,8 @@
 #include "moving_filter.h"
 #include "vx_kalman_filter.h"
 
-#include "Device_joint.h"
-#include "Device_wheel.h"
+#include "joint.h"
+#include "wheel.h"
 #include "remote.h"
 #include "error.h"
 
@@ -130,6 +130,11 @@ static void get_IMU_info() {
     /** 更新各轴加速度和角速度 **/
     chassis.imu_reference.pitch_gyro = -INS.Gyro[Y];
     chassis.imu_reference.yaw_gyro = -INS.Gyro[Z];
+    chassis.imu_reference.roll_gyro = INS.Gyro[X];
+
+    chassis.imu_reference.ax = INS.Accel[X];
+    chassis.imu_reference.ay = INS.Accel[Y];
+    chassis.imu_reference.az = INS.Accel[Z];
 
     /** 机体竖直方向加速度 **/
     chassis.imu_reference.robot_az = INS.MotionAccel_n[Z];
@@ -157,17 +162,53 @@ static void chassis_motor_cmd_send() {
 
     if(chassis.chassis_ctrl_mode != CHASSIS_DISABLE)
     {
+//        set_joint_torque(0.0f,
+//                         0.0f,
+//                         0.0f,
+//                         0.0f);
 
-        set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
+//        set_wheel_torque(0.0f, 0.0f);
+
+
+//
+//        if(!chassis.joint_is_reset)
+//        {
+//            LF_pos = LF_RESET;
+//            LB_pos = LB_RESET;
+//            RF_pos = RF_RESET;
+//            RB_pos = RB_RESET;
+//            p = 20.0f;
+//            d = 5.0f;
+//        }
+//        else
+//        {
+//            LF_pos = 0.0f;
+//            LB_pos = 0.0f;
+//            RF_pos = 0.0f;
+//            RB_pos = 0.0f;
+//            p = 0.0f;
+//            d = 0.0f;
+//        }
+
+//        set_joint_torque(0.0f,
+//                         0.0f,
+//                         0.0f,
+//                         0.0f,
+//                         LF_pos,
+//                         LB_pos,
+//                         RF_pos,
+//                         RB_pos,
+//                         p,
+//                         d);
+//
+//        set_wheel_torque(0, 0);
 
         set_joint_torque(-chassis.leg_L.joint_F_torque,
                          -chassis.leg_L.joint_B_torque,
                          chassis.leg_R.joint_F_torque,
                          chassis.leg_R.joint_B_torque);
 
-//        osDelay(1);
-//        set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
-
+        set_wheel_torque(-chassis.leg_L.wheel_torque, -chassis.leg_R.wheel_torque);
     }
     else
     {
@@ -464,6 +505,7 @@ extern void chassis_task(void const *pvParameters) {
 
     chassis_init();
 
+    // ???
     TickType_t last_wake_time = xTaskGetTickCount();
 
     while (1) {

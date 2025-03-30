@@ -117,6 +117,7 @@ typedef enum{
     CHASSIS_SPIN, // 小陀螺
 } ChassisCtrlMode;
 
+<<<<<<< HEAD
 typedef enum{
     JOINT_DISABLE = 1, // 失能模式
     JOINT_ENABLE, // 使能模式
@@ -156,6 +157,8 @@ typedef struct{
     float spin_speed;
 } WheelCtrlInfo;
 
+=======
+>>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
 /** 跳跃状态结构体 **/
 typedef enum{
     NOT_READY,
@@ -173,9 +176,16 @@ typedef struct{
     float yaw_angle;
     float yaw_total_angle;
 
+
     //三轴角速度
     float pitch_gyro;
     float yaw_gyro;
+    float roll_gyro;
+
+    //三轴加速度
+    float ax;
+    float ay;
+    float az;
 
     // 机体竖直向上的加速度
     float robot_az;
@@ -183,6 +193,10 @@ typedef struct{
 } IMUReference;
 
 
+<<<<<<< HEAD
+=======
+} ChassisCtrlInfo;
+>>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
 
 /** 状态变量结构体 **/
 typedef struct{
@@ -399,6 +413,7 @@ typedef struct{
 
     float wheel_turn_torque;          // 转向力矩
     float steer_compensatory_torque;  // 防劈叉力矩
+    float theta_error;                // 两条腿之间theta的误差
     float phi0_error;
 //  Pid chassis_vw_speed_pid;
 //  Pid chassis_spin_pid;
@@ -419,17 +434,13 @@ typedef struct{
 
 } Chassis;
 
-/** 关节结构体 **/
-typedef struct{
 
-    /** 传感器 **/
-    IMUReference imu_reference;
 
-    /** 遥控器信息 **/
-    JointCtrlMode joint_ctrl_mode;
-    JointCtrlMode joint_ctrl_mode_last;
-    JointCtrlInfo joint_ctrl_info;
+/*******************************************************************************
+ *                                    云台                                     *
+ *******************************************************************************/
 
+<<<<<<< HEAD
     /** 跳跃 **/
     JumpState jump_state;
 
@@ -454,6 +465,71 @@ typedef struct{
 
 /** 轮毂结构体 **/
 typedef struct{
+=======
+
+////云台电机的反馈量
+//typedef struct
+//{
+//    uint16_t ecd; // 编码器值
+//    int16_t last_ecd;
+//    int16_t speed_rpm; // 反馈回来的转速
+//    int16_t feedback_current; // 施加在电机上的电流
+//    uint8_t temperate; // 温度
+//
+//    int32_t round_cnt;   //电机旋转的总圈数
+//    int32_t total_ecd;   //电机旋转的总编码器值
+//
+//    uint16_t offset_ecd;//电机的校准编码值
+//} motor_measure_t;
+//
+//typedef struct
+//{
+//    const motor_measure_t *motor_measure;
+//
+//    fp32 speed;
+//
+//    fp32 rpm_set;
+//
+//    pid_t speed_p;
+//
+//    int16_t give_current;
+//
+//
+//}motor_3508_t;
+//
+//typedef struct
+//{
+//    motor_measure_t *motor_measure;
+//
+//    pid_t angle_pos_pid; // 云台角度位置环pid
+//    pid_t angle_speed_pid; // 云台角度速度环pid
+//
+//    fp32 relative_angle_get;
+//    fp32 relative_angle_set; //°
+//
+//    fp32 absolute_angle_get;
+//    fp32 absolute_angle_set;//rad
+//
+//    fp32 gyro_set;  //转速设置
+//    int16_t give_current; //最终电流值
+//
+//}motor_6020_t;
+//
+//
+//typedef struct
+//{
+//    motor_measure_t *motor_measure;
+//
+//    pid_t angle_p;//角度环pid
+//
+//    pid_t speed_p;//速度环pid
+//
+//    fp32 speed;//转速期望值
+//
+//    int16_t give_current;
+//
+//}motor_2006_t;
+>>>>>>> parent of 7ba7e41 (灏濊瘯灏嗗簳鐩樹换鍔″垎涓篔oint鍜學heel)
 
     /** 传感器 **/
     IMUReference imu_reference;

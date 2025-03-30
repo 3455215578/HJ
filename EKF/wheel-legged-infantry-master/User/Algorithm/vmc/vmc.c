@@ -4,7 +4,7 @@
 #include "robot_def.h"
 #include "vmc.h"
 #include "user_lib.h"
-#include "Device_joint.h"
+#include "joint.h"
 #include "moving_filter.h"
 
 extern Chassis chassis;
