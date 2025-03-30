@@ -109,14 +109,6 @@ typedef struct{
 } ChassisPhysicalConfig;
 
 /** 底盘模式结构体 **/
-//typedef enum{
-//    CHASSIS_DISABLE = 1, // 失能模式
-//    CHASSIS_INIT, // 初始化模式
-//    CHASSIS_ENABLE, // 使能模式
-//    CHASSIS_JUMP, // 跳跃模式
-//    CHASSIS_SPIN, // 小陀螺
-//} ChassisCtrlMode;
-
 typedef enum{
     CHASSIS_DISABLE = 1, // 失能模式
     CHASSIS_ENABLE, // 使能模式
@@ -131,6 +123,38 @@ typedef enum{
     JOINT_INIT, // 初始化模式
     JOINT_JUMP, // 跳跃模式
 } JointCtrlMode;
+
+typedef enum{
+    WHEEL_DISABLE = 1, // 失能模式
+    WHEEL_ENABLE, // 使能模式
+    WHEEL_INIT, // 初始化模式
+    WHEEL_JUMP, // 跳跃模式
+    WHEEL_SPIN, // 小陀螺
+} WheelCtrlMode;
+
+typedef struct{
+    float v_m_per_s; // 期望速度
+    float x; // 期望位移
+    float pitch_angle_rad;
+    float yaw_angle_rad;
+    float roll_angle_rad;
+    float height_m; // 期望腿长
+    float spin_speed;
+
+} ChassisCtrlInfo;
+
+typedef struct{
+    float v_m_per_s; // 期望速度
+    float roll_angle_rad;
+    float height_m; // 期望腿长
+
+} JointCtrlInfo;
+
+typedef struct{
+    float v_m_per_s; // 期望速度
+    float yaw_angle_rad;
+    float spin_speed;
+} WheelCtrlInfo;
 
 /** 跳跃状态结构体 **/
 typedef enum{
@@ -158,25 +182,7 @@ typedef struct{
 
 } IMUReference;
 
-typedef struct{
-    float v_m_per_s; // 期望速度
-    float x; // 期望位移
-    float pitch_angle_rad;
-    float yaw_angle_rad;
-    float roll_angle_rad;
-    float height_m; // 期望腿长
-    float spin_speed;
 
-} ChassisCtrlInfo;
-
-typedef struct{
-    float v_m_per_s; // 期望速度
-    float x; // 期望位移
-    float pitch_angle_rad;
-    float roll_angle_rad;
-    float height_m; // 期望腿长
-
-} JointCtrlInfo;
 
 /** 状态变量结构体 **/
 typedef struct{
@@ -424,10 +430,6 @@ typedef struct{
     JointCtrlMode joint_ctrl_mode_last;
     JointCtrlInfo joint_ctrl_info;
 
-    /** 腿部 **/
-    Leg leg_L;
-    Leg leg_R;
-
     /** 跳跃 **/
     JumpState jump_state;
 
@@ -436,7 +438,6 @@ typedef struct{
     Pid chassis_roll_pid;             // roll补偿pid
 
     float steer_compensatory_torque;  // 防劈叉力矩
-    float theta_error;                // 两条腿之间theta的误差
     float phi0_error;
 
     /** flag **/
@@ -451,7 +452,36 @@ typedef struct{
 
 } Joint;
 
+/** 轮毂结构体 **/
+typedef struct{
 
+    /** 传感器 **/
+    IMUReference imu_reference;
 
+    /** 遥控器信息 **/
+    WheelCtrlMode wheel_ctrl_mode;
+    WheelCtrlMode wheel_ctrl_mode_last;
+    WheelCtrlInfo wheel_ctrl_info;
+
+    /** PID **/
+    Pid chassis_turn_pid;             // 转向pid
+
+    float wheel_turn_torque;          // 转向力矩
+//  Pid chassis_vw_speed_pid;
+//  Pid chassis_spin_pid;
+
+    /** flag **/
+
+    bool init_flag;            // 轮毂初始化完成标志位
+
+    bool chassis_is_balance;   // 平衡标志位
+    bool recover_finish;       // 倒地自起完成标志位
+
+    bool chassis_is_offground; // 离地标志位
+
+} Wheel;
+
+extern Leg leg_L;
+extern Leg leg_R;
 
 #endif

@@ -10,3 +10,7 @@ ChassisPhysicalConfig chassis_physical_config = {0.075f,
                                                  0.27f,
                                                  0.15f,
                                                  0.15f};
+
+/** Õ»≤ø **/
+Leg leg_L;
+Leg leg_R;

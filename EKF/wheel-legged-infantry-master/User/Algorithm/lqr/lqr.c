@@ -8,6 +8,7 @@
 #include "robot_def.h"
 
 extern Chassis chassis;
+extern Joint App_joint;
 
 extern float vel_acc[2]; // 轮毂速度与加速度融合后的结果
 
@@ -202,7 +203,6 @@ static void state_variable_out(Leg* leg_L, Leg* leg_R) {
 /*******************************************************************************
  *                                     LQR                                     *
  *******************************************************************************/
-
 void lqr_ctrl(void) {
 
   // K矩阵拟合

@@ -6,41 +6,16 @@
 #include "device_joint.h"
 #include "remote.h"
 #include "user_lib.h"
-#include "gimbal.h"
 #include "error.h"
+#include "vmc.h"
 
 Joint App_joint;
+extern ChassisPhysicalConfig chassis_physical_config;
 
 /**********************  Function  ******************************/
+static void joint_state_variable_update(void)
+{
 
-static void joint_motor_cmd_send() {
-
-/** DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出 **/
-#if DEBUG_MODE
-    set_joint_torque(0, 0, 0, 0);
-#else
-
-    if(App_joint.joint_ctrl_mode != JOINT_DISABLE)
-    {
-        set_joint_torque(-App_joint.leg_L.joint_F_torque,
-                         -App_joint.leg_L.joint_B_torque,
-                         App_joint.leg_R.joint_F_torque,
-                         App_joint.leg_R.joint_B_torque);
-
-    }
-    else
-    {
-        for(int i = 0; i < 10; i++)
-        {
-            set_joint_torque(0.0f,
-                             0.0f,
-                             0.0f,
-                             0.0f);
-            osDelay(1);
-        }
-
-    }
-#endif
 }
 
 /** 关节接收遥控器信息 **/
@@ -74,31 +49,81 @@ static void joint_device_offline_handle() {
     }
 }
 
+static void joint_get_IMU_info() {
+
+    /** Yaw **/
+    App_joint.imu_reference.yaw_angle = -INS.Yaw * DEGREE_TO_RAD;
+    App_joint.imu_reference.yaw_total_angle = -INS.YawTotalAngle * DEGREE_TO_RAD;
+
+    /** Pitch **/
+    App_joint.imu_reference.pitch_angle = -INS.Roll * DEGREE_TO_RAD;
+
+    /** Roll **/
+    App_joint.imu_reference.roll_angle = INS.Pitch * DEGREE_TO_RAD;
+
+    /** 更新各轴加速度和角速度 **/
+    App_joint.imu_reference.pitch_gyro = -INS.Gyro[Y];
+
+    /** 机体竖直方向加速度 **/
+    App_joint.imu_reference.robot_az = INS.MotionAccel_n[Z];
+
+}
+
+
+static void joint_motor_cmd_send() {
+
+/** DEBUG_MODE: 置1时进入调试模式，关闭关节和轮毂输出 **/
+#if DEBUG_MODE
+    set_joint_torque(0, 0, 0, 0);
+#else
+
+    if(App_joint.joint_ctrl_mode != JOINT_DISABLE)
+    {
+        set_joint_torque(-leg_L.joint_F_torque,
+                         -leg_L.joint_B_torque,
+                         leg_R.joint_F_torque,
+                         leg_R.joint_B_torque);
+    }
+    else
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            set_joint_torque(0.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f);
+            osDelay(1);
+        }
+
+    }
+#endif
+}
+
 static void Joint_Pid_Init(void)
 {
     /** 腿长PID **/
-    pid_init(&App_joint.leg_L.leg_pos_pid,
+    pid_init(&leg_L.leg_pos_pid,
              CHASSIS_LEG_L0_POS_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_P,
              CHASSIS_LEG_L0_POS_PID_I,
              CHASSIS_LEG_L0_POS_PID_D);
 
-    pid_init(&App_joint.leg_R.leg_pos_pid,
+    pid_init(&leg_R.leg_pos_pid,
              CHASSIS_LEG_L0_POS_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_P,
              CHASSIS_LEG_L0_POS_PID_I,
              CHASSIS_LEG_L0_POS_PID_D);
 
-    pid_init(&App_joint.leg_L.leg_speed_pid,
+    pid_init(&leg_L.leg_speed_pid,
              CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT,
              CHASSIS_LEG_L0_SPEED_PID_P,
              CHASSIS_LEG_L0_SPEED_PID_I,
              CHASSIS_LEG_L0_SPEED_PID_D);
 
-    pid_init(&App_joint.leg_R.leg_speed_pid,
+    pid_init(&leg_R.leg_speed_pid,
              CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT,
              CHASSIS_LEG_L0_SPEED_PID_P,
@@ -106,14 +131,14 @@ static void Joint_Pid_Init(void)
              CHASSIS_LEG_L0_SPEED_PID_D);
 
     // 离地后的腿长PID
-    pid_init(&App_joint.leg_L.offground_leg_pid,
+    pid_init(&leg_L.offground_leg_pid,
              CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT,
              CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT,
              CHASSIS_OFFGROUND_LO_PID_P,
              CHASSIS_OFFGROUND_L0_PID_I,
              CHASSIS_OFFGROUND_L0_PID_D);
 
-    pid_init(&App_joint.leg_R.offground_leg_pid,
+    pid_init(&leg_R.offground_leg_pid,
              CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT,
              CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT,
              CHASSIS_OFFGROUND_LO_PID_P,
@@ -137,24 +162,22 @@ static void Joint_Pid_Init(void)
              CHASSIS_ROLL_PID_D);
 }
 
-static void joint_get_IMU_info() {
+static void Joint_Init(void)
+{
+    /** 初始化关节模式 **/
+    App_joint.joint_ctrl_mode = JOINT_DISABLE;
 
-    /** Yaw **/
-    App_joint.imu_reference.yaw_angle = -INS.Yaw * DEGREE_TO_RAD;
-    App_joint.imu_reference.yaw_total_angle = -INS.YawTotalAngle * DEGREE_TO_RAD;
+    /** 关节电机初始化 **/
+    joint_init();
 
-    /** Pitch **/
-    App_joint.imu_reference.pitch_angle = -INS.Roll * DEGREE_TO_RAD;
+    /** 关节Pid初始化 **/
+    Joint_Pid_Init();
 
-    /** Roll **/
-    App_joint.imu_reference.roll_angle = INS.Pitch * DEGREE_TO_RAD;
-
-    /** 更新各轴加速度和角速度 **/
-    App_joint.imu_reference.pitch_gyro = -INS.Gyro[Y];
-
-    /** 机体竖直方向加速度 **/
-    App_joint.imu_reference.robot_az = INS.MotionAccel_n[Z];
-
+    /** 移动平均滤波器初始化 **/
+    moving_average_filter_init(&leg_L.Fn_filter);
+    moving_average_filter_init(&leg_R.Fn_filter);
+    moving_average_filter_init(&leg_L.theta_ddot_filter);
+    moving_average_filter_init(&leg_R.theta_ddot_filter);
 }
 
 static void joint_chassis_is_balanced() {
@@ -179,19 +202,31 @@ static void joint_chassis_is_balanced() {
     }
 }
 
+// 倒地自救
+static void joint_chassis_selfhelp(void)
+{
+    if (!App_joint.recover_finish)
+    {
+        leg_L.joint_F_torque = 0;
+        leg_L.joint_B_torque = 0;
+        leg_R.joint_F_torque = 0;
+        leg_R.joint_B_torque = 0;
+    }
+}
+
 /*********************** 任务 ***************************/
 static void joint_disable_task() {
 
-    App_joint.leg_L.joint_F_torque = 0;
-    App_joint.leg_L.joint_B_torque = 0;
-    App_joint.leg_R.joint_F_torque = 0;
-    App_joint.leg_R.joint_B_torque = 0;
+    leg_L.joint_F_torque = 0;
+    leg_L.joint_B_torque = 0;
+    leg_R.joint_F_torque = 0;
+    leg_R.joint_B_torque = 0;
 
     App_joint.joint_ctrl_mode = JOINT_DISABLE;
     App_joint.jump_state = NOT_READY;
 
-    App_joint.leg_L.state_variable_feedback.x = 0.0f;
-    App_joint.leg_R.state_variable_feedback.x = 0.0f;
+    leg_L.state_variable_feedback.x = 0.0f;
+    leg_R.state_variable_feedback.x = 0.0f;
 
     App_joint.joint_ctrl_info.height_m = MIN_L0;
 
@@ -205,31 +240,19 @@ static void joint_disable_task() {
     App_joint.recover_finish = false;
 
     // 离地标志位
-    App_joint.leg_L.leg_is_offground = false;
-    App_joint.leg_R.leg_is_offground = false;
-    App_joint.chassis_is_offground   = false;
-//
-//    // 跳跃标志位
-//    chassis.jump_flag = false;
+    leg_L.leg_is_offground = false;
+    leg_R.leg_is_offground = false;
+    App_joint.chassis_is_offground = false;
+
 }
 
 static void joint_init_task() {
 
-    /** 关节电机初始化 **/
-    joint_init();
-
     /** 关节电机使能 **/
     joint_enable();
 
-    /** 关节Pid初始化 **/
-    Joint_Pid_Init();
-
-    /** 移动平均滤波器初始化 **/
-    moving_average_filter_init(&App_joint.leg_L.Fn_filter);
-    moving_average_filter_init(&App_joint.leg_R.Fn_filter);
-    moving_average_filter_init(&App_joint.leg_L.theta_ddot_filter);
-    moving_average_filter_init(&App_joint.leg_R.theta_ddot_filter);
-
+    /** 关节电机初始化完毕 **/
+    App_joint.init_flag = true;
 }
 
 
@@ -249,9 +272,9 @@ static void joint_enable_task() {
 
     lqr_ctrl();
 
-    vmc_ctrl();
+    joint_vmc_ctrl();
 
-//    chassis_selfhelp();
+    joint_chassis_selfhelp();
 //
 //    chassis_vx_kalman_run();
 
@@ -261,10 +284,9 @@ static void joint_enable_task() {
 
 void Joint_Task(void)
 {
-    joint_init_task();
+    Joint_Init();
 
     TickType_t last_wake_time = xTaskGetTickCount();
-
 
     while(1)
     {

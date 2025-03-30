@@ -129,7 +129,7 @@ static void forward_kinematics(Leg* leg_L, Leg* leg_R, ChassisPhysicalConfig *ph
 }
 
 // vmc正动力学解算
-static void forward_dynamics(VMC *vmc, const ChassisPhysicalConfig *physical_config) {
+void forward_dynamics(VMC *vmc, const ChassisPhysicalConfig *physical_config) {
     if (vmc == NULL)
     {
         return;
@@ -433,6 +433,47 @@ static void leg_is_offground(Chassis* chassis)
 /*******************************************************************************
  *                                     VMC                                     *
  *******************************************************************************/
+void joint_vmc_ctrl(void) {
+
+    // 更新phi1 phi4
+    vmc_phi_update(&chassis.leg_L, &chassis.leg_R);
+
+    // VMC 正运动学解算
+    forward_kinematics(&chassis.leg_L, &chassis.leg_R, &chassis_physical_config);
+
+    // 配置输出力矩
+    joint_motors_torque_set(&chassis, &chassis_physical_config);
+
+    // VMC 逆动力学解算
+    // 根据关节反馈力矩逆解算出虚拟力(F Tp)
+    Inverse_Dynamics(&chassis.leg_L.vmc,
+                     (get_joint_motors() + 1)->torque,
+                     get_joint_motors()->torque,
+                     &chassis_physical_config);
+    Inverse_Dynamics(&chassis.leg_R.vmc,
+                     -(get_joint_motors() + 2)->torque,
+                     -(get_joint_motors() + 3)->torque,
+                     &chassis_physical_config);
+
+    Inverse_Kinematics(&chassis.leg_L.vmc,
+                       (get_joint_motors() + 1)->angular_vel,
+                       get_joint_motors()->angular_vel,
+                       &chassis_physical_config);
+
+    Inverse_Kinematics(&chassis.leg_R.vmc,
+                       -(get_joint_motors() + 2)->angular_vel,
+                       -(get_joint_motors() + 3)->angular_vel,
+                       &chassis_physical_config);
+
+    // 竖直方向支持力解算
+    fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
+    fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
+
+//    // 腿部离地检测
+//    leg_is_offground(&chassis);
+
+}
+
 void vmc_ctrl(void) {
 
     // 更新phi1 phi4
