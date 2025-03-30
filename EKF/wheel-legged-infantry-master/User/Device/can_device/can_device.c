@@ -1,7 +1,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_can.h"
-#include "joint.h"
-#include "wheel.h"
+#include "Device_joint.h"
+#include "Device_wheel.h"
 #include "gimbal.h"
 
 extern CAN_HandleTypeDef hcan1;

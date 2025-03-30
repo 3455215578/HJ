@@ -1,4 +1,4 @@
-#include "joint.h"
+#include "device_joint.h"
 #include "cmsis_os.h"
 #include "chassis.h"
 
@@ -17,19 +17,10 @@ void joint_enable() {
     {
         set_dm8009_enable(CAN_2, JOINT_LF_SEND);
         osDelay(1);
-    }
-    for(int i = 0; i < 10; i ++)
-    {
         set_dm8009_enable(CAN_2, JOINT_LB_SEND);
         osDelay(1);
-    }
-    for(int i = 0; i < 10; i ++)
-    {
         set_dm8009_enable(CAN_2, JOINT_RF_SEND);
         osDelay(1);
-    }
-    for(int i = 0; i < 10; i ++)
-    {
         set_dm8009_enable(CAN_2, JOINT_RB_SEND);
         osDelay(1);
     }

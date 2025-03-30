@@ -1,7 +1,7 @@
 #include "vx_kalman_filter.h"
 #include "robot_def.h"
-#include "wheel.h"
-#include "joint.h"
+#include "Device_wheel.h"
+#include "App_joint.h"
 #include "cmsis_os.h"
 #include "ins.h"
 

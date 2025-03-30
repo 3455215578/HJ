@@ -60,6 +60,8 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
         User/Algorithm/user_lib
         User/Algorithm/vmc
 
+        User/App/App_joint
+        User/App/App_wheel
         User/App/chassis
         User/App/gimbal
         User/App/ins

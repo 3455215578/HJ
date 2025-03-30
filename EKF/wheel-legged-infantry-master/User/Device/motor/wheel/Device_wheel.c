@@ -1,4 +1,4 @@
-#include "wheel.h"
+#include "Device_wheel.h"
 #include <cmsis_os.h>
 
 static Lk9025 wheel[2];
