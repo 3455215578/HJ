@@ -42,21 +42,18 @@ static void chassis_device_offline_handle() {
 
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
+    float target_speed = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
 
-    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
+    // 加速
+    if(target_speed != 0.0f)
+    {
+        slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.02f);
+    }
+    else // 减速
+    {
+        slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.05f);
 
-//    float target_speed = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
-//
-//    // 加速
-//    if(target_speed != 0.0f)
-//    {
-//        slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.02f);
-//    }
-//    else // 减速
-//    {
-//        slope_following(&target_speed, &chassis.chassis_ctrl_info.v_m_per_s, 0.05f);
-//
-//    }
+    }
     chassis.chassis_ctrl_info.x = chassis.chassis_ctrl_info.x + CHASSIS_PERIOD * 0.001f * chassis.chassis_ctrl_info.v_m_per_s;
 
     chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
@@ -426,6 +423,9 @@ static void chassis_disable_task() {
     chassis.leg_L.state_variable_feedback.x = 0.0f;
     chassis.leg_R.state_variable_feedback.x = 0.0f;
 
+//    chassis.leg_L.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
+//    chassis.leg_R.state_variable_feedback.x = chassis.chassis_ctrl_info.x;
+
     chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
 
     chassis.chassis_ctrl_info.height_m = MIN_L0;
@@ -490,6 +490,7 @@ static void chassis_enable_task() {
     chassis_selfhelp();
 
     chassis_vx_kalman_run();
+
 
 //    chassis_is_offground();
 

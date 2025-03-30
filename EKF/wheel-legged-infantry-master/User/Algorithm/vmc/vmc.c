@@ -409,20 +409,20 @@ static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_c
     float Fn_raw = P + chassis_physical_config->wheel_weight * 9.8f + chassis_physical_config->wheel_weight * leg_az;
 
     update_moving_average_filter(&leg->Fn_filter, Fn_raw);
-    leg->Fn = get_moving_average_filtered_value(&leg->Fn_filter);
+    leg->Fn = get_moving_average_filtered_value(&leg->Fn_filter) - 20.0f;
 
 }
 
 static void leg_is_offground(Chassis* chassis)
 {
-    if(chassis->leg_L.Fn < 30.0f)
+    if(chassis->leg_L.Fn < 40.0f)
     {
         chassis->leg_L.leg_is_offground = true;
     }else{
         chassis->leg_L.leg_is_offground = false;
     }
 
-    if(chassis->leg_R.Fn < 30.0f)
+    if(chassis->leg_R.Fn < 40.0f)
     {
         chassis->leg_R.leg_is_offground = true;
     }else{
