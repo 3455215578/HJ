@@ -79,7 +79,7 @@ static void wheel_disable_task() {
     chassis.leg_L.state_variable_feedback.x = 0.0f;
     chassis.leg_R.state_variable_feedback.x = 0.0f;
 
-    chassis.chassis_ctrl_info.yaw_angle_rad = chassis.imu_reference.yaw_total_angle;
+    chassis.chassis_ctrl_info.yaw_rad = chassis.imu_reference.yaw_total_rad;
 
     /** 初始化标志位 **/
 
@@ -98,7 +98,7 @@ static void wheel_enable_task(void)
     if (chassis.chassis_ctrl_mode != CHASSIS_SPIN)
     {
         // 计算转向力矩
-        chassis.wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis.imu_reference.yaw_total_angle - chassis.chassis_ctrl_info.yaw_angle_rad)
+        chassis.wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis.imu_reference.yaw_total_rad - chassis.chassis_ctrl_info.yaw_rad)
                                      + CHASSIS_TURN_PID_D * chassis.imu_reference.yaw_gyro;
 
     }else
@@ -137,7 +137,7 @@ void wheel_task(void const *pvParameters)
 {
     App_Wheel_Init();
 
-//    TickType_t last_wake_time = xTaskGetTickCount();
+    TickType_t last_wake_time = xTaskGetTickCount();
 
     while(1)
     {
@@ -160,9 +160,7 @@ void wheel_task(void const *pvParameters)
 
         wheel_motor_cmd_send();
 
-        osDelay(CHASSIS_PERIOD);
-
-//        vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
+        vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
     }
 
 }

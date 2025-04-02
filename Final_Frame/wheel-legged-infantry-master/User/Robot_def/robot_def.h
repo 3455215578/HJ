@@ -119,10 +119,8 @@ typedef enum{
 
 typedef struct{
     float v_m_per_s; // 期望速度
-    float x; // 期望位移
-    float pitch_angle_rad;
-    float yaw_angle_rad;
-    float roll_angle_rad;
+    float yaw_rad;
+    float roll_rad;
     float height_m; // 期望腿长
     float spin_speed;
 
@@ -141,12 +139,10 @@ typedef enum{
 /** 传感器结构体 **/
 typedef struct{
     // 欧拉角
-    float roll_angle;
-    float pitch_angle;
-    float yaw_angle;
-    float yaw_last_angle;
-    float yaw_total_angle;
-    float yaw_round_count;
+    float roll_rad;
+    float pitch_rad;
+    float yaw_rad;
+    float yaw_total_rad;
 
 
     //三轴角速度

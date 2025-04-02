@@ -164,7 +164,7 @@ static void wheel_motors_torque_set(Chassis *chassis) {
     if (chassis->chassis_ctrl_mode != CHASSIS_SPIN) {
 
         // 计算转向力矩
-        chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_total_angle - chassis->chassis_ctrl_info.yaw_angle_rad)
+        chassis->wheel_turn_torque =  CHASSIS_TURN_PID_P * (chassis->imu_reference.yaw_total_rad - chassis->chassis_ctrl_info.yaw_rad)
                                       + CHASSIS_TURN_PID_D * chassis->imu_reference.yaw_gyro;
 
     }else {
@@ -286,8 +286,8 @@ static void joint_motors_torque_set(Chassis *chassis,
 
     /****** Roll pid ******/
     pid_calc(&chassis->chassis_roll_pid,
-             chassis->imu_reference.roll_angle,
-             chassis->chassis_ctrl_info.roll_angle_rad);
+             chassis->imu_reference.roll_rad,
+             chassis->chassis_ctrl_info.roll_rad);
 
 
     chassis->leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config->body_weight * GRAVITY * cosf(chassis->leg_L.state_variable_feedback.theta)

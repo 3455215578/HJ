@@ -106,7 +106,7 @@
 
 //when imu is calibrating ,buzzer set frequency and strength. 当imu在校准,蜂鸣器的设置频率和强度
 #define imu_start_buzzer()          buzzer_on(95, 10000)
-//when gimbal is calibrating ,buzzer set frequency and strength.当云台在校准,蜂鸣器的设置频率和强度
+//when Gimbal_Task is calibrating ,buzzer set frequency and strength.当云台在校准,蜂鸣器的设置频率和强度
 #define gimbal_start_buzzer()       buzzer_on(31, 19999)
 #define cali_buzzer_off()           buzzer_off()            //buzzer off，关闭蜂鸣器
 
@@ -143,7 +143,7 @@
 #define CALIED_FLAG             0x55                // means it has been calibrated
 //you have 20 seconds to calibrate by remote control. 有20s可以用遥控器进行校准
 #define CALIBRATE_END_TIME          20000
-//when 10 second, buzzer frequency change to high frequency of gimbal calibration.当10s的时候,蜂鸣器切成高频声音
+//when 10 second, buzzer frequency change to high frequency of Gimbal_Task calibration.当10s的时候,蜂鸣器切成高频声音
 #define RC_CALI_BUZZER_MIDDLE_TIME  10000
 //in the beginning, buzzer frequency change to low frequency of imu calibration.当开始校准的时候,蜂鸣器切成低频声音
 #define RC_CALI_BUZZER_START_TIME   0
@@ -187,7 +187,7 @@ typedef struct {
   int8_t temperature;         // imu control temperature
   float latitude;              // latitude
 } __packed head_cali_t;
-//gimbal device
+//Gimbal_Task device
 typedef struct {
   uint16_t yaw_offset;
   uint16_t pitch_offset;

@@ -1,16 +1,38 @@
-#include "update.h"
+#include "update_task.h"
 #include "robot_def.h"
 
 #include "remote.h"
 #include "error.h"
-#include "ins.h"
+#include "ins_task.h"
 #include "user_lib.h"
+#include "wheel.h"
 
 #define UPDATE_PERIOD 3 // 数据更新任务周期为3ms
 
 extern Chassis chassis;
-extern float vel_acc[2];
+extern ChassisPhysicalConfig chassis_physical_config;
 
+/** 速度融合 **/
+KalmanFilter_t vaEstimateKF;	   // 卡尔曼滤波器结构体
+
+float vel_acc[2]; // 轮毂速度与加速度融合后的结果
+
+float vaEstimateKF_F[4] = {1.0f, 0.005f,
+                           0.0f, 1.0f};	   // 状态转移矩阵，控制周期为0.001s
+
+float vaEstimateKF_P[4] = {1.0f, 0.0f,
+                           0.0f, 1.0f};    // 后验估计协方差初始值
+
+float vaEstimateKF_Q[4] = {0.000025f, 0.005f,
+                           0.005f, 1.0f};    // Q矩阵初始值、先验估计值方差噪声
+
+float vaEstimateKF_R[4] = {0.0025f, 0.0f,
+                           0.0f,  1.0f}; 	//200、200为测量噪声方差
+
+const float vaEstimateKF_H[4] = {1.0f, 0.0f,
+                                 0.0f, 1.0f};	// 设置矩阵H为常量
+
+/** LQR **/
 // 初始化K矩阵
 float wheel_K_L[6] = {0, 0, 0, 0, 0, 0};
 float joint_K_L[6] = {0, 0, 0, 0, 0, 0};
@@ -47,14 +69,14 @@ float wheel_fitting_factor[6][4] = {
 static void get_IMU_info() {
 
     /** Yaw **/
-    chassis.imu_reference.yaw_angle = -INS.Yaw * DEGREE_TO_RAD;
-    chassis.imu_reference.yaw_total_angle = -INS.YawTotalAngle * DEGREE_TO_RAD;
+    chassis.imu_reference.yaw_rad = -INS.Yaw * DEGREE_TO_RAD;
+    chassis.imu_reference.yaw_total_rad = -INS.YawTotalAngle * DEGREE_TO_RAD;
 
     /** Pitch **/
-    chassis.imu_reference.pitch_angle = -INS.Roll * DEGREE_TO_RAD;
+    chassis.imu_reference.pitch_rad = -INS.Roll * DEGREE_TO_RAD;
 
     /** Roll **/
-    chassis.imu_reference.roll_angle = INS.Pitch * DEGREE_TO_RAD;
+    chassis.imu_reference.roll_rad = INS.Pitch * DEGREE_TO_RAD;
 
     /** 更新各轴加速度和角速度 **/
     chassis.imu_reference.pitch_gyro = -INS.Gyro[Y];
@@ -69,6 +91,59 @@ static void get_IMU_info() {
     chassis.imu_reference.robot_az = INS.MotionAccel_n[Z];
 
 }
+
+/*******************************************************************************
+ *                                  速度融合                                    *
+ *******************************************************************************/
+void xvEstimateKF_Init(KalmanFilter_t *EstimateKF)//初始化卡尔曼结构体，并把该开头定义的矩阵复制到结构体中的矩阵
+{
+    Kalman_Filter_Init(EstimateKF, 2, 0, 2);	// 状态向量2维 没有控制量 测量向量2维
+
+    memcpy(EstimateKF->F_data, vaEstimateKF_F, sizeof(vaEstimateKF_F));
+    memcpy(EstimateKF->P_data, vaEstimateKF_P, sizeof(vaEstimateKF_P));
+    memcpy(EstimateKF->Q_data, vaEstimateKF_Q, sizeof(vaEstimateKF_Q));
+    memcpy(EstimateKF->R_data, vaEstimateKF_R, sizeof(vaEstimateKF_R));
+    memcpy(EstimateKF->H_data, vaEstimateKF_H, sizeof(vaEstimateKF_H));
+
+}
+
+static void xvEstimateKF_Update(KalmanFilter_t *EstimateKF ,float acc,float vel)
+{
+    //卡尔曼滤波器测量值更新
+    EstimateKF->MeasuredVector[0] =	vel;//测量速度
+    EstimateKF->MeasuredVector[1] = acc;//测量加速度
+
+    //卡尔曼滤波器更新函数
+    Kalman_Filter_Update(EstimateKF);
+
+    // 提取估计值
+    for (uint8_t i = 0; i < 2; i++)
+    {
+        vel_acc[i] = EstimateKF->FilteredValue[i];
+    }
+}
+
+void speed_calc(void)
+{
+    static float w_l,w_r=0.0f;//左右驱动轮的角速度
+    static float v_lb,v_rb=0.0f;//通过左右驱动轮算出的机体速度
+    static float aver_v=0.0f;//通过取平均计算出机体速度
+
+    // 左边驱动轮转子相对大地角速度，这里定义的是顺时针为正
+    w_l = -get_wheel_motors()->angular_vel - INS.Gyro[Y] + chassis.leg_L.vmc.forward_kinematics.d_alpha;
+    // 轮毂相对于机体(b系)的速度
+    v_lb = w_l * chassis_physical_config.wheel_radius + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_L.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_L.state_variable_feedback.theta) + chassis.leg_L.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_L.state_variable_feedback.theta);
+
+    // 右边驱动轮转子相对大地角速度，这里定义的是顺时针为正
+    w_r = -(get_wheel_motors() + 1)->angular_vel - INS.Gyro[Y] + chassis.leg_R.vmc.forward_kinematics.d_alpha;
+    // 轮毂相对于机体(b系)的速度
+    v_rb = w_r * chassis_physical_config.wheel_radius + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_R.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_R.state_variable_feedback.theta) + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_R.state_variable_feedback.theta);
+
+    aver_v = (v_rb - v_lb) / 2.0f;//取平均
+
+    xvEstimateKF_Update(&vaEstimateKF,INS.MotionAccel_b[X],aver_v);//不断更新卡尔曼滤波中的各项参数
+}
+
 
 /*******************************************************************************
  *                                  LQR                                        *
@@ -248,7 +323,7 @@ void lqr_ctrl(void) {
     // 更新反馈状态变量
     state_variable_update(&chassis.leg_L,
                           &chassis.leg_R,
-                          chassis.imu_reference.pitch_angle,
+                          chassis.imu_reference.pitch_rad,
                           chassis.imu_reference.pitch_gyro);
 
     // 设置期望状态变量
@@ -264,17 +339,24 @@ void lqr_ctrl(void) {
 /*******************************************************************************
  *                                  Task                                       *
  *******************************************************************************/
- // 512
 void update_task(void const *pvParameters)
 {
+    /** 融合速度卡尔曼滤波器初始化 **/
+    xvEstimateKF_Init(&vaEstimateKF);
+
+    TickType_t last_wake_time = xTaskGetTickCount();
+
     while(1)
     {
         /** 更新底盘结构体中IMU数据 **/
         get_IMU_info();
 
+        /** 更新速度 **/
+        speed_calc();
+
         /** 更新lqr **/
         lqr_ctrl();
 
-        osDelay(UPDATE_PERIOD);
+        vTaskDelayUntil(&last_wake_time, UPDATE_PERIOD);
     }
 }

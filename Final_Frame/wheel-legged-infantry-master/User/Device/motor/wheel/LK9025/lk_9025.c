@@ -2,6 +2,7 @@
 #include <stm32f4xx_hal_can.h>
 #include "lk_9025.h"
 #include "user_lib.h"
+#include "bsp_can.h"
 
 #define LK_TORQUE_CONSTANT 0.32f
 #define LK_CURRENT_2_DATA 124.12f//62.5f // 1A电流对应的数值

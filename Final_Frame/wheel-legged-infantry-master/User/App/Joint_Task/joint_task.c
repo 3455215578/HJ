@@ -96,11 +96,11 @@ static void chassis_is_balanced() {
 
     if(!chassis.chassis_is_offground) // 跳跃时不进行平衡判断
     {
-        if (ABS(chassis.imu_reference.pitch_angle) <= 0.1744f) // -10° ~ 10°
+        if (ABS(chassis.imu_reference.pitch_rad) <= 0.1744f) // -10° ~ 10°
         {
             chassis.chassis_is_balance = true;
 
-            if((ABS(chassis.imu_reference.pitch_angle) <= 0.05233f)) // -3° ~ 3°
+            if((ABS(chassis.imu_reference.pitch_rad) <= 0.05233f)) // -3° ~ 3°
             {
                 chassis.recover_finish = true;
             }
@@ -237,7 +237,7 @@ void joint_task(void const *pvParameters)
 {
     App_joint_init();
 
-//    TickType_t last_wake_time = xTaskGetTickCount();
+    TickType_t last_wake_time = xTaskGetTickCount();
 
     while(1)
     {
@@ -260,8 +260,7 @@ void joint_task(void const *pvParameters)
 
         joint_motor_cmd_send();
 
-        osDelay(CHASSIS_PERIOD);
-//        vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
+        vTaskDelayUntil(&last_wake_time, CHASSIS_PERIOD);
     }
 
 }

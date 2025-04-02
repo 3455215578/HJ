@@ -61,10 +61,9 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
 
         User/App/INS_Task
         User/App/Update_Task
-        User/App/Observe_Task
         User/App/Joint_Task
         User/App/Wheel_Task
-        User/App/gimbal
+        User/App/Gimbal_Task
         User/App/RC_Task
 
         User/Bsp/can

@@ -104,7 +104,7 @@
 
 #include "remote.h"
 
-//include head,gimbal,gyro,accel,mag. gyro,accel and mag have the same data struct. total 5(CALI_LIST_LENGHT) devices, need data lenght + 5 * 4 bytes(name[3]+cali)
+//include head,Gimbal_Task,gyro,accel,mag. gyro,accel and mag have the same data struct. total 5(CALI_LIST_LENGHT) devices, need data lenght + 5 * 4 bytes(name[3]+cali)
 #define FLASH_WRITE_BUF_LENGHT  (sizeof(head_cali_t) + sizeof(gimbal_cali_t) + sizeof(imu_cali_t) * 3  + CALI_LIST_LENGHT * 4)
 
 
@@ -203,7 +203,7 @@ static unsigned char cali_gyro_hook(uint32_t *cali, unsigned char cmd);   //gyro
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static unsigned char cali_gimbal_hook(uint32_t *cali, unsigned char cmd); //gimbal device cali function
+static unsigned char cali_gimbal_hook(uint32_t *cali, unsigned char cmd); //Gimbal_Task device cali function
 
 
 
@@ -214,7 +214,7 @@ uint32_t calibrate_task_stack;
 extern struct RCCtrl rc_ctrl;
 static const struct RCCtrl *calibrate_RC;   //remote control point
 head_cali_t     head_cali;       //head cali data
-gimbal_cali_t   gimbal_cali;     //gimbal cali data
+gimbal_cali_t   gimbal_cali;     //Gimbal_Task cali data
 imu_cali_t      accel_cali;      //accel cali data
 imu_cali_t      gyro_cali;       //gyro cali data
 imu_cali_t      mag_cali;        //mag cali data
@@ -384,7 +384,7 @@ static void RC_cmd_to_calibrate(void)
     }
     else if (rc_action_flag == GIMBAL_FLAG && rc_cmd_time > RC_CMD_LONG_TIME)
     {
-        //gimbal cali,
+        //Gimbal_Task cali,
         rc_action_flag = 0;
         rc_cmd_time = 0;
         cali_sensor[CALI_GIMBAL].cali_cmd = 1;

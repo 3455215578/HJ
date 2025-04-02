@@ -27,13 +27,12 @@
 /* USER CODE BEGIN Includes */
 #include "Calibrate.h"
 #include "robot_def.h"
-#include "gimbal.h"
-#include "ins.h"
-#include "update.h"
+#include "gimbal_task.h"
+#include "ins_task.h"
+#include "update_task.h"
 #include "rc_task.h"
 #include "joint_task.h"
 #include "wheel_task.h"
-#include "observe_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +55,6 @@
 osThreadId calibrateTaskHandle;
 
 osThreadId UpdateTaskHandle;
-osThreadId ObserveTaskHandle;
 osThreadId RCTaskHandle;
 osThreadId JointTaskHandle;
 osThreadId WheelTaskHandle;
@@ -144,34 +142,33 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of INSTask */
-  /** 姿态任务(实时性强) **/
-  osThreadDef(INSTask, StartINSTask, osPriorityRealtime, 0, 512);
-  INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
+  /** 姿态任务(高优先级) **/
+//  osThreadDef(INSTask, StartINSTask, osPriorityHigh, 0, 512);
+//  INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
+
+    osThreadDef(INSTask, StartINSTask, osPriorityHigh, 0, 1024);
+    INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  osThreadDef(calibrateTask, calibrate_task, osPriorityNormal, 0, 512);
+  osThreadDef(calibrateTask, calibrate_task, osPriorityIdle, 0, 512);
   calibrateTaskHandle = osThreadCreate(osThread(calibrateTask), NULL);
 
-  /** 遥控器任务(中优先级) **/
-  osThreadDef(RCTask, RC_task, osPriorityNormal, 0, 128);
+  /** 遥控器任务(低优先级) **/
+  osThreadDef(RCTask, RC_task, osPriorityLow, 0, 128);
   RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
 
-  /** 更新数据(实时性较强) **/
-  osThreadDef(UpdateTask, update_task, osPriorityAboveNormal, 0, 256);
+  /** 更新数据(高优先级) **/
+  osThreadDef(UpdateTask, update_task, osPriorityHigh, 0, 1024);
   UpdateTaskHandle = osThreadCreate(osThread(UpdateTask), NULL);
 
-  /** 融合速度(实时性较强) **/
-  osThreadDef(ObserveTask, observe_task, osPriorityAboveNormal, 0, 256);
-  ObserveTaskHandle = osThreadCreate(osThread(ObserveTask), NULL);
-
-  /** 用户任务 **/
-  osThreadDef(WheelTask, wheel_task, osPriorityHigh, 0, 512);
+  /** 用户任务(中优先级) **/
+  osThreadDef(WheelTask, wheel_task, osPriorityAboveNormal, 0, 512);
   WheelTaskHandle = osThreadCreate(osThread(WheelTask), NULL);
 
-  osThreadDef(JointTask, joint_task, osPriorityHigh, 0, 512);
+  osThreadDef(JointTask, joint_task, osPriorityAboveNormal, 0, 512);
   JointTaskHandle = osThreadCreate(osThread(JointTask), NULL);
 
-  osThreadDef(gimbalTask, gimbal_task, osPriorityHigh, 0, 128);
+  osThreadDef(gimbalTask, gimbal_task, osPriorityAboveNormal, 0, 128);
   gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
 

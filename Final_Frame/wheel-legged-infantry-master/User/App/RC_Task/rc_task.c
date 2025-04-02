@@ -6,7 +6,7 @@
 
 extern Chassis chassis;
 
-#define RC_PERIOD 10 // 遥控器任务周期为10ms
+#define RC_PERIOD 5 // 遥控器任务周期为5ms
 
 /*******************************************************************************
  *                                    Remote                                   *
@@ -24,7 +24,7 @@ static void chassis_device_offline_handle() {
 static void set_chassis_ctrl_info() {
     chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
 
-    chassis.chassis_ctrl_info.yaw_angle_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+    chassis.chassis_ctrl_info.yaw_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
 }
 

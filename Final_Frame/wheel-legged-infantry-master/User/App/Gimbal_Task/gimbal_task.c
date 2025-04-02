@@ -4,7 +4,7 @@
 
 #include "bsp_can.h"
 #include "can_device.h"
-#include "gimbal.h"
+#include "gimbal_task.h"
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
@@ -110,8 +110,8 @@ void gimbal_msg_unpack(uint32_t id, uint8_t data[]) {
       int_yaw_angle_rad |= ((uint32_t) data[6]) << 8;
       int_yaw_angle_rad |= data[7];
 
-      gimbal_msg.chassis_ctrl_info.roll_angle_rad = *(float *) &int_roll_angle_rad;
-      gimbal_msg.chassis_ctrl_info.yaw_angle_rad = *(float *) &int_yaw_angle_rad;
+      gimbal_msg.chassis_ctrl_info.roll_rad = *(float *) &int_roll_angle_rad;
+      gimbal_msg.chassis_ctrl_info.yaw_rad = *(float *) &int_yaw_angle_rad;
       break;
     }
   }
@@ -128,8 +128,8 @@ extern void gimbal_task(void const *pvParameters) {
   while (1) {
     send_chassis_angle(CAN_1,
                            CHASSIS_ANGLE_VEL_INFO,
-                           chassis.imu_reference.pitch_angle,
-                           chassis.imu_reference.yaw_angle);
+                           chassis.imu_reference.pitch_rad,
+                           chassis.imu_reference.yaw_rad);
 
     vTaskDelayUntil(&last_wake_time, 5);
   }
