@@ -196,14 +196,14 @@ static void left_joint_torque_calc(void)
                                                   chassis.phi0_error,
                                                   0.0f);
 
-    chassis.leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point =   joint_K_L[0] * (chassis.leg_L.state_variable_feedback.theta - 0.0f)
+    chassis.leg_L.vmc.forward_kinematics.F_Tp_set_point.E.Tp_set_point =   joint_K_L[0] * (chassis.leg_L.state_variable_feedback.theta - 0.0f)
                                                                         + joint_K_L[1] * (chassis.leg_L.state_variable_feedback.theta_dot - 0.0f)
                                                                         + joint_K_L[2] * (chassis.leg_L.state_variable_feedback.x - 0.0f)
                                                                         + joint_K_L[3] * (chassis.leg_L.state_variable_feedback.x_dot - chassis.chassis_ctrl_info.v_m_per_s)
                                                                         + joint_K_L[4] * (chassis.leg_L.state_variable_feedback.phi - 0.0f)
                                                                         + joint_K_L[5] * (chassis.leg_L.state_variable_feedback.phi_dot - 0.0f);
 
-    chassis.leg_L.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point -= chassis.steer_compensatory_torque;
+    chassis.leg_L.vmc.forward_kinematics.F_Tp_set_point.E.Tp_set_point -= chassis.steer_compensatory_torque;
 
     // F
     /****** ÍÈ³¤pid ******/
@@ -220,7 +220,7 @@ static void left_joint_torque_calc(void)
              chassis.imu_reference.roll_rad,
              chassis.chassis_ctrl_info.roll_rad);
 
-    chassis.leg_L.vmc.forward_kinematics.Fxy_set_point.E.Fy_set_point =  0.5f * chassis_physical_config.body_weight * GRAVITY * cosf(chassis.leg_L.state_variable_feedback.theta)
+    chassis.leg_L.vmc.forward_kinematics.F_Tp_set_point.E.F_set_point =  0.5f * chassis_physical_config.body_weight * GRAVITY * cosf(chassis.leg_L.state_variable_feedback.theta)
                                                                        + chassis.leg_L.leg_speed_pid.out
                                                                        + chassis.chassis_roll_pid.out;
 
@@ -295,6 +295,18 @@ static void left_enable_task()
 
     left_wheel_torque_calc();
     left_joint_torque_calc();
+
+    Inverse_Dynamics(&chassis.leg_L.vmc,
+                     (get_joint_motors() + 1)->torque,
+                     get_joint_motors()->torque,
+                     &chassis_physical_config);
+
+    Inverse_Kinematics(&chassis.leg_L.vmc,
+                       (get_joint_motors() + 1)->angular_vel,
+                       get_joint_motors()->angular_vel,
+                       &chassis_physical_config);
+
+    fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
 
     chassis_selfhelp();
 }

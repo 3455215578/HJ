@@ -220,10 +220,10 @@ typedef struct{
     union { // 自行学习联合体的特性: union
         float array[2][2];
         struct {
+            float F_set_point;
             float Tp_set_point;
-            float Fy_set_point;
         } E;
-    } Fxy_set_point;
+    } F_Tp_set_point;
 
     union {
         float array[2][2];
@@ -269,10 +269,10 @@ typedef struct {
     union {
         float array[2][1];
         struct {
+            float F_fdb;
             float Tp_fdb;
-            float Fy_fdb;
         } E;
-    } Fxy_fdb;
+    } F_Tp_fdb;
 
  /** 逆运动学解算(Inverse Dynamics): 从 末端执行器(w1 w4) 到 末端编码(d_L0 d_phi0) **/
     union {
