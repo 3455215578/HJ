@@ -42,25 +42,75 @@ float joint_K_R[6] = {0, 0, 0, 0, 0, 0};
 
 // K拟合系数矩阵
 float wheel_fitting_factor[6][4] = {
-        {-115.015570f,150.811623f,-90.385399f,-0.683845f},
-        {-2.961175f,3.934224f,-6.074763f,-0.252076f},
+        {-180.128775f,224.401180f,-139.003572f,-0.093513f},
+        {-9.718106f,8.949069f,-14.856590f,-0.143007f},
 
-        {-3.197913f,2.994897f,-0.912153f,-0.770101f},
-        {-4.585014f,4.245380f,-1.343306f,-1.832575f},
+        {-73.127694f,66.874031f,-19.362594f,-8.209220f},
+        {-49.589597f,44.528163f,-14.217075f,-7.527445f},
 
-        {-1560.279813f,1753.178328f,-751.049746f,122.776898f},
-        {-28.079548f,33.933430f,-17.010394f,5.064552f}
+        {-2568.054756f,2918.121091f,-1249.704742f,189.518497f},
+        {-44.300525f,55.407893f,-27.380095f,8.304001f}
 };float joint_fitting_factor[6][4] = {
-        {258.977305f,-263.622791f,101.677280f,7.728395f},
-        {4.739531f,-1.272110f,-4.793368f,1.251058f},
+        {314.132566f,-300.671491f,93.604539f,10.136978f},
+        {25.116916f,-20.663557f,-3.491195f,1.588599f},
 
-        {-27.388500f,30.412116f,-12.660277f,1.778826f},
-        {-66.806639f,73.128794f,-29.955460f,4.144668f},
+        {-255.367230f,285.537094f,-118.590711f,15.388693f},
+        {-237.748535f,261.755785f,-107.900778f,13.868445f},
 
-        {3129.744241f,-3030.664276f,1001.402362f,547.097076f},
-        {25.711759f,-32.151577f,18.367651f,12.656690f}
+        {3958.282632f,-3767.171439f,1200.715310f,300.167031f},
+        {145.325564f,-150.778294f,58.573076f,5.365314f}
 };
 
+
+/*******************************************************************************
+ *                                    Remote                                   *
+ *******************************************************************************/
+
+/** 模块离线处理 **/
+static void chassis_device_offline_handle() {
+    check_is_rc_online(get_rc_ctrl());
+    if (get_errors() != 0) {
+        chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+    }
+}
+
+/** 底盘接收遥控器信息 **/
+static void set_chassis_ctrl_info() {
+    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
+
+    chassis.chassis_ctrl_info.yaw_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+
+}
+
+/** 底盘根据遥控器设置模式 **/
+static void set_chassis_mode() {
+    if (switch_is_down(get_rc_ctrl()->rc.s[RC_s_R])) { // 失能
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == false) { // 初始化模式
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_INIT;
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
+
+    }
+
+}
+
+/** 底盘通过板间通信接收云台的信息 **/
+static void set_chassis_ctrl_info_from_gimbal_msg()
+{
+
+}
+
+/** 底盘根据云台信息设置模式 **/
+static void set_chassis_mode_from_gimbal_msg()
+{
+
+}
 
 
 /*******************************************************************************
@@ -220,6 +270,12 @@ static void state_variable_update(Leg* leg_L, Leg* leg_R, float phi, float phi_d
         leg_L->state_variable_feedback.x = leg_L->state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_L->state_variable_feedback.x_dot;
         leg_R->state_variable_feedback.x = leg_R->state_variable_feedback.x + CHASSIS_PERIOD * 0.001f * leg_R->state_variable_feedback.x_dot;
 
+        if(ABS(vel_acc[0]) < 0.1f)
+        {
+            leg_L->state_variable_feedback.x = 0.0f;
+            leg_R->state_variable_feedback.x = 0.0f;
+        }
+
     }
 
     // x_ddot
@@ -348,6 +404,18 @@ void update_task(void const *pvParameters)
 
     while(1)
     {
+        /** 设置遥控信息 **/
+#if CHASSIS_REMOTE
+        set_chassis_mode();
+
+        set_chassis_ctrl_info();
+
+        chassis_device_offline_handle();
+#else
+        set_chassis_mode_from_gimbal_msg();
+        set_chassis_ctrl_info_from_gimbal_msg();
+#endif
+
         /** 更新底盘结构体中IMU数据 **/
         get_IMU_info();
 

@@ -35,6 +35,7 @@ void joint_enable() {
     }
 }
 
+// 不加osDelay有一边动不了(why)
 void set_joint_torque(float joint_LF_torque, float joint_LB_torque, float joint_RF_torque, float joint_RB_torque) {
     set_dm8009_torque(CAN_2, JOINT_LF_SEND, joint_LF_torque);
     osDelay(1);

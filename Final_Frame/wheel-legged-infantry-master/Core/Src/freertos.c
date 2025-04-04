@@ -52,7 +52,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-osThreadId calibrateTaskHandle;
+//osThreadId calibrateTaskHandle;
 
 osThreadId UpdateTaskHandle;
 osThreadId RCTaskHandle;
@@ -146,16 +146,16 @@ void MX_FREERTOS_Init(void) {
 //  osThreadDef(INSTask, StartINSTask, osPriorityHigh, 0, 512);
 //  INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
 
-    osThreadDef(INSTask, StartINSTask, osPriorityHigh, 0, 1024);
+    osThreadDef(INSTask, StartINSTask, osPriorityHigh, 0, 512);
     INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  osThreadDef(calibrateTask, calibrate_task, osPriorityIdle, 0, 512);
-  calibrateTaskHandle = osThreadCreate(osThread(calibrateTask), NULL);
+//  osThreadDef(calibrateTask, calibrate_task, osPriorityIdle, 0, 512);
+//  calibrateTaskHandle = osThreadCreate(osThread(calibrateTask), NULL);
 
   /** 遥控器任务(低优先级) **/
-  osThreadDef(RCTask, RC_task, osPriorityLow, 0, 128);
-  RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
+//  osThreadDef(RCTask, RC_task, osPriorityLow, 0, 128);
+//  RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
 
   /** 更新数据(高优先级) **/
   osThreadDef(UpdateTask, update_task, osPriorityHigh, 0, 1024);
@@ -165,7 +165,7 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(WheelTask, wheel_task, osPriorityAboveNormal, 0, 512);
   WheelTaskHandle = osThreadCreate(osThread(WheelTask), NULL);
 
-  osThreadDef(JointTask, joint_task, osPriorityAboveNormal, 0, 512);
+  osThreadDef(JointTask, joint_task, osPriorityAboveNormal, 0, 1024);
   JointTaskHandle = osThreadCreate(osThread(JointTask), NULL);
 
   osThreadDef(gimbalTask, gimbal_task, osPriorityAboveNormal, 0, 128);

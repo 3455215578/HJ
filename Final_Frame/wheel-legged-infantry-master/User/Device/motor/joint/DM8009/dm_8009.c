@@ -4,6 +4,7 @@
 #include "../../../can_device/can_device.h"
 
 #include "dm_8009.h"
+#include "bsp_can.h"
 
 
 extern CAN_HandleTypeDef hcan1;

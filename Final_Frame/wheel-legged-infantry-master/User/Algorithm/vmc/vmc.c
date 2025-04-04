@@ -388,7 +388,7 @@ static void Inverse_Dynamics(VMC *vmc,
 }
 
 // 计算竖直方向支持力
-static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_config) {
+static void fn_cal(Leg *leg, float body_az, ChassisPhysicalConfig *chassis_physical_config) {
 
     if (leg == NULL) {
         return;
@@ -398,7 +398,7 @@ static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_c
     float P = leg->vmc.inverse_kinematics.Fxy_fdb.E.Fy_fdb * cosf(leg->state_variable_feedback.theta)
               + leg->vmc.inverse_kinematics.Fxy_fdb.E.Tp_fdb * sinf(leg->state_variable_feedback.theta) / leg->vmc.forward_kinematics.fk_L0.L0;
 
-    float leg_az = az - leg->vmc.inverse_kinematics.V_fdb.E.dd_L0_fdb * cosf(leg->state_variable_feedback.theta)
+    float wheel_az = body_az - leg->vmc.inverse_kinematics.V_fdb.E.dd_L0_fdb * cosf(leg->state_variable_feedback.theta)
                    + 2.0f * leg->vmc.inverse_kinematics.V_fdb.E.d_L0_fdb * leg->state_variable_feedback.theta_dot
                      * sinf(leg->state_variable_feedback.theta)
                    + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_ddot
@@ -406,10 +406,13 @@ static void fn_cal(Leg *leg, float az, ChassisPhysicalConfig *chassis_physical_c
                    + leg->vmc.forward_kinematics.fk_L0.L0 * leg->state_variable_feedback.theta_dot
                      * leg->state_variable_feedback.theta_dot * cosf(leg->state_variable_feedback.theta);
 
-    float Fn_raw = P + chassis_physical_config->wheel_weight * 9.8f + chassis_physical_config->wheel_weight * leg_az;
 
-    update_moving_average_filter(&leg->Fn_filter, Fn_raw);
-    leg->Fn = get_moving_average_filtered_value(&leg->Fn_filter) - 20.0f;
+        leg->Fn = P + chassis_physical_config->wheel_weight * (GRAVITY + wheel_az);
+
+//    float Fn_raw = P + chassis_physical_config->wheel_weight * (GRAVITY + wheel_az);
+
+//    update_moving_average_filter(&leg->Fn_filter, Fn_raw);
+//    leg->Fn = get_moving_average_filtered_value(&leg->Fn_filter) - 20.0f;
 
 }
 
@@ -433,47 +436,6 @@ static void leg_is_offground(Chassis* chassis)
 /*******************************************************************************
  *                                     VMC                                     *
  *******************************************************************************/
-void joint_vmc_ctrl(void) {
-
-    // 更新phi1 phi4
-    vmc_phi_update(&chassis.leg_L, &chassis.leg_R);
-
-    // VMC 正运动学解算
-    forward_kinematics(&chassis.leg_L, &chassis.leg_R, &chassis_physical_config);
-
-    // 配置输出力矩
-    joint_motors_torque_set(&chassis, &chassis_physical_config);
-
-    // VMC 逆动力学解算
-    // 根据关节反馈力矩逆解算出虚拟力(F Tp)
-    Inverse_Dynamics(&chassis.leg_L.vmc,
-                     (get_joint_motors() + 1)->torque,
-                     get_joint_motors()->torque,
-                     &chassis_physical_config);
-    Inverse_Dynamics(&chassis.leg_R.vmc,
-                     -(get_joint_motors() + 2)->torque,
-                     -(get_joint_motors() + 3)->torque,
-                     &chassis_physical_config);
-
-    Inverse_Kinematics(&chassis.leg_L.vmc,
-                       (get_joint_motors() + 1)->angular_vel,
-                       get_joint_motors()->angular_vel,
-                       &chassis_physical_config);
-
-    Inverse_Kinematics(&chassis.leg_R.vmc,
-                       -(get_joint_motors() + 2)->angular_vel,
-                       -(get_joint_motors() + 3)->angular_vel,
-                       &chassis_physical_config);
-
-    // 竖直方向支持力解算
-    fn_cal(&chassis.leg_L, chassis.imu_reference.robot_az, &chassis_physical_config);
-    fn_cal(&chassis.leg_R, chassis.imu_reference.robot_az, &chassis_physical_config);
-
-//    // 腿部离地检测
-//    leg_is_offground(&chassis);
-
-}
-
 void vmc_ctrl(void) {
 
     // 更新phi1 phi4
