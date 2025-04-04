@@ -6,6 +6,66 @@
 #include "ins_task.h"
 #include "vmc.h"
 #include "lqr.h"
+#include "remote.h"
+#include "error.h"
+
+/*******************************************************************************
+ *                                    Remote                                   *
+ *******************************************************************************/
+
+/** 模块离线处理 **/
+static void chassis_device_offline_handle() {
+    check_is_rc_online(get_rc_ctrl());
+    if (get_errors() != 0) {
+        chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+    }
+}
+
+/** 底盘接收遥控器信息 **/
+static void set_chassis_ctrl_info() {
+    chassis.chassis_ctrl_info.v_m_per_s = (float) (get_rc_ctrl()->rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
+
+    chassis.chassis_ctrl_info.yaw_rad -= (float) (get_rc_ctrl()->rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+
+}
+
+/** 底盘根据遥控器设置模式 **/
+static void set_chassis_mode() {
+    if (switch_is_down(get_rc_ctrl()->rc.s[RC_s_R])) { // 失能
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == false) { // 初始化模式
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_INIT;
+    }
+    else if (switch_is_mid(get_rc_ctrl()->rc.s[RC_s_R]) && chassis.init_flag == true) { // 使能
+        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
+
+        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.10f;
+        }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.22f;
+        }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.35f;
+        }
+
+    }
+
+}
+
+/** 底盘通过板间通信接收云台的信息 **/
+static void set_chassis_ctrl_info_from_gimbal_msg()
+{
+
+}
+
+/** 底盘根据云台信息设置模式 **/
+static void set_chassis_mode_from_gimbal_msg()
+{
+
+}
 
 static void right_pid_init(void)
 {
@@ -67,11 +127,11 @@ static void chassis_is_balanced() {
 
     if(!chassis.chassis_is_offground) // 跳跃时不进行平衡判断
     {
-        if (ABS(chassis.imu_reference.pitch_rad) <= 0.1744f) // -10° ~ 10°
+        if (ABS(chassis.leg_R.state_variable_feedback.phi) <= 0.1744f) // -10° ~ 10°
         {
             chassis.chassis_is_balance = true;
 
-            if((ABS(chassis.imu_reference.pitch_rad) <= 0.05233f)) // -3° ~ 3°
+            if((ABS(chassis.leg_R.state_variable_feedback.phi) <= 0.05233f)) // -3° ~ 3°
             {
                 chassis.recover_finish = true;
             }
@@ -149,7 +209,7 @@ static void right_joint_torque_calc(void)
     // Tp
     // 防劈叉pid已在左腿任务计算，此处不再重复
 
-    chassis.leg_R.vmc.forward_kinematics.F_Tp_set_point.E.Tp_set_point =   joint_K_R[0] * (chassis.leg_R.state_variable_feedback.theta - 0.0f)
+    chassis.leg_R.vmc.forward_kinematics.F_Tp_set_point.E.Tp_set_point =  joint_K_R[0] * (chassis.leg_R.state_variable_feedback.theta - 0.0f)
                                                                         + joint_K_R[1] * (chassis.leg_R.state_variable_feedback.theta_dot - 0.0f)
                                                                         + joint_K_R[2] * (chassis.leg_R.state_variable_feedback.x - 0.0f)
                                                                         + joint_K_R[3] * (chassis.leg_R.state_variable_feedback.x_dot - chassis.chassis_ctrl_info.v_m_per_s)
@@ -194,7 +254,7 @@ static void right_init_task()
     right_joint_enable();
     right_wheel_enable();
 
-    chassis.left_init_flag = true;
+    chassis.right_init_flag = true;
 
     if(chassis.left_init_flag && chassis.right_init_flag)
     {
@@ -213,6 +273,7 @@ static void right_disable_task()
     chassis.jump_state = NOT_READY;
 
     chassis.leg_R.state_variable_feedback.x = 0.0f;
+    chassis.chassis_ctrl_info.yaw_rad = chassis.imu_reference.yaw_total_rad;
 
     /** 初始化标志位 **/
 
@@ -227,6 +288,7 @@ static void right_disable_task()
 
     // 离地标志位
     chassis.leg_R.leg_is_offground = false;
+    chassis.chassis_is_offground = false;
 
     // 跳跃标志位
     chassis.jump_flag = false;
@@ -270,6 +332,18 @@ void right_task(void const *pvParameters)
     while(1)
     {
         right_feedback_update();
+
+        /** 设置遥控信息 **/
+#if CHASSIS_REMOTE
+        set_chassis_mode();
+
+        set_chassis_ctrl_info();
+
+        chassis_device_offline_handle();
+#else
+        set_chassis_mode_from_gimbal_msg();
+        set_chassis_ctrl_info_from_gimbal_msg();
+#endif
 
         switch (chassis.chassis_ctrl_mode) {
 

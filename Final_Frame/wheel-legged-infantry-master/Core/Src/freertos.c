@@ -168,8 +168,8 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(JointTask, joint_task, osPriorityAboveNormal, 0, 1024);
   JointTaskHandle = osThreadCreate(osThread(JointTask), NULL);
 
-  osThreadDef(gimbalTask, gimbal_task, osPriorityAboveNormal, 0, 128);
-  gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
+//  osThreadDef(gimbalTask, gimbal_task, osPriorityAboveNormal, 0, 128);
+//  gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
 
   /* USER CODE END RTOS_THREADS */

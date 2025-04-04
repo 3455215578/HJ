@@ -4,7 +4,7 @@
 #include "error.h"
 #include "cmsis_os.h"
 
-#define RC_PERIOD 5 // 遥控器任务周期为5ms
+#define RC_PERIOD 10 // 遥控器任务周期为10ms
 
 /*******************************************************************************
  *                                    Remote                                   *
@@ -40,6 +40,14 @@ static void set_chassis_mode() {
         chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
 
+        if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.10f;
+        }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.22f;
+        }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
+            chassis.chassis_ctrl_info.height_m = 0.35f;
+        }
+
     }
 
 }
@@ -59,7 +67,7 @@ static void set_chassis_mode_from_gimbal_msg()
 // 128
 void RC_task(void const *pvParameters)
 {
-    TickType_t last_wake_time = xTaskGetTickCount();
+//    TickType_t last_wake_time = xTaskGetTickCount();
 
     while(1)
     {
@@ -75,7 +83,8 @@ void RC_task(void const *pvParameters)
         set_chassis_ctrl_info_from_gimbal_msg();
 #endif
 
-        vTaskDelayUntil(&last_wake_time, RC_PERIOD);
+//        vTaskDelayUntil(&last_wake_time, RC_PERIOD);
+        osDelay(RC_PERIOD);
     }
 
 }

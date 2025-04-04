@@ -63,7 +63,7 @@ void observe_task(void const *pvParameters)
 
     xvEstimateKF_Init(&vaEstimateKF);
 
-    TickType_t last_wake_time = xTaskGetTickCount();
+//    TickType_t last_wake_time = xTaskGetTickCount();
 
     while(1)
     {
@@ -103,7 +103,8 @@ void observe_task(void const *pvParameters)
 
         }
 
-        vTaskDelayUntil(&last_wake_time, OBSERVE_PERIOD);
+        osDelay(OBSERVE_PERIOD);
+//        vTaskDelayUntil(&last_wake_time, OBSERVE_PERIOD);
     }
 }
 

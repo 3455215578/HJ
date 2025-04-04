@@ -52,7 +52,7 @@ void INS_Task(void const *pvParameters)
 {
     INS_Init();
 
-    TickType_t last_wake_time = xTaskGetTickCount();
+//    TickType_t last_wake_time = xTaskGetTickCount();
 
     while(1)
     {
@@ -113,7 +113,8 @@ void INS_Task(void const *pvParameters)
 
         count++;
 
-        vTaskDelayUntil(&last_wake_time, INS_PERIOD);
+        osDelay(INS_PERIOD);
+//        vTaskDelayUntil(&last_wake_time, INS_PERIOD);
     }
 
 }

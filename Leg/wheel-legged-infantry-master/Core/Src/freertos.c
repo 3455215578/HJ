@@ -140,7 +140,7 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  osThreadDef(INSTask, INS_Task, osPriorityRealtime, 0, 512);
+  osThreadDef(INSTask, INS_Task, osPriorityRealtime, 0, 1024);
   INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
 
   osThreadDef(ObserveTask, observe_task, osPriorityHigh, 0, 512);
@@ -152,8 +152,8 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(RightTask, right_task, osPriorityAboveNormal, 0, 512);
   RightTaskHandle = osThreadCreate(osThread(RightTask), NULL);
 
-  osThreadDef(RCTask, RC_task, osPriorityNormal, 0, 256);
-  RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
+//  osThreadDef(RCTask, RC_task, osPriorityNormal, 0, 256);
+//  RCTaskHandle = osThreadCreate(osThread(RCTask), NULL);
 
 //  osThreadDef(calibrateTask, calibrate_task, osPriorityIdle, 0, 512);
 //  calibrateTaskHandle = osThreadCreate(osThread(calibrateTask), NULL);
