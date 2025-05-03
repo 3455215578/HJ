@@ -11,6 +11,7 @@
 #include "vx_kalman_filter.h"
 #include "lqr.h"
 #include "delay.h"
+#include "bsp_dwt.h"
 
 
 /** µ×ÅÌpid³õÊ¼»¯ **/
@@ -490,26 +491,15 @@ void send_torque_task(float joint_LF_torque, float joint_LB_torque, float joint_
 
     if(dm_time % 2 == 0)
     {
-        set_dm8009_MIT(&joint[LF],LF_pos,0.0f, Kp, Kd,joint_LF_torque);
-        set_dm8009_MIT(&joint[RF],RF_pos,0.0f, Kp, Kd,joint_RF_torque);
-
-//        set_dm8009_MIT(&joint[LF],LF_pos,0.0f, Kp, Kd,0.0f);
-//        set_dm8009_MIT(&joint[LB],LB_pos,0.0f, Kp, Kd,0.0f);
-
-//        set_dm8009_MIT(&joint[LF], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-//        set_dm8009_MIT(&joint[LB], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
     }
     else if(dm_time % 2 == 1)
     {
+        set_dm8009_MIT(&joint[LF],LF_pos,0.0f, Kp, Kd,joint_LF_torque);
         set_dm8009_MIT(&joint[LB],LB_pos,0.0f, Kp, Kd,joint_LB_torque);
+        DWT_Delay(0.0005);
+        set_dm8009_MIT(&joint[RF],RF_pos,0.0f, Kp, Kd,joint_RF_torque);
         set_dm8009_MIT(&joint[RB],RB_pos,0.0f, Kp, Kd,joint_RB_torque);
-
-//        set_dm8009_MIT(&joint[LB],LB_pos,0.0f, Kp, Kd,0.0f);
-//        set_dm8009_MIT(&joint[RB],RB_pos,0.0f, Kp, Kd,0.0f);
-
-//        set_dm8009_MIT(&joint[LB],0.0f,0.0f,0.0f,0.0f,0.0f);
-//        set_dm8009_MIT(&joint[RB],0.0f,0.0f,0.0f,0.0f,0.0f);
 
     }
 
