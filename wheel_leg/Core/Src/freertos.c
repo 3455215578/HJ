@@ -29,6 +29,8 @@
 #include "ins_task.h"
 #include "chassis_task.h"
 #include "buzzer.h"
+#include "joint.h"
+#include "wheel.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

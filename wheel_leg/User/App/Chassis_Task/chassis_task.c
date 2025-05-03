@@ -393,7 +393,7 @@ static void joint_calc(void)
 static void leg_length_set(void)
 {
     if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L])){
-        chassis.chassis_ctrl_info.height_m = 0.10f;
+        chassis.chassis_ctrl_info.height_m = 0.12f;
     }else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L])){
         chassis.chassis_ctrl_info.height_m = 0.22f;
     }else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L])){
@@ -483,48 +483,30 @@ static void chassis_enable_task(void)
 
 /** 发送力矩任务 **/
 // 500Hz
-void send_torque_task(float joint_LF_torque, float joint_LB_torque, float joint_RF_torque, float joint_RB_torque,
-                      float wheel_L_torque, float wheel_R_torque)
+static void send_torque_task(float joint_LF_torque, float joint_LB_torque, float joint_RF_torque, float joint_RB_torque,
+                             float wheel_L_torque, float wheel_R_torque)
 {
     /** DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM **/
-    static int dm_time = 0;
+    static int time = 0;
 
-    if(dm_time % 2 == 0)
-    {
-
-    }
-    else if(dm_time % 2 == 1)
+    if(time % 2 == 0)
     {
         set_dm8009_MIT(&joint[LF],LF_pos,0.0f, Kp, Kd,joint_LF_torque);
         set_dm8009_MIT(&joint[LB],LB_pos,0.0f, Kp, Kd,joint_LB_torque);
-        DWT_Delay(0.0005);
+        DWT_Delay(0.0002);
         set_dm8009_MIT(&joint[RF],RF_pos,0.0f, Kp, Kd,joint_RF_torque);
         set_dm8009_MIT(&joint[RB],RB_pos,0.0f, Kp, Kd,joint_RB_torque);
 
-    }
-
-    dm_time ++;
-
-    if(dm_time >= 10000)
-    {
-        dm_time = 0;
-    }
-
-    /** LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK LK **/
-    static int lk_time = 1;
-
-    if(lk_time % 2 == 0)
-    {
         lk9025_multi_torque_set(wheel_L_torque, wheel_R_torque);
-//        lk9025_multi_torque_set(0.0f, 0.0f);
     }
 
-    lk_time ++;
+    time ++;
 
-    if(lk_time > 10000)
+    if(time >= 100000000)
     {
-        lk_time = 1;
+        time = 0;
     }
+
 }
 
 // 1kHz

@@ -49,10 +49,9 @@ function K = get_k_length(leg_length)
     B=subs(B,[R,L,LM,l,mw,mp,M,Iw,Ip,IM,g],[R1,L1,LM1,l1,mw1,mp1,M1,Iw1,Ip1,IM1,9.8]);
     B=double(B);
 
-% 1.板凳模型
 %   Q = diag([1 1 1 1 1 1]);
 %   Q = diag([1 1 150 1 1000 1]);
-    Q = diag([1 1 150 1 10000 10]);
+    Q = diag([1 1 150 1 5000 1]);
 
     R = [1 0;0 0.25];
     
