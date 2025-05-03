@@ -35,6 +35,7 @@
 #include "bsp_dwt.h"
 #include "remote.h"
 #include "BMI088driver.h"
+#include "buzzer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -114,6 +115,9 @@ int main(void)
   remote_control_init();
   DWT_Init(168);
   while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR);
+
+  Buzzer_Init();
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -192,6 +196,7 @@ void SystemClock_Config(void)
         Error_Handler();
     }
 }
+
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */

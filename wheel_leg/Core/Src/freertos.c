@@ -28,6 +28,7 @@
 #include "robot_def.h"
 #include "ins_task.h"
 #include "chassis_task.h"
+#include "buzzer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -195,6 +196,7 @@ void StartChassisTask(void const * argument)
 {
   /* USER CODE BEGIN StartChassisTask */
   chassis_init();
+
   /* Infinite loop */
   for(;;)
   {

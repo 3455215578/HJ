@@ -6,6 +6,7 @@
 #include "pid.h"
 #include "moving_filter.h"
 #include "can_device.h"
+#include "user_lib.h"
 
 typedef float fp32; // 表明某个float类型变量是32位浮点数
 typedef double fp64;
@@ -54,7 +55,7 @@ typedef double fp64;
 
 /** PID参数 **/
 /** 转向PID **/
-#define CHASSIS_TURN_PID_P 5.0f
+#define CHASSIS_TURN_PID_P 20.0f // 5.0f 10.0f
 #define CHASSIS_TURN_PID_I 0.0f
 #define CHASSIS_TURN_PID_D 3.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
@@ -89,12 +90,13 @@ typedef double fp64;
 #define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
 
 /** 防劈叉PID **/
-#define CHASSIS_LEG_COORDINATION_PID_P 20.0f
+#define CHASSIS_LEG_COORDINATION_PID_P 100.0f // 100.0f
 #define CHASSIS_LEG_COORDINATION_PID_I 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_D 2.0f
 #define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 10.0f
 
+#define PHI_BALANCE 0.5f * DEGREE_TO_RAD
 
 /*******************************************************************************
  *                                    底盘                                     *
