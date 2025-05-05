@@ -1,0 +1,4 @@
+#ifndef _BOARD_COMMUNICATION_TASK_H
+#define _BOARD_COMMUNICATION_TASK_H
+
+#endif
