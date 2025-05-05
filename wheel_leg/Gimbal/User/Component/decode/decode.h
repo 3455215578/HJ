@@ -16,7 +16,6 @@ void encode_send_data(uint16_t cmd_id, void* buf, uint16_t len);
 
 uint16_t referee_data_solve(uint8_t *frame);
 void usb_fifo_init();
-void decode_task(void const * arg);
-void decode_task(void const * argument);
+void Decode_task(void const *arg);
 
 #endif //OSX_PROJECT_DECODE_H

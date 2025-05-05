@@ -423,3 +423,14 @@ void fabs_limit(fp32 *x, fp32 limit) {
         *x = -limit;
     }
 }
+
+//ÏÞ·ùº¯Êý
+fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue)
+{
+    if (Value < minValue)
+        return minValue;
+    else if (Value > maxValue)
+        return maxValue;
+    else
+        return Value;
+}

@@ -109,6 +109,7 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*" "USB_DEVICE
         "User/Algorithm/*.*"
         "User/App/*.*"
         "User/Bsp/*.*"
+        "User/Component/*.*"
         "User/Device/*.*"
         "User/Robot_def/*.*"
         )

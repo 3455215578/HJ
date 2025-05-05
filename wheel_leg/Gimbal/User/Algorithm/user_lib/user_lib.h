@@ -165,4 +165,6 @@ void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type,
 
 void fabs_limit(fp32 *x, fp32 limit);
 
+fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
+
 #endif

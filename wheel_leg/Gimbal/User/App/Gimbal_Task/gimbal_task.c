@@ -116,6 +116,8 @@ void Gimbal_task(void const*pvParameters) {
                                0,                               //207
                                0                                //208
         );
+
+
         vTaskDelay(GIMBAL_PERIOD);
     }
 }

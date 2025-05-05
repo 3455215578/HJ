@@ -29,6 +29,8 @@
 #include "buzzer.h"
 #include "Atti.h"
 #include "gimbal_task.h"
+#include "decode.h"
+#include "usb_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,9 +54,15 @@
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 
-osThreadId GimbalTaskHandle;
-osThreadId INSTaskHandle;
-osThreadId DetectTaskHandle;
+osThreadId calibrateTaskHandle;
+
+osThreadId gimbalTaskHandle;
+osThreadId imuTaskHandle;
+osThreadId detectTaskHandle;
+osThreadId usbtaskHandle;
+osThreadId decodetaskHandle;
+
+
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -84,6 +92,9 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
   /* place for user code */
 }
+
+QueueHandle_t CDC_send_queue;
+
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
@@ -128,19 +139,35 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-    osThreadDef(INSTaskHandle, INS_task, osPriorityRealtime, 0, 512);
-    INSTaskHandle = osThreadCreate(osThread(INSTaskHandle), NULL);
+    /* definition and creation of gimbalTask */
+    osThreadDef(gimbalTask, Gimbal_task, osPriorityHigh, 0, 512);
+    gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
-    osThreadDef(GimbalTaskHandle, Gimbal_task, osPriorityHigh, 0, 512);
-    GimbalTaskHandle = osThreadCreate(osThread(GimbalTaskHandle), NULL);
+    /* definition and creation of imuTask */
+    osThreadDef(imuTask, INS_task, osPriorityIdle, 0, 512);
+    imuTaskHandle = osThreadCreate(osThread(imuTask), NULL);
 
     /* definition and creation of detectTask */
-    osThreadDef(DetectTaskHandle, Detect_task, osPriorityIdle, 0, 128);
-    DetectTaskHandle = osThreadCreate(osThread(DetectTaskHandle), NULL);
+    osThreadDef(detectTask, Detect_task, osPriorityIdle, 0, 128);
+    detectTaskHandle = osThreadCreate(osThread(detectTask), NULL);
+
+    /* definition and creation of usbtask */
+    osThreadDef(usbtask, USB_task, osPriorityHigh, 0, 128);
+    usbtaskHandle = osThreadCreate(osThread(usbtask), NULL);
+
+//    /* definition and creation of decodetask */
+//    osThreadDef(decodetask, Decode_task, osPriorityHigh, 0, 128);
+//    decodetaskHandle = osThreadCreate(osThread(decodetask), NULL);
+
+
+
+  /* USER CODE BEGIN RTOS_THREADS */
+
+    CDC_send_queue = xQueueCreate(1, 128);
+
   /* USER CODE END RTOS_THREADS */
 
 }
