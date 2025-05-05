@@ -52,4 +52,6 @@ typedef enum
 extern detect_device_t detect_list[DETECT_DEVICE_LIST_LEN];
 extern void detect_handle(uint8_t index);
 
+void Detect_task(void const*pvParameters);
+
 #endif //DEMO1_DETECTION_H

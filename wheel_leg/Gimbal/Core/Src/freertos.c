@@ -27,6 +27,8 @@
 /* USER CODE BEGIN Includes */
 #include "robot_def.h"
 #include "buzzer.h"
+#include "Atti.h"
+#include "gimbal_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,7 +51,10 @@
 
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
+
+osThreadId GimbalTaskHandle;
 osThreadId INSTaskHandle;
+osThreadId DetectTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -57,7 +62,6 @@ osThreadId INSTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
-void StartINSTask(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -127,12 +131,16 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of INSTask */
-//  osThreadDef(INSTask, StartINSTask, osPriorityRealtime, 0, 512);
-//  INSTaskHandle = osThreadCreate(osThread(INSTask), NULL);
-
   /* USER CODE BEGIN RTOS_THREADS */
+    osThreadDef(INSTaskHandle, INS_task, osPriorityRealtime, 0, 512);
+    INSTaskHandle = osThreadCreate(osThread(INSTaskHandle), NULL);
 
+    osThreadDef(GimbalTaskHandle, Gimbal_task, osPriorityHigh, 0, 512);
+    GimbalTaskHandle = osThreadCreate(osThread(GimbalTaskHandle), NULL);
+
+    /* definition and creation of detectTask */
+    osThreadDef(DetectTaskHandle, Detect_task, osPriorityIdle, 0, 128);
+    DetectTaskHandle = osThreadCreate(osThread(DetectTaskHandle), NULL);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -155,26 +163,6 @@ void StartDefaultTask(void const * argument)
   }
   /* USER CODE END StartDefaultTask */
 }
-
-/* USER CODE BEGIN Header_StartINSTask */
-/**
-* @brief Function implementing the INSTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartINSTask */
-//void StartINSTask(void const * argument)
-//{
-//  /* USER CODE BEGIN StartINSTask */
-//    INS_Init();
-//    /* Infinite loop */
-//    for (;;)
-//    {
-//        INS_Task();
-//        osDelay(1);
-//    }
-//  /* USER CODE END StartINSTask */
-//}
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
