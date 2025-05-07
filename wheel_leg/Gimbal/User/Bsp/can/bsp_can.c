@@ -5,6 +5,19 @@
 #include "gimbal_task.h"
 #include "launcher.h"
 
+/* 发送结构体 */
+CAN_TxFrame_TypeDef Gimbal_Send_Chassis_TxFrame =  {
+        .hcan = &hcan2,
+
+        .Header.StdId = 0x110,
+        .Header.ExtId = 0,
+        .Header.IDE = CAN_ID_STD,
+        .Header.RTR = CAN_RTR_DATA,
+        .Header.DLC = 0x08,
+        .Header.TransmitGlobalTime = DISABLE,
+
+};
+
 /* 接收结构体 */
 CAN_RxFrame_TypeDef CAN1_RxFrame;
 CAN_RxFrame_TypeDef CAN2_RxFrame;
@@ -21,15 +34,12 @@ void can_filter_init(void)
     can_filter_st.FilterMaskIdLow = 0x0000;
     can_filter_st.FilterBank = 0;
     can_filter_st.FilterFIFOAssignment = CAN_RX_FIFO0;
-//    can_filter_st.FilterFIFOAssignment = CAN_RX_FIFO1;
     HAL_CAN_ConfigFilter(&hcan1, &can_filter_st);
     HAL_CAN_Start(&hcan1);
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
-
     can_filter_st.SlaveStartFilterBank = 14;
     can_filter_st.FilterBank = 14;
-    can_filter_st.FilterFIFOAssignment = CAN_RX_FIFO0;
     HAL_CAN_ConfigFilter(&hcan2, &can_filter_st);
     HAL_CAN_Start(&hcan2);
     HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
@@ -56,6 +66,18 @@ uint32_t get_can_free_mail(CAN_HandleTypeDef* hcan)
     }
 }
 
+void CAN_Gimbal_Send_Chassis_Data(CAN_TxFrame_TypeDef* Gimbal_Send_Chassis_TxFrame)
+{
+    /** 获取邮箱 **/
+    uint32_t can_send_mail = get_can_free_mail(Gimbal_Send_Chassis_TxFrame->hcan);
+
+    /** 发送数据 **/
+    if (can_send_mail != 0) {
+        HAL_CAN_AddTxMessage(Gimbal_Send_Chassis_TxFrame->hcan, &Gimbal_Send_Chassis_TxFrame->Header, Gimbal_Send_Chassis_TxFrame->Data, &can_send_mail);
+    }
+}
+
+
 /** CAN1接收中断处理 **/
 static void CAN1_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
 {
@@ -75,7 +97,7 @@ static void CAN1_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
         case CAN_LAUNCHER_TRIGGER: //203
         {
             DJI_Motor_Decode(&launcher.trigger.motor_measure, Data);
-            DJI_Round_Count(&launcher.trigger.motor_measure);//获取转动拨轮电机转动圈数和总编码值
+            DJI_Round_Count(&launcher.trigger.motor_measure);//获取转动拨盘电机转动圈数和总编码值
             detect_handle(DETECT_LAUNCHER_3508_TRIGGER);
             break;
         }
