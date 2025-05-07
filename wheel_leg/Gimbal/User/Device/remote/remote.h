@@ -12,7 +12,6 @@
 #include "user_lib.h"
 
 #define SBUS_RX_BUF_NUM 36u
-
 #define RC_FRAME_LENGTH 18u
 
 #define RC_CH_VALUE_MIN         ((uint16_t)364)

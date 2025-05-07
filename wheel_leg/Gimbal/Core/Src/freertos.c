@@ -158,9 +158,9 @@ void MX_FREERTOS_Init(void) {
     osThreadDef(usbtask, USB_task, osPriorityHigh, 0, 128);
     usbtaskHandle = osThreadCreate(osThread(usbtask), NULL);
 
-//    /* definition and creation of decodetask */
-//    osThreadDef(decodetask, Decode_task, osPriorityHigh, 0, 128);
-//    decodetaskHandle = osThreadCreate(osThread(decodetask), NULL);
+    /* definition and creation of decodetask */
+    osThreadDef(decodetask, Decode_task, osPriorityHigh, 0, 128);
+    decodetaskHandle = osThreadCreate(osThread(decodetask), NULL);
 
 
 

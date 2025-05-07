@@ -8,6 +8,11 @@
 #include "struct_typedef.h"
 #include "bsp_can.h"
 
+typedef enum {
+    CAN_1,
+    CAN_2,
+}CAN_TYPE;
+
 // DJIµç»úµÄCAN_ID
 typedef enum {
     CAN_DJI_MOTOR_0x200_ID = 0x200, // C620/C610 id=1~4 (0x201~0x204)

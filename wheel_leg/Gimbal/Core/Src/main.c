@@ -35,7 +35,6 @@
 /* USER CODE BEGIN Includes */
 #include "bsp_delay.h"
 #include "bsp_can.h"
-#include "bsp_dwt.h"
 #include "remote.h"
 #include "BMI088driver.h"
 #include "buzzer.h"
@@ -138,8 +137,7 @@ int main(void)
     usart6_init(&usart6_buf[0], REFEREE_BUFFER_SIZE);
     usart1_init(&usart1_buf[0], REFEREE_BUFFER_SIZE);
 
-
-    CAN_init();
+    can_filter_init();
 
     cali_param_init();
     remote_control_init();

@@ -17,15 +17,14 @@
 /*********************************************************************************************************
 *                                              包含头文件
 *********************************************************************************************************/
+#include "Balance.h"
 #include "gimbal_task.h"
 #include "launcher.h"
 #include "protocol_balance.h"
 #include "Atti.h"
 #include "packet.h"
-#include "can_send.h"
 #include "cmsis_os.h"
-#include "gimbal_task.h"
-#include "Balance.h"
+#include "board_communication_task.h"
 
 /*********************************************************************************************************
 *                                              内部变量
@@ -104,9 +103,9 @@ void Gimbal_task(void const*pvParameters) {
         /* 控制电机 */
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x200_ID,
-                               launcher.fire_l.give_current,    //201
-                               launcher.fire_r.give_current,    //202
-                               launcher.trigger.give_current,   //203
+                               launcher.fire_l.target_current,    //201
+                               launcher.fire_r.target_current,    //202
+                               1000,   //203
                                0                                //204
         );
         DJI_Send_Motor_Mapping(CAN_1,
@@ -116,6 +115,21 @@ void Gimbal_task(void const*pvParameters) {
                                0,                               //207
                                0                                //208
         );
+
+//        DJI_Send_Motor_Mapping(CAN_1,
+//                               CAN_DJI_MOTOR_0x200_ID,
+//                               launcher.fire_l.give_current,    //201
+//                               launcher.fire_r.give_current,    //202
+//                               0,   //203
+//                               0                                //204
+//        );
+//        DJI_Send_Motor_Mapping(CAN_1,
+//                               CAN_DJI_MOTOR_0x1FF_ID,
+//                               0,         //205
+//                               0,       //206
+//                               0,                               //207
+//                               0                                //208
+//        );
 
 
         vTaskDelay(GIMBAL_PERIOD);
@@ -137,20 +151,24 @@ static void Gimbal_Init(void) {
     gimbal.mode = gimbal.last_mode = GIMBAL_RELAX;
 
     /* pit 轴电机角度环和速度环PID初始化 */
-    pid_init(&gimbal.pitch.speed_p, GIMBAL_PITCH_SPEED_MAX_OUT,
-             GIMBAL_PITCH_SPEED_MAX_IOUT, GIMBAL_PITCH_SPEED_PID_KP,
-             GIMBAL_PITCH_SPEED_PID_KI, GIMBAL_PITCH_SPEED_PID_KD);
-    pid_init(&gimbal.pitch.angle_p, GIMBAL_PITCH_ANGLE_MAX_OUT,
-             GIMBAL_PITCH_ANGLE_MAX_IOUT, GIMBAL_PITCH_ANGLE_PID_KP,
-             GIMBAL_PITCH_ANGLE_PID_KI, GIMBAL_PITCH_ANGLE_PID_KD);
+    pid_init(&gimbal.pitch.speed_p,
+             GIMBAL_PITCH_SPEED_MAX_OUT, GIMBAL_PITCH_SPEED_MAX_IOUT,
+             GIMBAL_PITCH_SPEED_PID_KP, GIMBAL_PITCH_SPEED_PID_KI, GIMBAL_PITCH_SPEED_PID_KD
+             );
+
+    pid_init(&gimbal.pitch.angle_p,
+             GIMBAL_PITCH_ANGLE_MAX_OUT, GIMBAL_PITCH_ANGLE_MAX_IOUT,
+             GIMBAL_PITCH_ANGLE_PID_KP, GIMBAL_PITCH_ANGLE_PID_KI, GIMBAL_PITCH_ANGLE_PID_KD
+             );
 
     /* yaw 轴电机角度环和速度环PID初始化 */
-    pid_init(&gimbal.yaw.speed_p, GIMBAL_YAW_SPEED_MAX_OUT,
-             GIMBAL_YAW_SPEED_MAX_IOUT, GIMBAL_YAW_SPEED_PID_KP,
-             GIMBAL_YAW_SPEED_PID_KI, GIMBAL_YAW_SPEED_PID_KD);
-    pid_init(&gimbal.yaw.angle_p, GIMBAL_YAW_ANGLE_MAX_OUT,
-             GIMBAL_YAW_ANGLE_MAX_IOUT, GIMBAL_YAW_ANGLE_PID_KP,
-             GIMBAL_YAW_ANGLE_PID_KI, GIMBAL_YAW_ANGLE_PID_KD);
+    pid_init(&gimbal.yaw.speed_p,
+             GIMBAL_YAW_SPEED_MAX_OUT, GIMBAL_YAW_SPEED_MAX_IOUT,
+             GIMBAL_YAW_SPEED_PID_KP, GIMBAL_YAW_SPEED_PID_KI, GIMBAL_YAW_SPEED_PID_KD);
+
+    pid_init(&gimbal.yaw.angle_p,
+             GIMBAL_YAW_ANGLE_MAX_OUT, GIMBAL_YAW_ANGLE_MAX_IOUT,
+             GIMBAL_YAW_ANGLE_PID_KP, GIMBAL_YAW_ANGLE_PID_KI, GIMBAL_YAW_ANGLE_PID_KD);
 
     /* 找到yaw轴正方向 */
     gimbal.yaw.motor_measure.offset_ecd = YAW_OFFSET_ECD;
@@ -235,13 +253,13 @@ static void Gimbal_Device_Offline_Handle(void) {
         gimbal.yaw.give_current = 0;
     }
     if (detect_list[DETECT_LAUNCHER_3508_FIRE_L].status == OFFLINE) {
-        launcher.fire_l.give_current = 0;
+        launcher.fire_l.target_current = 0;
     }
     if (detect_list[DETECT_LAUNCHER_3508_FIRE_R].status == OFFLINE) {
-        launcher.fire_r.give_current = 0;
+        launcher.fire_r.target_current = 0;
     }
     if (detect_list[DETECT_LAUNCHER_3508_TRIGGER].status == OFFLINE) {
-        launcher.trigger.give_current = 0;
+        launcher.trigger.target_current = 0;
     }
 }
 
@@ -455,8 +473,8 @@ void Gimbal_Ctrl_Loop_Cal(void){
 float a_pitch = 0.f;
 float a_yaw = 0.f;
 void Gimbal_Auto_Handle(void) {
-    if(KeyBoard.F.status == KEY_CLICK) a_pitch += 0.2f;
-    if(KeyBoard.C.status == KEY_CLICK) a_pitch -= 0.2f;
+    // if(KeyBoard.F.status == KEY_CLICK) a_pitch += 0.2f;
+    // if(KeyBoard.C.status == KEY_CLICK) a_pitch -= 0.2f;
     // if(KeyBoard.Z.status == KEY_CLICK) a_yaw += 0.2f;
     // if(KeyBoard.X.status == KEY_CLICK) a_yaw -= 0.2f;
     //获取视觉发送的角度误差
@@ -465,7 +483,6 @@ void Gimbal_Auto_Handle(void) {
     first_order_filter_cali(&gimbal.auto_yaw[1], cosf(robot_ctrl.yaw / 180.0f * PI));//yaw数据分解成y
     gimbal.yaw.absolute_angle_set = (atan2f(gimbal.auto_yaw[0].out, gimbal.auto_yaw[1].out) * 180.0f / PI) + a_yaw;//在此处做合成
     gimbal.pitch.absolute_angle_set = gimbal.auto_pitch.out + a_pitch;
-    // 自瞄不需要云台底盘相对角
 
     //云台绕圈时进行绝对角循环设置
     if(gimbal.yaw.absolute_angle_set>=180){
@@ -479,32 +496,3 @@ void Gimbal_Auto_Handle(void) {
                                                      MIN_ABS_ANGLE,
                                                      MAX_ABS_ANGLE);
 }
-
-
-void Gimbal_Can_Msg(uint32_t can_id, uint8_t *can_msg) {
-    switch (can_id) {
-        case CAN_GIMBAL_YAW: //205
-            DJI_Motor_Decode(&gimbal.yaw.motor_measure, can_msg);
-            detect_handle(DETECT_GIMBAL_6020_YAW);
-            break;
-        case CAN_GIMBAL_PITCH: //206
-            DJI_Motor_Decode(&gimbal.pitch.motor_measure, can_msg);
-            detect_handle(DETECT_GIMBAL_6020_PITCH);
-            break;
-        case CAN_LAUNCHER_FIRE_L: //208
-            DJI_Motor_Decode(&launcher.fire_l.motor_measure, can_msg);
-            detect_handle(DETECT_LAUNCHER_3508_FIRE_L);
-            break;
-        case CAN_LAUNCHER_FIRE_R: //207
-            DJI_Motor_Decode(&launcher.fire_r.motor_measure, can_msg);
-            detect_handle(DETECT_LAUNCHER_3508_FIRE_R);
-            break;
-        case CAN_LAUNCHER_TRIGGER: //203
-            DJI_Motor_Decode(&launcher.trigger.motor_measure, can_msg);
-            DJI_Round_Count(&launcher.trigger.motor_measure);//获取转动拨轮电机转动圈数和总编码值
-            detect_handle(DETECT_LAUNCHER_3508_TRIGGER);
-            break;
-    }
-}
-
-void Chassis_to_Gimbal_Can(uint32_t can_id, const uint8_t *rx_data) {}

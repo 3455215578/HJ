@@ -125,8 +125,10 @@ void update_pc_info() {
 }
 
 //根据遥控器更改键鼠的按键状态
-static void key_update(Key *key, uint16_t key_status, uint16_t cnt) {
-    if (key_status) {
+static void key_update(Key *key, uint16_t key_status, uint16_t cnt)
+{
+    if (key_status)
+    {
         key->press_cnt++;
         if (key->status == KEY_RELAX) {
             key->last_status = KEY_RELAX;

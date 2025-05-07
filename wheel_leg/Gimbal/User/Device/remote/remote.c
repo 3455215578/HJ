@@ -253,7 +253,7 @@ static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
     }
     //摇杆错误检测，若摇杆一次变化量超过500，即产生错误，将本次的值回归上次的值
     for (int i = 0; i < 4; ++i) {
-        if(abs((rc_ctrl->rc.last_ch[i]-rc_ctrl->rc.ch[i]))>500)
+        if(ABS((rc_ctrl->rc.last_ch[i]-rc_ctrl->rc.ch[i]))>500)
             rc_ctrl->rc.ch[i] = rc_ctrl->rc.last_ch[i];
         else
             rc_ctrl->rc.last_ch[i] = rc_ctrl->rc.ch[i];

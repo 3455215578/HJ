@@ -52,9 +52,7 @@
 #include "Referee.h"
 #include "launcher.h"
 #include "gimbal_task.h"
-#include "Cap_Task.h"
 #include "key_board.h"
-#include "gimbal_task.h"
 #include "Balance.h"
 
 uint8_t Referee_ID;
@@ -67,8 +65,6 @@ extern UART_HandleTypeDef huart1;
 extern key_board_t KeyBoard;
 //extern chassis_t chassis;//获取底盘模式
 extern gimbal_t gimbal;//获取云台模式
-extern int32_t cap_percentage;//电容百分比，在can_receive.c文件中可见
-extern Bear_Cap bearCap;
 
 ext_ui_color uiColor;//判断ui颜色
 ext_ui_change uiChange; //绘制动态UI的参数
@@ -87,20 +83,6 @@ uint8_t usart6_buf[REFEREE_BUFFER_SIZE]={0};
 Referee_info_t Referee;
 
 uint8_t bit_2;
-
-/*
- * UI更新状态
- */
-ui_robot_status_t ui_robot_status={
-
-        .static_update=true,
-        .gimbal_mode=GIMBAL_RELAX,
-        .chassis_mode=CHASSIS_RELAX,
-        .block_warning=false,
-        .super_cap_value=0.f,
-        .shoot_heat_limit=0,
-
-};
 
 /*函数和声明*/
 static void referee_unpack_fifo_data(void);
@@ -941,7 +923,7 @@ void dynamic_color_draw()
 //        uiColor.spin_color = UI_CYAN_BLUE;//不开启时蓝青色
 //    }
 
-    if(launcher.fire_mode == Fire_ON)
+    if(launcher.fir_wheel_mode == Fire_ON)
     {
         uiColor.fire_color = UI_YELLOW;//摩擦轮启动,ui变黄色
     }
@@ -950,7 +932,7 @@ void dynamic_color_draw()
         uiColor.fire_color = UI_CYAN_BLUE;//不开启时蓝青色
     }
 
-    if(launcher.shoot_cmd == SHOOT_FAIL){
+    if(launcher.trigger_mode == SHOOT_FAIL){
         uiColor.shoot_color = UI_PINK; //拨盘转动,ui变黄色
     }
     else
@@ -958,40 +940,6 @@ void dynamic_color_draw()
         uiColor.shoot_color = UI_CYAN_BLUE;//不转动时蓝青色
     }
 
-    if(bearCap.mode == WORK) {
-        uiColor.cap_color = UI_ORANGE;
-    }else {
-        uiColor.cap_color = UI_CYAN_BLUE;
-    }
-}
-
-///* 右上角的小陀螺状态下，圆弧动态变化 */
-//int flag = 0;
-//void dynamic_chassis_draw ()
-//{
-//    if(chassis.mode == CHASSIS_SPIN_L || chassis.mode == CHASSIS_SPIN_R) {
-//        if(uiChange.spin_endangle == 360) {
-//            uiChange.spin_startangle = 65;
-//            uiChange.spin_endangle = 5;
-//        }else if(uiChange.spin_startangle == 360) {
-//            uiChange.spin_startangle = 5;
-//            uiChange.spin_endangle = 305;
-//        }else {
-//            uiChange.spin_startangle += 5;
-//            uiChange.spin_endangle += 5;
-//        }
-//        flag = 1;
-//    }else {
-//        if(flag == 0) {
-//            uiChange.spin_startangle = 30;
-//            uiChange.spin_endangle = 330;
-//        }
-//    }
-//}
-
-void dynamic_cap_draw()
-{
-    uiChange.cap_endangle = (1.428)*(int)(bearCap.capReceiveData.esr_v/100) + 229;
 }
 
 /* 6个动态元素的UI更新 */

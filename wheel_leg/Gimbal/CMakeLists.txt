@@ -49,56 +49,59 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Middlewares/ST/ARM/DSP/Inc
+include_directories(Core/Inc
+        USB_DEVICE/App USB_DEVICE/Target
+        Drivers/STM32F4xx_HAL_Driver/Inc
+        Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+        Middlewares/Third_Party/FreeRTOS/Source/include
+        Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+        Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+        Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+        Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+        Middlewares/ST/ARM/DSP/Inc
+        Drivers/CMSIS/Device/ST/STM32F4xx/Include
+        Drivers/CMSIS/Include
+
         User/Algorithm/AHRS
-        User/Algorithm/controller
         User/Algorithm/CRC8_CRC16
         User/Algorithm/filter
         User/Algorithm/filter/kalman_filter
         User/Algorithm/pid
-        User/Algorithm/pid/Feedforward_PID
         User/Algorithm/QuaternionEKF
+        User/Algorithm/ramp
         User/Algorithm/SMC
         User/Algorithm/user_lib
-        User/Algorithm/ramp
 
         User/App/Atti
         User/App/Board_Communication_Task
-        User/App/Cap_Task
         User/App/Gimbal_Task
+        User/App/Referee_Task/Calibrate
         User/App/Referee_Task/Detection
         User/App/Referee_Task/Referee
-        User/App/Referee_Task/Calibrate
 
         User/Balance
 
         User/Bsp/adc
-        User/Bsp/can
-        User/Bsp/led
-        User/Bsp/imu_pwm
-        User/Bsp/delay
-        User/Bsp/dwt
-        User/Bsp/flash
-        User/Bsp/pwm
-        User/Bsp/rc
         User/Bsp/buzzer
+        User/Bsp/can
+        User/Bsp/delay
+        User/Bsp/flash
+        User/Bsp/imu_pwm
+        User/Bsp/led
+        User/Bsp/rc
         User/Bsp/spi
         User/Bsp/usart
 
         User/Component/decode
-        User/Component/packet
         User/Component/fifo
-
-
+        User/Component/packet
 
         User/Device/bmi088
         User/Device/buzzer
-        User/Device/can_device
         User/Device/ist8310
         User/Device/key_board
         User/Device/motor/DJI_Motor
         User/Device/remote
-        User/Device/servo
 
         User/Robot_def
 )
