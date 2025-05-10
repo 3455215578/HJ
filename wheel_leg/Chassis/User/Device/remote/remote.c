@@ -295,40 +295,28 @@ static void set_chassis_ctrl_info() {
 
     chassis.chassis_ctrl_info.yaw_rad -= (float) (rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
-    if(chassis.chassis_ctrl_mode == CHASSIS_SPIN_L)
-    {
-        chassis.chassis_ctrl_info.spin_speed = 0.1f;
-    }
-    else if(chassis.chassis_ctrl_mode == CHASSIS_SPIN_R)
-    {
-        chassis.chassis_ctrl_info.spin_speed = -0.5f;
-    }
-
 }
 
 /** 底盘根据遥控器设置模式 **/
 static void set_chassis_mode() {
     if (switch_is_down(rc_ctrl.rc.s[RC_s_R])) { // 失能
-        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_last_ctrl_mode = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
     }
     else if (switch_is_mid(rc_ctrl.rc.s[RC_s_R]) && (chassis.init_flag == false)) { // 初始化模式
-        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_last_ctrl_mode = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_INIT;
     }
     else if (switch_is_mid(rc_ctrl.rc.s[RC_s_R]) && (chassis.init_flag == true)) { // 使能
-        chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
+        chassis.chassis_last_ctrl_mode = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_ENABLE;
     }
     else if(switch_is_up(rc_ctrl.rc.s[RC_s_R]))
     {
-            chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
-            chassis.chassis_ctrl_mode = CHASSIS_SPIN_R;
+            chassis.chassis_last_ctrl_mode = chassis.chassis_ctrl_mode;
+            chassis.chassis_ctrl_mode = CHASSIS_SPIN;
     }
-//        else {
-//            chassis.chassis_ctrl_mode_last = chassis.chassis_ctrl_mode;
-//            chassis.chassis_ctrl_mode = CHASSIS_SPIN_L;
-//        }
+
     }
 
 

@@ -56,19 +56,19 @@ typedef double fp64;
 
 
 /** PID参数 **/
-/** 转向PID **/
-#define CHASSIS_TURN_PID_P 20.0f // 5.0f 10.0f
-#define CHASSIS_TURN_PID_I 0.0f
-#define CHASSIS_TURN_PID_D 3.0f
-#define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_TURN_PID_OUT_LIMIT 4.0f
+/** 转向位置环PID **/
+#define CHASSIS_VW_POS_PID_P 0.0f
+#define CHASSIS_VW_POS_PID_I 0.0f
+#define CHASSIS_VW_POS_PID_D 0.0f
+#define CHASSIS_VW_POS_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_VW_POS_PID_OUT_LIMIT 0.0f
 
-/** 小陀螺PID **/
-#define CHASSIS_SPIN_PID_P 10.0f
-#define CHASSIS_SPIN_PID_I 0.0f
-#define CHASSIS_SPIN_PID_D 0.0f
-#define CHASSIS_SPIN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_SPIN_PID_OUT_LIMIT 4.0f
+/** 转向速度环PID **/
+#define CHASSIS_VW_SPEED_PID_P 0.0f
+#define CHASSIS_VW_SPEED_PID_I 0.0f
+#define CHASSIS_VW_SPEED_PID_D 0.0f
+#define CHASSIS_VW_SPEED_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_VW_SPEED_PID_OUT_LIMIT 0.0f
 
 /** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 15.0f
@@ -78,14 +78,14 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2.0f
 
 /** 腿长速度环PID **/
-#define CHASSIS_LEG_L0_SPEED_PID_P 35.0f // 50.0f
+#define CHASSIS_LEG_L0_SPEED_PID_P 30.0f // 50.0f
 #define CHASSIS_LEG_L0_SPEED_PID_I 0.0f
 #define CHASSIS_LEG_L0_SPEED_PID_D 0.0f
 #define CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
 
 /** Roll PID **/
-#define CHASSIS_ROLL_PID_P 800.0f
+#define CHASSIS_ROLL_PID_P 500.0f
 #define CHASSIS_ROLL_PID_I 0.0f
 #define CHASSIS_ROLL_PID_D 0.0f
 #define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
@@ -123,11 +123,10 @@ typedef struct{
 /** 底盘模式结构体 **/
 typedef enum{
     CHASSIS_DISABLE = 1, // 失能模式
-    CHASSIS_ENABLE, // 使能模式
     CHASSIS_INIT, // 初始化模式
+    CHASSIS_ENABLE, // 使能模式
+    CHASSIS_SPIN, // 小陀螺
     CHASSIS_JUMP, // 跳跃模式
-    CHASSIS_SPIN_R, // 小陀螺
-    CHASSIS_SPIN_L, // 小陀螺
 } ChassisCtrlMode;
 
 typedef struct{
@@ -371,7 +370,7 @@ typedef struct{
 
     /** 遥控器信息 **/
     ChassisCtrlMode chassis_ctrl_mode;
-    ChassisCtrlMode chassis_ctrl_mode_last;
+    ChassisCtrlMode chassis_last_ctrl_mode;
     ChassisCtrlInfo chassis_ctrl_info;
 
     /** 腿部 **/
@@ -382,21 +381,22 @@ typedef struct{
     JumpState jump_state;
 
     /** PID **/
-    Pid chassis_spin_pid;
-    Pid chassis_turn_pid;             // 转向pid
+    // Wheel
+    float target_spin_speed;
+
+    Pid chassis_vw_pos_pid;
+    Pid chassis_vw_speed_pid;
+    float wheel_turn_torque;          // 转向力矩
+
+    // Joint
     Pid chassis_leg_coordination_pid; // 防劈叉pid
     Pid chassis_roll_pid;             // roll补偿pid
 
-    float wheel_turn_torque;          // 转向力矩
-    float steer_compensatory_torque;  // 防劈叉力矩
     float phi0_error;
-//  Pid chassis_vw_speed_pid;
-//  Pid chassis_spin_pid;
+    float steer_compensatory_torque;  // 防劈叉力矩
 
 
     /** flag **/
-
-    bool joint_is_reset;       // 关节复位标志位
 
     bool init_flag;            // 底盘初始化完成标志位
 

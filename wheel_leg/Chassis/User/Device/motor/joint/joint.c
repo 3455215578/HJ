@@ -50,47 +50,47 @@ Dm8009* get_joint_motors(void){
 }
 
 /** 倒地时关节位置异常  -> 复位 **/
-static void joint_is_reset(void)
-{
-    if(!chassis.recover_finish)
-    {
-        if((joint[LF].pos_r > LF_RESET) || ((joint[LB].pos_r < LB_RESET)
-        || (joint[RF].pos_r < RF_RESET) || (joint[RB].pos_r > RB_RESET)))
-        {
-            chassis.joint_is_reset = false;
-        }
-        else
-        {
-            chassis.joint_is_reset = true;
-        }
-    }
-
-
-}
-
-void joint_reset(void)
-{
-    joint_is_reset();
-
-    if(!chassis.joint_is_reset)
-    {
-        Kp = 20.0f;
-        Kd = 5.0f;
-
-        LF_pos = LF_RESET;
-        LB_pos = LB_RESET;
-        RF_pos = RF_RESET;
-        RB_pos = RB_RESET;
-
-    }
-    else
-    {
-        Kp = 0.0f;
-        Kd = 0.0f;
-
-        LF_pos = 0.0f;
-        LB_pos = 0.0f;
-        RF_pos = 0.0f;
-        RB_pos = 0.0f;
-    }
-}
+//static void joint_is_reset(void)
+//{
+//    if(!chassis.recover_finish)
+//    {
+//        if((joint[LF].pos_r > LF_RESET) || ((joint[LB].pos_r < LB_RESET)
+//        || (joint[RF].pos_r < RF_RESET) || (joint[RB].pos_r > RB_RESET)))
+//        {
+//            chassis.joint_is_reset = false;
+//        }
+//        else
+//        {
+//            chassis.joint_is_reset = true;
+//        }
+//    }
+//
+//
+//}
+//
+//void joint_reset(void)
+//{
+//    joint_is_reset();
+//
+//    if(!chassis.joint_is_reset)
+//    {
+//        Kp = 20.0f;
+//        Kd = 5.0f;
+//
+//        LF_pos = LF_RESET;
+//        LB_pos = LB_RESET;
+//        RF_pos = RF_RESET;
+//        RB_pos = RB_RESET;
+//
+//    }
+//    else
+//    {
+//        Kp = 0.0f;
+//        Kd = 0.0f;
+//
+//        LF_pos = 0.0f;
+//        LB_pos = 0.0f;
+//        RF_pos = 0.0f;
+//        RB_pos = 0.0f;
+//    }
+//}

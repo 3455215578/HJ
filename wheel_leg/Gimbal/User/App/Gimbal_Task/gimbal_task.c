@@ -103,33 +103,18 @@ void Gimbal_task(void const*pvParameters) {
         /* 控制电机 */
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x200_ID,
-                               launcher.fire_l.target_current,    //201
-                               launcher.fire_r.target_current,    //202
-                               1000,   //203
-                               0                                //204
+                               0,    //201
+                               0,    //202
+                               0,   //203
+                               0                                  //204
         );
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x1FF_ID,
-                               gimbal.yaw.give_current,         //205
-                               gimbal.pitch.give_current,       //206
+                               0,                               //205
+                               0,                               //206
                                0,                               //207
                                0                                //208
         );
-
-//        DJI_Send_Motor_Mapping(CAN_1,
-//                               CAN_DJI_MOTOR_0x200_ID,
-//                               launcher.fire_l.give_current,    //201
-//                               launcher.fire_r.give_current,    //202
-//                               0,   //203
-//                               0                                //204
-//        );
-//        DJI_Send_Motor_Mapping(CAN_1,
-//                               CAN_DJI_MOTOR_0x1FF_ID,
-//                               0,         //205
-//                               0,       //206
-//                               0,                               //207
-//                               0                                //208
-//        );
 
 
         vTaskDelay(GIMBAL_PERIOD);
@@ -148,7 +133,7 @@ void Gimbal_task(void const*pvParameters) {
   * @retval         返回空
   */
 static void Gimbal_Init(void) {
-    gimbal.mode = gimbal.last_mode = GIMBAL_RELAX;
+    gimbal.mode = gimbal.last_mode = GIMBAL_DISABLE;
 
     /* pit 轴电机角度环和速度环PID初始化 */
     pid_init(&gimbal.pitch.speed_p,
@@ -175,8 +160,8 @@ static void Gimbal_Init(void) {
     /* 使pitch失能保持当前状态 */
     gimbal.pitch.absolute_angle_set = gimbal.pitch.absolute_angle_get;
 
-    gimbal.pitch.give_current = 0;
-    gimbal.yaw.give_current = 0;
+    gimbal.pitch.target_current = 0;
+    gimbal.yaw.target_current = 0;
 
     //低通滤波初始化
     first_order_filter_init(&gimbal.mouse_in_x, 1, 40);
@@ -247,10 +232,10 @@ static void Gimbal_Device_Offline_Handle(void) {
     }
     if (detect_list[DETECT_GIMBAL_6020_PITCH].status == OFFLINE) {
         gimbal.pitch.absolute_angle_set = gimbal.pitch.absolute_angle_get;
-        gimbal.pitch.give_current = 0;
+        gimbal.pitch.target_current = 0;
     }
     if (detect_list[DETECT_GIMBAL_6020_YAW].status == OFFLINE) {
-        gimbal.yaw.give_current = 0;
+        gimbal.yaw.target_current = 0;
     }
     if (detect_list[DETECT_LAUNCHER_3508_FIRE_L].status == OFFLINE) {
         launcher.fire_l.target_current = 0;
@@ -294,7 +279,7 @@ static void Gimbal_Mode_Set(void) {
     switch (rc_ctrl.rc.s[RC_s_R]) {
         case RC_SW_DOWN: {
             gimbal.last_mode = gimbal.mode;
-            gimbal.mode = GIMBAL_RELAX;
+            gimbal.mode = GIMBAL_DISABLE;
         } break;
         case RC_SW_MID:
         case RC_SW_UP:
@@ -330,7 +315,7 @@ static void Gimbal_Mode_Set(void) {
   */
 static void Gimbal_Control(void) {
     switch (gimbal.mode) {
-        case GIMBAL_RELAX://云台失能（fire, pitch, single_shoot）
+        case GIMBAL_DISABLE://云台失能（fire, pitch, single_shoot）
             Gimbal_Relax_Handle();
             break;
 
@@ -360,8 +345,8 @@ void Gimbal_Relax_Handle(void) {
     DJI_Send_Motor_Mapping(CAN_2,CAN_DJI_MOTOR_0x1FF_ID,0,0,0,0);
     gimbal.pitch.absolute_angle_set = gimbal.pitch.absolute_angle_get;
     gimbal.yaw.absolute_angle_set = gimbal.yaw.absolute_angle_get;
-    gimbal.pitch.give_current = 0;
-    gimbal.yaw.give_current = 0;
+    gimbal.pitch.target_current = 0;
+    gimbal.yaw.target_current = 0;
     Launcher_Relax_Handle();
 }
 
@@ -448,7 +433,7 @@ void Gimbal_Ctrl_Loop_Cal(void){
 
     first_order_filter_cali(&gimbal.filter_yaw_gyro_in, gyro_yaw);
 
-    gimbal.yaw.give_current = (int16_t)pid_calc(&gimbal.yaw.speed_p,
+    gimbal.yaw.target_current = (int16_t)pid_calc(&gimbal.yaw.speed_p,
                                                 gimbal.filter_yaw_gyro_in.out,//gimbal.yaw.motor_measure->speed_rpm,
                                                 gimbal.yaw.gyro_set);
     //计算pitch轴的控制输出
@@ -458,7 +443,7 @@ void Gimbal_Ctrl_Loop_Cal(void){
 
     first_order_filter_cali(&gimbal.filter_pitch_gyro_in,gyro_pitch);
     ///// 读取陀螺仪的角速度加在内环的期望上面
-    gimbal.pitch.give_current= (int16_t)pid_calc(&gimbal.pitch.speed_p,
+    gimbal.pitch.target_current= (int16_t)pid_calc(&gimbal.pitch.speed_p,
                                                  gimbal.filter_pitch_gyro_in.out,
                                                  gimbal.pitch.gyro_set);
 

@@ -32,8 +32,8 @@ void joint_enable(void);
 /** 返回关节电机指针 **/
 Dm8009* get_joint_motors(void);
 
-/** 关节位置异常时复位 **/
-void joint_reset(void);
+///** 关节位置异常时复位 **/
+//void joint_reset(void);
 
 extern Dm8009 joint[4];
 

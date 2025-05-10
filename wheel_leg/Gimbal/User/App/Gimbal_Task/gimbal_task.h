@@ -67,7 +67,7 @@ typedef struct {
     pid_type_def speed_p;   //速度环 PID 控制参数
     pid_type_def angle_p;   //角度环 PID 控制参数
     fp32 gyro_set;          //转速设置
-    int16_t give_current;   //设置电流值
+    int16_t target_current;   //设置电流值
 
     fp32 relative_angle_set; //°    设定
     fp32 relative_angle_get; //°    获取
