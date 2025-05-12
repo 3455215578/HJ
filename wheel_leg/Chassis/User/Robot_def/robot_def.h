@@ -56,19 +56,13 @@ typedef double fp64;
 
 
 /** PID参数 **/
-/** 转向位置环PID **/
-#define CHASSIS_VW_POS_PID_P 0.0f
-#define CHASSIS_VW_POS_PID_I 0.0f
-#define CHASSIS_VW_POS_PID_D 0.0f
-#define CHASSIS_VW_POS_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_VW_POS_PID_OUT_LIMIT 0.0f
 
-/** 转向速度环PID **/
-#define CHASSIS_VW_SPEED_PID_P 0.0f
-#define CHASSIS_VW_SPEED_PID_I 0.0f
-#define CHASSIS_VW_SPEED_PID_D 0.0f
-#define CHASSIS_VW_SPEED_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_VW_SPEED_PID_OUT_LIMIT 0.0f
+/** 转向PID **/
+#define CHASSIS_TURN_PID_P 5.0f
+#define CHASSIS_TURN_PID_I 0.0f
+#define CHASSIS_TURN_PID_D 3.0f
+#define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_TURN_PID_OUT_LIMIT 4.0f
 
 /** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 15.0f
@@ -384,8 +378,7 @@ typedef struct{
     // Wheel
     float target_spin_speed;
 
-    Pid chassis_vw_pos_pid;
-    Pid chassis_vw_speed_pid;
+    Pid chassis_turn_pid;
     float wheel_turn_torque;          // 转向力矩
 
     // Joint
