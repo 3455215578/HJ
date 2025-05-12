@@ -250,9 +250,8 @@ static void Gimbal_Device_Offline_Handle(void) {
 
 
 static void Send_Gimbal_Data(void) {
-
     /* Ò£¿ØÆ÷Êý¾Ý */
-    Send_Chassis_Rc(rc_ctrl.rc.ch[CHASSIS_X_CHANNEL],
+    Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_X_CHANNEL],
                        rc_ctrl.rc.ch[YAW_CHANNEL],
                        rc_ctrl.rc.ch[AUTO_CHANNEL],
                        rc_ctrl.rc.s[RC_s_L],

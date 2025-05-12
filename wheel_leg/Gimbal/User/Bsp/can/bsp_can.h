@@ -24,13 +24,10 @@ typedef struct {
 
 } CAN_RxFrame_TypeDef;
 
-extern CAN_TxFrame_TypeDef Gimbal_Send_Chassis_TxFrame;
-
 extern CAN_RxFrame_TypeDef CAN1_RxFrame;
 extern CAN_RxFrame_TypeDef CAN2_RxFrame;
 
 void can_filter_init(void);
 uint32_t get_can_free_mail(CAN_HandleTypeDef* hcan);
-void CAN_Gimbal_Send_Chassis_Data(CAN_TxFrame_TypeDef* Gimbal_Send_Chassis_TxFrame);
 
 #endif
