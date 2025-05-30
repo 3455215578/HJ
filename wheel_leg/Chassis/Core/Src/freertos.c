@@ -203,7 +203,7 @@ void StartChassisTask(void const * argument)
   for(;;)
   {
     chassis_task();
-    osDelay(1); // 500Hz
+    osDelay(1); // 1kHz
   }
   /* USER CODE END StartChassisTask */
 }
