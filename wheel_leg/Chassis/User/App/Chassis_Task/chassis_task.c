@@ -26,6 +26,17 @@ static void chassis_pid_init() {
              CHASSIS_VW_POS_PID_P,
              CHASSIS_VW_POS_PID_I,
              CHASSIS_VW_POS_PID_D);
+<<<<<<< HEAD
+=======
+
+    /** 转向速度环PID **/
+    pid_init(&chassis.chassis_vw_speed_pid,
+             CHASSIS_VW_SPEED_PID_OUT_LIMIT,
+             CHASSIS_VW_SPEED_PID_IOUT_LIMIT,
+             CHASSIS_VW_SPEED_PID_P,
+             CHASSIS_VW_SPEED_PID_I,
+             CHASSIS_VW_SPEED_PID_D);
+>>>>>>> parent of f4dde99 (璋冨弬)
 
     /** 转向速度环PID **/
     pid_init(&chassis.chassis_vw_speed_pid,

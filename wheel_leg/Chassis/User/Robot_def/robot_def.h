@@ -64,7 +64,10 @@ typedef double fp64;
 #define CHASSIS_VW_POS_PID_OUT_LIMIT 0.0f
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of f4dde99 (璋冨弬)
 /** 转向速度环PID **/
 #define CHASSIS_VW_SPEED_PID_P 0.0f
 #define CHASSIS_VW_SPEED_PID_I 0.0f
@@ -398,7 +401,10 @@ typedef struct{
     float target_spin_speed;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of f4dde99 (璋冨弬)
     Pid chassis_vw_pos_pid;
     Pid chassis_vw_speed_pid;
     float wheel_turn_torque;          // 转向力矩
