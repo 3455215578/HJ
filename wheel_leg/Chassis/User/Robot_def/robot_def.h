@@ -57,13 +57,6 @@ typedef double fp64;
 
 /** PID参数 **/
 
-/** 转向PID **/
-#define CHASSIS_TURN_PID_P 5.0f
-#define CHASSIS_TURN_PID_I 0.0f
-#define CHASSIS_TURN_PID_D 3.0f
-#define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_TURN_PID_OUT_LIMIT 4.0f
-
 /** 腿长位置环PID **/
 #define CHASSIS_LEG_L0_POS_PID_P 15.0f
 #define CHASSIS_LEG_L0_POS_PID_I 0.0f
@@ -72,7 +65,7 @@ typedef double fp64;
 #define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2.0f
 
 /** 腿长速度环PID **/
-#define CHASSIS_LEG_L0_SPEED_PID_P 30.0f // 50.0f
+#define CHASSIS_LEG_L0_SPEED_PID_P 27.0f // 50.0f
 #define CHASSIS_LEG_L0_SPEED_PID_I 0.0f
 #define CHASSIS_LEG_L0_SPEED_PID_D 0.0f
 #define CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT 0.0f
@@ -92,12 +85,6 @@ typedef double fp64;
 #define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
 
-/** 防劈叉PID **/
-#define CHASSIS_LEG_COORDINATION_PID_P 20.0f // 100.0f
-#define CHASSIS_LEG_COORDINATION_PID_I 0.0f
-#define CHASSIS_LEG_COORDINATION_PID_D 2.0f
-#define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 10.0f
 
 #define PHI_BALANCE 0.5f * DEGREE_TO_RAD
 
@@ -106,12 +93,17 @@ typedef double fp64;
  *******************************************************************************/
 
 /** 底盘物理参数结构体 **/
-typedef struct{
+typedef struct
+{
     float wheel_radius; // 驱动轮半径
     float body_weight; // 机体质量(有云台要算上云台)
     float wheel_weight; // 驱动轮重量(算上电机)
 
-    float l1, l2, l3, l4, l5; // 五连杆参数
+    // 五连杆每根腿的长度(m)
+    float L1a, L2a;
+    float L1u, L2u;
+    float L1d, L2d;
+
 } ChassisPhysicalConfig;
 
 /** 底盘模式结构体 **/
@@ -124,7 +116,7 @@ typedef enum{
 } ChassisCtrlMode;
 
 typedef struct{
-    float v_m_per_s; // 期望速度
+    float s_dot; // 期望速度 m/s
     float yaw_rad;
     float roll_rad;
     float height_m; // 期望腿长
@@ -169,19 +161,37 @@ typedef struct{
 
 /** 状态变量结构体 **/
 typedef struct{
-    float theta; // 状态变量1
-    float theta_dot; // 状态变量2
-    float theta_last;
-    float theta_dot_last;
-    float theta_ddot;
 
-    float x; // 状态变量3
-    float x_dot; // 状态变量4
-    float x_dot_last;
-    float x_ddot;
+    // 状态变量
+    // 运动部分
+    float s;
+    float s_dot;
+    float yaw;
+    float yaw_dot;
 
-    float phi; // 状态变量5
-    float phi_dot; // 状态变量6
+    // 平衡部分
+    float theta_l;
+    float theta_l_dot;
+    float theta_r;
+    float theta_r_dot;
+    float theta_b;
+    float theta_b_dot;
+
+
+    // 其他
+    float theta_l_last;
+    float theta_l_dot_last;
+    float theta_l_ddot;
+
+    float theta_r_last;
+    float theta_r_dot_last;
+    float theta_r_ddot;
+
+
+    float s_dot_last;
+    float s_ddot;
+
+
 } StateVariable;
 
 /** VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC VMC **/
@@ -198,8 +208,7 @@ typedef struct{// 腿长
 typedef struct{// 五连杆中的角度
     float phi1;
     float phi2;
-    float phi3;
-    float phi4;
+
 
     float phi0; // 腿摆角
     float last_phi0;
@@ -208,28 +217,26 @@ typedef struct{// 五连杆中的角度
     float dd_phi0;
 } FKPhi;
 
-typedef struct{// 五连杆中的点坐标(Coordinates)
-    float a_x, a_y;
-    float b_x, b_y;
-    float c_x, c_y;
-    float d_x, d_y;
-    float e_x, e_y;
-} FKPointCoordinates;
+typedef struct{// VMC正运动学解算中的中间变量
+    float x_1, y_1;
+    float x_2, y_2;
+    float sigma1;
+    float Xe, Ye;
+} FKTemp;
 
 typedef struct{
     FKL0 fk_L0;
     FKPhi fk_phi;
-    FKPointCoordinates fk_point_coordinates;
-    float d_alpha; // ?
+    FKTemp fk_temp;
 
 /** 正动力学解算(Forward Dynamics)：从 末端力(F Tp) 到 末端执行器(T1 T4) **/
-    union { // 自行学习联合体的特性: union
+    union { // 联合体
         float array[2][2];
         struct {
-            float Tp_set_point;
-            float Fy_set_point;
+            float Tb_set_point;
+            float F_set_point;
         } E;
-    } Fxy_set_point;
+    } Tb_F_set_point;
 
     union {
         float array[2][2];
@@ -328,10 +335,6 @@ typedef struct{
 
     /** 状态变量 **/
     StateVariable state_variable_feedback;  // 反馈状态变量
-    StateVariable state_variable_set_point; // 期望状态变量
-    StateVariable state_variable_error;     // 误差 = 反馈 - 期望
-    StateVariable state_variable_wheel_out; // 各个状态变量通过lqr计算的关于轮毂的输出
-    StateVariable state_variable_joint_out; // 各个状态变量通过lqr计算的关于关节的输出
 
     /** 腿部VMC **/
     VMC vmc;
@@ -378,16 +381,8 @@ typedef struct{
     // Wheel
     float target_spin_speed;
 
-    Pid chassis_turn_pid;
-    float wheel_turn_torque;          // 转向力矩
-
     // Joint
-    Pid chassis_leg_coordination_pid; // 防劈叉pid
     Pid chassis_roll_pid;             // roll补偿pid
-
-    float phi0_error;
-    float steer_compensatory_torque;  // 防劈叉力矩
-
 
     /** flag **/
 

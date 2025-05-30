@@ -291,7 +291,7 @@ static void chassis_device_offline_handle() {
 
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
-    chassis.chassis_ctrl_info.v_m_per_s = (float) (rc_ctrl.rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
+    chassis.chassis_ctrl_info.s_dot = (float) (rc_ctrl.rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
 
     chassis.chassis_ctrl_info.yaw_rad -= (float) (rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 

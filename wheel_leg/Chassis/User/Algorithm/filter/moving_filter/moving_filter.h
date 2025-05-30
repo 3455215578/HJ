@@ -10,7 +10,6 @@ typedef struct{
 } MovingAverageFilter;
 
 void moving_average_filter_init(MovingAverageFilter *filter);
-void update_moving_average_filter(MovingAverageFilter *filter, float newValue);
-float get_moving_average_filtered_value(const MovingAverageFilter *filter);
+float update_moving_average_filter(MovingAverageFilter *filter, float newValue);
 
 #endif

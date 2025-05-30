@@ -12,7 +12,7 @@ void moving_average_filter_init(MovingAverageFilter *filter) {
 }
 
 // 更新滤波器状态
-void update_moving_average_filter(MovingAverageFilter *filter, float newValue) {
+float update_moving_average_filter(MovingAverageFilter *filter, float newValue) {
   // 减去旧值
   filter->sum -= filter->window[filter->index];
 
@@ -23,9 +23,5 @@ void update_moving_average_filter(MovingAverageFilter *filter, float newValue) {
   // 更新索引
   filter->index = (filter->index + 1) % WINDOW_SIZE;
 
-}
-
-float get_moving_average_filtered_value(const MovingAverageFilter *filter) {
-  // 计算平均值
   return filter->sum / WINDOW_SIZE;
 }

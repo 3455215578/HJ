@@ -2,37 +2,71 @@
 #include "math.h"
 
 /** LQR **/
-// 初始化K矩阵
-float wheel_K_L[6] = {0, 0, 0, 0, 0, 0};
-float joint_K_L[6] = {0, 0, 0, 0, 0, 0};
-
-float wheel_K_R[6] = {0, 0, 0, 0, 0, 0};
-float joint_K_R[6] = {0, 0, 0, 0, 0, 0};
-
 // K拟合系数矩阵
-float wheel_fitting_factor[6][4] = {
-        {-99.746973f,149.952666f,-122.737131f,-2.112860f},
-        {-5.352698f,4.064938f,-14.531029f,-0.668076f},
+float chassis_fitting_factor[40][6] = {};
 
-        {-15.571363f,17.434131f,-5.924996f,-11.611683f},
-        {15.206041f,-14.318027f,3.004635f,-10.569000f},
+// 初始化K矩阵
+float wheel_K_L[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float wheel_K_R[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        {-147.261467f,244.941601f,-164.617771f,53.143857f},
-        {-12.846524f,18.745767f,-11.232035f,6.451811f}
-};float joint_fitting_factor[6][4] = {
-        {471.049154f,-495.117728f,182.407877f,6.515025f},
-        {32.628256f,-30.694807f,0.209013f,2.121746f},
+float joint_K_L[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float joint_K_R[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        {48.821029f,1.705867f,-33.752835f,7.761870f},
-        {-18.833123f,56.509585f,-46.224473f,8.149772f},
-
-        {721.828292f,-843.376430f,376.102873f,39.038292f},
-        {49.901832f,-67.268776f,35.766698f,0.821366f}
-};
 
 /** 拟合K **/
-void chassis_K_matrix_fitting(float L0, float K[6], const float KL[6][4]) {
-    for (int i = 0; i < 6; i++) {
-        K[i] = KL[i][0] * powf(L0, 3) + KL[i][1] * powf(L0, 2) + KL[i][2] * powf(L0, 1) + KL[i][3] * powf(L0, 0);
+void chassis_K_matrix_fitting(float L0_l, float L0_r, const float K_fitting_factor[40][6])
+{
+    /** Wheel **/
+    for (int i = 0; i < 20; i++)
+    {
+        // Left
+        if(i < 10)
+        {
+            wheel_K_L[i] =  K_fitting_factor[i][0] * powf(L0_l, 0)
+                          + K_fitting_factor[i][1] * powf(L0_l, 1)
+                          + K_fitting_factor[i][2] * powf(L0_l, 2)
+                          + K_fitting_factor[i][3] * powf(L0_r, 1)
+                          + K_fitting_factor[i][4] * powf(L0_r, 2)
+                          + K_fitting_factor[i][5] * L0_l * L0_r;
+        }
+        // Right
+        else
+        {
+            wheel_K_R[i - 10] =  K_fitting_factor[i][0] * powf(L0_l, 0)
+                               + K_fitting_factor[i][1] * powf(L0_l, 1)
+                               + K_fitting_factor[i][2] * powf(L0_l, 2)
+                               + K_fitting_factor[i][3] * powf(L0_r, 1)
+                               + K_fitting_factor[i][4] * powf(L0_r, 2)
+                               + K_fitting_factor[i][5] * L0_l * L0_r;
+        }
+
     }
+
+
+    /** Joint**/
+    for (int i = 20; i < 40; i++)
+    {
+        // Left
+        if(i < 30)
+        {
+            joint_K_L[i - 20] =  K_fitting_factor[i][0] * powf(L0_l, 0)
+                               + K_fitting_factor[i][1] * powf(L0_l, 1)
+                               + K_fitting_factor[i][2] * powf(L0_l, 2)
+                               + K_fitting_factor[i][3] * powf(L0_r, 1)
+                               + K_fitting_factor[i][4] * powf(L0_r, 2)
+                               + K_fitting_factor[i][5] * L0_l * L0_r;
+        }
+        // Right
+        else
+        {
+            joint_K_R[i - 30] =  K_fitting_factor[i][0] * powf(L0_l, 0)
+                               + K_fitting_factor[i][1] * powf(L0_l, 1)
+                               + K_fitting_factor[i][2] * powf(L0_l, 2)
+                               + K_fitting_factor[i][3] * powf(L0_r, 1)
+                               + K_fitting_factor[i][4] * powf(L0_r, 2)
+                               + K_fitting_factor[i][5] * L0_l * L0_r;
+        }
+
+    }
+
 }
