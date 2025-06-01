@@ -8,4 +8,4 @@ float cal_leg_theta(float phi0, float phi);
 void vmc_forward_dynamics(VMC *vmc, const ChassisPhysicalConfig *physical_config);
 void vmc_calc(void);
 
-#endif //VMC_H
+#endif

@@ -36,6 +36,7 @@
 #include "remote.h"
 #include "BMI088driver.h"
 #include "buzzer.h"
+#include "essemi_swd_print.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +69,6 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -110,10 +110,24 @@ int main(void)
   MX_TIM10_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+
+  /** Debug缓冲区初始化 **/
+  essemi_swd_configupbuffer(0, "SWDUP", NULL, 0, ESSEMI_SWD_MODE_BLOCK_IF_FIFO_FULL);
+  essemi_swd_configdownbuffer(0, "SWDDOWN", NULL, 0, ESSEMI_SWD_MODE_BLOCK_IF_FIFO_FULL);
+
+  /** can过滤器初始化 **/
   can_filter_init();
+
+  /** 延时模块初始化 **/
   delay_init();
+
+  /** 遥控器模块初始化 **/
   remote_control_init();
+
+  /** dwt外设初始化 **/
   DWT_Init(168);
+
+  /** IMU初始化 **/
   while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR);
 
   Buzzer_Init();

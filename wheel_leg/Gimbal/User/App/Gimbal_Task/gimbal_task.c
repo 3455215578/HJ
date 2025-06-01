@@ -137,14 +137,18 @@ static void Gimbal_Init(void) {
 
     /* pit 轴电机角度环和速度环PID初始化 */
     pid_init(&gimbal.pitch.speed_p,
-             GIMBAL_PITCH_SPEED_MAX_OUT, GIMBAL_PITCH_SPEED_MAX_IOUT,
-             GIMBAL_PITCH_SPEED_PID_KP, GIMBAL_PITCH_SPEED_PID_KI, GIMBAL_PITCH_SPEED_PID_KD
-             );
+             GIMBAL_PITCH_SPEED_MAX_OUT,
+             GIMBAL_PITCH_SPEED_MAX_IOUT,
+             GIMBAL_PITCH_SPEED_PID_KP,
+             GIMBAL_PITCH_SPEED_PID_KI,
+             GIMBAL_PITCH_SPEED_PID_KD);
 
     pid_init(&gimbal.pitch.angle_p,
-             GIMBAL_PITCH_ANGLE_MAX_OUT, GIMBAL_PITCH_ANGLE_MAX_IOUT,
-             GIMBAL_PITCH_ANGLE_PID_KP, GIMBAL_PITCH_ANGLE_PID_KI, GIMBAL_PITCH_ANGLE_PID_KD
-             );
+             GIMBAL_PITCH_ANGLE_MAX_OUT,
+             GIMBAL_PITCH_ANGLE_MAX_IOUT,
+             GIMBAL_PITCH_ANGLE_PID_KP,
+             GIMBAL_PITCH_ANGLE_PID_KI,
+             GIMBAL_PITCH_ANGLE_PID_KD);
 
     /* yaw 轴电机角度环和速度环PID初始化 */
     pid_init(&gimbal.yaw.speed_p,

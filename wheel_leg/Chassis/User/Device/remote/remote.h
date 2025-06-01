@@ -44,22 +44,22 @@
 #define MOUSE_NO 0
 /* ----------------------- Data Struct ------------------------------------- */
 struct RCCtrl {
-  __packed struct {
-    int16_t ch[5];
-    char s[2];
-  } rc;
-  __packed struct {
-    int16_t x;
-    int16_t y;
-    int16_t z;
-    uint8_t press_l;
-    uint8_t press_r;
-  } mouse;
-  __packed struct {
-    uint16_t v;
-  } key;
+    __packed struct {
+        int16_t ch[5];
+        char s[2];
+    } rc;
+    __packed struct {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+        uint8_t press_l;
+        uint8_t press_r;
+    } mouse;
+    __packed struct {
+        uint16_t v;
+    } key;
 
-  uint32_t last_heartbeat_timestamp_ms;
+    uint32_t last_heartbeat_timestamp_ms;
 
 }__packed;
 

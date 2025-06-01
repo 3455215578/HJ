@@ -182,7 +182,7 @@ void StartINSTask(void const * argument)
     for (;;)
     {
         INS_Task();
-        osDelay(1);
+        osDelay(2); // 500Hz
     }
   /* USER CODE END StartINSTask */
 }
@@ -203,7 +203,7 @@ void StartChassisTask(void const * argument)
   for(;;)
   {
     chassis_task();
-    osDelay(1); // 1kHz
+    osDelay(5); // 200Hz
   }
   /* USER CODE END StartChassisTask */
 }

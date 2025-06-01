@@ -1,15 +1,15 @@
- #ifndef _LQR_H
+#ifndef _LQR_H
 #define _LQR_H
 
-extern float wheel_K_L[10];
-extern float joint_K_L[10];
-extern float wheel_K_R[10];
-extern float joint_K_R[10];
+extern float wheel_K_L[6];
+extern float joint_K_L[6];
+extern float wheel_K_R[6];
+extern float joint_K_R[6];
 
-// K拟合系数矩阵
-extern float chassis_fitting_factor[40][6];
+// 拟合系数
+extern float wheel_fitting_factor[6][4];
+extern float joint_fitting_factor[6][4];
 
-
- void chassis_K_matrix_fitting(float L0_l, float L0_r, const float K_fitting_factor[40][6]);
+void chassis_K_matrix_fitting(float L0, float K[6], const float KL[6][4]);
 
 #endif

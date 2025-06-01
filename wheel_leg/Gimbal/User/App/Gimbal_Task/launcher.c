@@ -107,10 +107,10 @@ static void Trigger_Control(void) {
         // 设置拨盘期望转速
         launcher.trigger.target_speed = TRIGGER_SPEED;
 
-        // 连发时让期望总编码器值和实际反馈总编码器值相等，便于后续切换单发模式
+        // 连发时让期望总编码器值总与实际反馈总编码器值相等，便于后续切换单发模式
         trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd;
     }
-        /** 读取单发指令，预备进入单发模式 **/
+    /** 读取单发指令，预备进入单发模式 **/
     else if (launcher.trigger_mode == SHOOT_READY_TO_SINGLE)
     {
         trigger_time = HAL_GetTick(); // 这时候开始计时，开始转的时候计时
@@ -167,7 +167,7 @@ static void Trigger_Finish_Judge() {
     if(launcher.trigger_mode != SHOOT_CLOSE) {
         /* 这里记录的是拨盘完成一次单发使用的时间 */
         total_time = HAL_GetTick() - trigger_time;
-        /* 这里记录的是拨盘当前ECD与我们期望他转动到的ECD的差值有多大 */
+        /* 这里记录的是拨盘当前总编码器值与我们期望它转动到的总编码器值的差值 */
         total_ecd_error = ABS(trigger_target_total_ecd - launcher.trigger.motor_measure.total_ecd);
 
         /***********************        判断单发模式和连发模式时拨盘是否卡弹       *************************************/
@@ -177,8 +177,8 @@ static void Trigger_Finish_Judge() {
         // A: 当然不是差值一直大于TRI_MINECD都判断为单发未完成，如果在TRI_MAXTIME时间内都没有完成就会认为他堵转了，将状态改为单发堵转
         // A: 所以这里判断是SHOOT_SINGLE还是SHOOT_BLOCK的关键在于total_time的判断
 
-        // 单发
-        if(total_ecd_error > TRI_MINECD) // 说明还未完成转动任务
+        /** 单发 **/
+        if(total_ecd_error > TRI_MINECD) // 说明还未完成转动任务，需要继续停留在单发执行任务
         {
             if((launcher.trigger_mode == SHOOT_SINGLE) && (total_time < TRI_MAXTIME))
             {/* 未超过规定最大时间，则维持单发模式不变 */
@@ -189,13 +189,13 @@ static void Trigger_Finish_Judge() {
                 launcher.trigger_mode = SHOOT_BLOCK;
             }
         }
-            // 发射顺利
+         // 单发顺利
         else if((total_ecd_error < TRI_MINECD) && (launcher.trigger_mode != SHOOT_CONTINUE))
         {
             launcher.trigger_mode = SHOOT_OVER;
         }
 
-            // 连发
+        /** 连发 **/
         else if(launcher.trigger_mode == SHOOT_CONTINUE)
         {
             /* 如果在连发状态下的反馈转速小于TRI_MAXSPEED持续一段时间，则判断其为堵转状态 */
@@ -382,7 +382,7 @@ void Launcher_Mode_Set() {
  *          ③ 只有当《上一时刻左边拨杆不在最上面，而下一时刻在最上面》时，才会进行发射机构模式判断
  *
  * Q1: 摩擦轮是如何被开启的?
- * A1: 当你将左拨杆从任意位置(特指中间或下面)拨到最上面时，成功进入判断，并进入 else if 分支，将 KeyBoard.Q.click_flag 被置1， 摩擦轮开启
+ * A1: 当你将左拨杆从任意位置(特指中间或下面)拨到最上面时，成功进入判断，并进入 else if 分支，KeyBoard.Q.click_flag 被置1， 摩擦轮开启
  *
  *
  * Q2: 摩擦轮在开启后如何被关闭？

@@ -74,6 +74,7 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
         User/Device/bmi088
         User/Device/buzzer
         User/Device/can_device
+        User/Device/debug
         User/Device/ist8310
         User/Device/key_board
         User/Device/led
