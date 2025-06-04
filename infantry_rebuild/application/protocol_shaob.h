@@ -2,7 +2,7 @@
 #define ROBOMASTER_PROTOCOL_H
 
 #include "struct_typedef.h"
-#include "Referee_Task/Referee.h"
+#include "referee_task.h"
 
 #define HEADER_SOF 0xA5
 #define REF_PROTOCOL_FRAME_MAX_SIZE         128

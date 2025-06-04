@@ -6,10 +6,8 @@
 #include "cmsis_os.h"
 #include "main.h"
 #include "chassis_task.h"
-#include "math.h"
-#include "Detect_Task/Detection.h"
-#include "Gimbal_Task/launcher.h"
-#include "Cap_Task/Cap.h"
+#include "detect_task.h"
+#include "cap_task.h"
 #include "bsp_cap.h"
 
 extern CAN_HandleTypeDef hcan1;
@@ -84,21 +82,21 @@ void cap2_info_decode(cap2_info_t *cap, uint8_t *rx_data) {
 }
 
 //车轮电机的发送函数
-void
-CAN_cmd_motor(CAN_TYPE can_type, can_msg_id_e CMD_ID, int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4) {
+void CAN_cmd_motor(CAN_TYPE can_type, can_msg_id_e CMD_ID, int16_t RF_motor, int16_t LF_motor, int16_t LB_motor,
+                   int16_t RB_motor) {
     uint32_t send_mail_box;
     tx_message.StdId = CMD_ID;
     tx_message.IDE = CAN_ID_STD;
     tx_message.RTR = CAN_RTR_DATA;
     tx_message.DLC = 0x08;
-    can_send_data[0] = motor1 >> 8;
-    can_send_data[1] = motor1;
-    can_send_data[2] = motor2 >> 8;
-    can_send_data[3] = motor2;
-    can_send_data[4] = motor3 >> 8;
-    can_send_data[5] = motor3;
-    can_send_data[6] = motor4 >> 8;
-    can_send_data[7] = motor4;
+    can_send_data[0] = RF_motor >> 8;
+    can_send_data[1] = RF_motor;
+    can_send_data[2] = LF_motor >> 8;
+    can_send_data[3] = LF_motor;
+    can_send_data[4] = LB_motor >> 8;
+    can_send_data[5] = LB_motor;
+    can_send_data[6] = RB_motor >> 8;
+    can_send_data[7] = RB_motor;
 
     if (can_type == CAN_1) {
         HAL_CAN_AddTxMessage(&hcan1, &tx_message, can_send_data, &send_mail_box);

@@ -4,10 +4,9 @@
 
 /*include*/
 #include "chassis_task.h"
-#include "Detect_Task/Detection.h"
 #include "bsp_cap.h"
 /*define*/
-/*轮子控制映射：                                 解算坐标：      x(前)
+/*轮子ID映射：                                    解算坐标：      x(前)
             ****      前       ****                                |
            * 2 LF *          * 1 RF *                              |
             ****              ****                                 |
@@ -187,22 +186,29 @@ void send_robot_id() {
 
 static void chassis_init(chassis_t *chassis_ptr) {
 
-    if (chassis_ptr == NULL)
+    if (chassis_ptr == NULL) {
         return;
-    pid_init(&chassis_ptr->chassis_vw_pid, CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
+    }
+
+    /** 底盘跟随云台pid初始化 **/
+    pid_init(&chassis_ptr->chassis_follow_gimbal_pid,
+             CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
              (uint32_t) CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT,
-             CHASSIS_FOLLOW_GIMBAL_PID_KP, CHASSIS_FOLLOW_GIMBAL_PID_KI, CHASSIS_FOLLOW_GIMBAL_PID_KD);
+             CHASSIS_FOLLOW_GIMBAL_PID_KP,
+             CHASSIS_FOLLOW_GIMBAL_PID_KI,
+             CHASSIS_FOLLOW_GIMBAL_PID_KD);
+
     //底盘驱动电机速度环初始化和电机数据结构体获取
     for (int i = 0; i < 4; i++) {
 
         chassis_ptr->motor_chassis[i].motor_measure = motor_3508_measure + i;
 
         pid_init(&chassis_ptr->motor_chassis[i].speed_p,
-                 CHASSIS_3508_PID_MAX_OUT,
-                 CHASSIS_3508_PID_MAX_IOUT,
-                 CHASSIS_3508_PID_KP,
-                 CHASSIS_3508_PID_KI,
-                 CHASSIS_3508_PID_KD);
+                 CHASSIS_3508_SPEED_PID_MAX_OUT,
+                 CHASSIS_3508_SPEED_PID_MAX_IOUT,
+                 CHASSIS_3508_SPEED_PID_KP,
+                 CHASSIS_3508_SPEED_PID_KI,
+                 CHASSIS_3508_SPEED_PID_KD);
     }
     //初始时底盘模式为失能
     chassis_ptr->mode = chassis_ptr->last_mode = CHASSIS_RELAX;
@@ -283,10 +289,10 @@ static void chassis_wheel_cal() {
     vw = chassis.vw;
 
     //麦轮运动学解算
-    wheel_rpm[0] = (-vy - vx - vw * rotate_ratio_f) * wheel_rpm_ratio;
-    wheel_rpm[1] = (-vy + vx - vw * rotate_ratio_f) * wheel_rpm_ratio;
-    wheel_rpm[2] = (vy + vx - vw * rotate_ratio_b) * wheel_rpm_ratio;
-    wheel_rpm[3] = (vy - vx - vw * rotate_ratio_b) * wheel_rpm_ratio;
+    wheel_rpm[RF] = (-vy - vx - vw * rotate_ratio_f) * wheel_rpm_ratio;
+    wheel_rpm[LF] = (-vy + vx - vw * rotate_ratio_f) * wheel_rpm_ratio;
+    wheel_rpm[LB] = (vy + vx - vw * rotate_ratio_b) * wheel_rpm_ratio;
+    wheel_rpm[RB] = (vy - vx - vw * rotate_ratio_b) * wheel_rpm_ratio;
 
 
     // find max item
@@ -301,10 +307,10 @@ static void chassis_wheel_cal() {
         for (uint8_t i = 0; i < 4; i++) wheel_rpm[i] *= rate;
     }
 
-    chassis.motor_chassis[RF].rpm_set = wheel_rpm[0];
-    chassis.motor_chassis[LF].rpm_set = wheel_rpm[1];
-    chassis.motor_chassis[LB].rpm_set = wheel_rpm[2];
-    chassis.motor_chassis[RB].rpm_set = wheel_rpm[3];
+    chassis.motor_chassis[RF].rpm_set = wheel_rpm[RF];
+    chassis.motor_chassis[LF].rpm_set = wheel_rpm[LF];
+    chassis.motor_chassis[LB].rpm_set = wheel_rpm[LB];
+    chassis.motor_chassis[RB].rpm_set = wheel_rpm[RB];
 
 }
 
@@ -316,6 +322,7 @@ fp32 mg_compensation_torque = 0.f;
 fp32 mg_compensation_current = 0.f;
 fp32 mg_compensation_torque_limit = 300.f;
 fp32 mg_compensation_current_limit = 10000.f;
+
 
 static void chassis_wheel_loop_cal() {
 
@@ -368,7 +375,7 @@ void calc_power_limit(pid_t *pid, int i) {
     chassis.chassis_power_limit.K[i] = pid->p * CHASSIS_CURRENT_CONVERT;
     chassis.chassis_power_limit.M[i] =
             -(pid->p * chassis.motor_chassis[i].motor_measure->speed_rpm - pid->iout) * CHASSIS_CURRENT_CONVERT;
-    pid->sum_err = fp32_constrain(pid->sum_err, -CHASSIS_3508_PID_MAX_IOUT, -CHASSIS_3508_PID_MAX_IOUT);
+    pid->sum_err = fp32_constrain(pid->sum_err, -CHASSIS_3508_SPEED_PID_MAX_IOUT, -CHASSIS_3508_SPEED_PID_MAX_IOUT);
 }
 
 //功率控制
@@ -446,10 +453,15 @@ void chassis_can_send_back_mapping() {
 
     int16_t *real_motor_give_current[4];
 
-    real_motor_give_current[0] = &chassis.motor_chassis[LF].give_current;
-    real_motor_give_current[1] = &chassis.motor_chassis[RF].give_current;
-    real_motor_give_current[2] = &chassis.motor_chassis[RB].give_current;
-    real_motor_give_current[3] = &chassis.motor_chassis[LB].give_current;
+//    real_motor_give_current[0] = &chassis.motor_chassis[LF].give_current;
+//    real_motor_give_current[1] = &chassis.motor_chassis[RF].give_current;
+//    real_motor_give_current[2] = &chassis.motor_chassis[RB].give_current;
+//    real_motor_give_current[3] = &chassis.motor_chassis[LB].give_current;
+
+    real_motor_give_current[0] = &chassis.motor_chassis[RF].give_current;
+    real_motor_give_current[1] = &chassis.motor_chassis[LF].give_current;
+    real_motor_give_current[2] = &chassis.motor_chassis[LB].give_current;
+    real_motor_give_current[3] = &chassis.motor_chassis[RB].give_current;
 
     CAN_cmd_motor(CAN_1,
                   CAN_MOTOR_0x200_ID,
@@ -458,6 +470,16 @@ void chassis_can_send_back_mapping() {
                   *real_motor_give_current[2],
                   *real_motor_give_current[3]
     );
+
+//    CAN_cmd_motor(CAN_1,
+//                  CAN_MOTOR_0x200_ID,
+//                  0,
+//                  0,
+//                  0,
+//                  0
+//    );
+
+
 
 //    CAN_cmd_motor(CAN_1,
 //                  CAN_MOTOR_0x200_ID,
@@ -496,7 +518,7 @@ void chassis_follow_gimbal_handle() {
     //速度矢量分解
     chassis.vx = cos_yaw * vx_temp - sin_yaw * vy_temp;
     chassis.vy = -(sin_yaw * vx_temp + cos_yaw * vy_temp);
-    chassis.vw = pid_calc(&chassis.chassis_vw_pid, -gimbal.yaw.relative_angle_get,
+    chassis.vw = pid_calc(&chassis.chassis_follow_gimbal_pid, -gimbal.yaw.relative_angle_get,
                           0);//+0.1*(gimbal.yaw.relative_angle_get);
     //跟随死区
     if (abs(chassis.vw) < 0.15) {                                 //0.15

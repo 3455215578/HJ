@@ -332,15 +332,13 @@
 // 将SPI2设为Transmit only Master，模拟高低电平
 //（虽然用PWM也行，而且C板的PWM口有足足7个）
 
-#include <stdlib.h>
 #include "bsp_led.h"
 #include "spi.h"
-#include "dma.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "Gimbal_Task/Gimbal.h"
+#include "gimbal_task.h"
 #include "chassis_task.h"
-#include "Cap_Task/Cap.h"
+#include "cap_task.h"
 
 //声明外部变量
 extern chassis_t chassis;

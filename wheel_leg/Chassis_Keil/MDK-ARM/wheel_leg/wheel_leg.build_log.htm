@@ -1,0 +1,83 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ÂµVision V5.24.2.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: A admin, A, LIC=76F5U-SUL0R-FWH2N-YB7H1-7VGY2-9G1L8
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.24.1
+Toolchain Path:  D:\stm32\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 5 (build 528)
+Assembler:       Armasm.exe V5.06 update 5 (build 528)
+Linker/Locator:  ArmLink.exe V5.06 update 5 (build 528)
+Library Manager: ArmAr.exe V5.06 update 5 (build 528)
+Hex Converter:   FromElf.exe V5.06 update 5 (build 528)
+CPU DLL:         SARMCM3.DLL V5.24.1
+Dialog DLL:      DCM.DLL V1.16.0.0
+Target DLL:      CMSIS_AGDI.dll V1.28.3.0
+Dialog DLL:      TCM.DLL V1.32.0.0
+ 
+<h2>Project:</h2>
+D:\GitHub\Code\HJ\wheel_leg\Chassis_Keil\MDK-ARM\wheel_leg.uvprojx
+Project File Date:  06/04/2025
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\stm32\ARM\ARMCC\Bin'
+Build target 'wheel_leg'
+compiling bsp_can.c...
+../User/Device/motor/wheel/wheel.h(16): warning:  #1295-D: Deprecated declaration get_wheel_motors - give arg types
+  Lk9025 *get_wheel_motors();
+..\User\Bsp\can\bsp_can.c: 1 warning, 0 errors
+compiling chassis_task.c...
+../User/Device/motor/wheel/wheel.h(16): warning:  #1295-D: Deprecated declaration get_wheel_motors - give arg types
+  Lk9025 *get_wheel_motors();
+../User/Device/remote/remote.h(72): warning:  #1295-D: Deprecated declaration get_rc_ctrl - give arg types
+  struct RCCtrl * get_rc_ctrl();
+../User/Device/remote/error.h(15): warning:  #1295-D: Deprecated declaration get_errors - give arg types
+  uint32_t get_errors();
+../User/Algorithm/filter/vx_kalman_filter/vx_kalman_filter.h(20): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\User\App\Chassis_Task\chassis_task.c(243): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_L.vmc.forward_kinematics.fk_L0.L0, wheel_K_L, wheel_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(244): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_R.vmc.forward_kinematics.fk_L0.L0, wheel_K_R, wheel_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(288): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_L.vmc.forward_kinematics.fk_L0.L0, joint_K_L, joint_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(289): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_R.vmc.forward_kinematics.fk_L0.L0, joint_K_R, joint_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(553): warning:  #1-D: last line of file ends without a newline
+  }
+..\User\App\Chassis_Task\chassis_task.c: 9 warnings, 0 errors
+linking...
+Program Size: Code=52236 RO-data=3184 RW-data=1240 ZI-data=37440  
+FromELF: creating hex file...
+"wheel_leg\wheel_leg.axf" - 0 Error(s), 10 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.0.1.pack
+                ARM.CMSIS.5.0.1
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.0.1
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.8.0.pack
+                Keil.STM32F4xx_DFP.2.8.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_wheel_leg
+  D:\stm32\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include
+  D:\stm32\ARM\PACK\Keil\STM32F4xx_DFP\2.8.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.0.1
+Build Time Elapsed:  00:00:02
+</pre>
+</body>
+</html>

@@ -19,7 +19,7 @@
 
 #include "struct_typedef.h"
 #include "PID.h"
-#include "Cap_Task/Cap.h"
+#include "cap_task.h"
 #include "Feedforward_PID.h"
 /******************** define *******************/
 
@@ -40,10 +40,15 @@ typedef enum {
     CAN_MOTOR_0x2FF_ID = 0x2FF,
 
     //0X200对应的电机ID(CAN1)
-    CAN_CHASSIS_3508_MOTOR_RF = 0x202,
-    CAN_CHASSIS_3508_MOTOR_LF = 0x201,
-    CAN_CHASSIS_3508_MOTOR_LB = 0x204,
-    CAN_CHASSIS_3508_MOTOR_RB = 0x203,
+    CAN_CHASSIS_3508_MOTOR_RF = 0x201,
+    CAN_CHASSIS_3508_MOTOR_LF = 0x202,
+    CAN_CHASSIS_3508_MOTOR_LB = 0x203,
+    CAN_CHASSIS_3508_MOTOR_RB = 0x204,
+
+//    CAN_CHASSIS_3508_MOTOR_RF = 0x202,
+//    CAN_CHASSIS_3508_MOTOR_LF = 0x201,
+//    CAN_CHASSIS_3508_MOTOR_LB = 0x204,
+//    CAN_CHASSIS_3508_MOTOR_RB = 0x203,
 
     //0X1FF对应的电机ID(CAN1)
     CAN_GIMBAL_6020_YAW = 0x205,
@@ -170,8 +175,8 @@ extern motor_measure_t motor_yaw_measure;
 extern motor_measure_t motor_pitch_measure;
 extern motor_measure_t motor_shoot_measure[4];
 
-extern void
-CAN_cmd_motor(CAN_TYPE can_type, can_msg_id_e CMD_ID, int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
+extern void CAN_cmd_motor(CAN_TYPE can_type, can_msg_id_e CMD_ID, int16_t RF_motor, int16_t LF_motor, int16_t LB_motor,
+                          int16_t RB_motor);
 
 extern void CAN_cmd_chassis_rudder(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 

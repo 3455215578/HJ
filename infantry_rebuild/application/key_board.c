@@ -4,8 +4,8 @@
 //
 
 #include "key_board.h"
-#include "Referee_Task/Referee.h"
-#include "Detect_Task/Detection.h"
+#include "referee_task.h"
+#include "detect_task.h"
 
 key_board_t KeyBoard;
 extern RC_ctrl_t rc_ctrl;

@@ -50,7 +50,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #include <stdbool.h>
 #include "launcher.h"
-#include "Gimbal.h"
+#include "gimbal_task.h"
 #include "can_receive.h"
 #include "chassis_task.h"
 #include "cmsis_os.h"
@@ -58,12 +58,10 @@
 #include "key_board.h"
 #include "bsp_laser.h"
 #include "filter.h"
-#include "Referee_Task/Referee.h"
-#include "Detect_Task/Detection.h"
-#include "queue.h"
+#include "referee_task.h"
+#include "detect_task.h"
 #include "STL.h"
 #include "Feedforward_PID.h"
-#include "Referee_Task/Referee.h"
 
 uint8_t rc_last_sw_L;
 uint8_t rc_last_sw_R;

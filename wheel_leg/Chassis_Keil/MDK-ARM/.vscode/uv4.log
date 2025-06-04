@@ -1,0 +1,27 @@
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\stm32\ARM\ARMCC\Bin'
+Build target 'wheel_leg'
+compiling chassis_task.c...
+../User/Device/motor/wheel/wheel.h(16): warning:  #1295-D: Deprecated declaration get_wheel_motors - give arg types
+  Lk9025 *get_wheel_motors();
+../User/Device/remote/remote.h(72): warning:  #1295-D: Deprecated declaration get_rc_ctrl - give arg types
+  struct RCCtrl * get_rc_ctrl();
+../User/Device/remote/error.h(15): warning:  #1295-D: Deprecated declaration get_errors - give arg types
+  uint32_t get_errors();
+../User/Algorithm/filter/vx_kalman_filter/vx_kalman_filter.h(20): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\User\App\Chassis_Task\chassis_task.c(243): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_L.vmc.forward_kinematics.fk_L0.L0, wheel_K_L, wheel_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(244): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_R.vmc.forward_kinematics.fk_L0.L0, wheel_K_R, wheel_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(290): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_L.vmc.forward_kinematics.fk_L0.L0, joint_K_L, joint_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(291): warning:  #167-D: argument of type "float (*)[4]" is incompatible with parameter of type "const float (*)[4]"
+      chassis_K_matrix_fitting(chassis.leg_R.vmc.forward_kinematics.fk_L0.L0, joint_K_R, joint_fitting_factor);
+..\User\App\Chassis_Task\chassis_task.c(558): warning:  #1-D: last line of file ends without a newline
+  }
+..\User\App\Chassis_Task\chassis_task.c: 9 warnings, 0 errors
+linking...
+Program Size: Code=52256 RO-data=3184 RW-data=1256 ZI-data=37440  
+FromELF: creating hex file...
+"wheel_leg\wheel_leg.axf" - 0 Error(s), 9 Warning(s).
+Build Time Elapsed:  00:00:03
