@@ -24,83 +24,80 @@ typedef double fp64;
 /** 遥控器路径 **/
 // x : 2-左手 ; 0-右手
 // y : 3-左手 ; 1-右手
+
 #define CHASSIS_SPEED_CHANNEL 1
 #define CHASSIS_YAW_CHANNEL 0
-#define CHASSIS_SPIN_CHANNEL 4
-
-#define TEST_CHASSIS_ROLL_CHANNEL 2
-#define TEST_CHASSIS_LEG_CHANNEL 3
-#define CHASSIS_PIT_CHANNEL 3
-#define CHASSIS_ROLL_CHANNEL 0
 
 /** 变量约束 **/
 #define MAX_CHASSIS_VX_SPEED 2.1f
-#define MAX_PITCH 0.174533f
-#define MIN_PITCH (-0.174533f)
-#define MAX_ROLL 0.12f
-#define MIN_ROLL (-0.12f)
 #define MAX_WHEEL_TORQUE 10.f
 #define MIN_WHEEL_TORQUE (-10.f)
 #define MAX_JOINT_TORQUE 40.f
 #define MIN_JOINT_TORQUE (-40.f)
 
 #define MIN_L0 0.10f
-#define MAX_L0 0.40f
-
 
 /** 遥控器值映射 **/
 #define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
 #define MAX_CHASSIS_YAW_INCREMENT 0.01f
 #define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
-#define RC_TO_PITCH ((MAX_PITCH-MIN_PITCH)/660)
-#define RC_TO_ROLL ((MAX_ROLL-MIN_ROLL)/660)
 
+#define PHI_BALANCE 0.5f * DEGREE_TO_RAD // 平衡点在0.5°
 
-/** PID参数 **/
+/****** PID参数 ******/
 
-/** 转向PID **/
+/** Wheel **/
+
+// 转向PID
 #define CHASSIS_TURN_PID_P 250.0f // 30.0f 45.0f 200.0f 250.0f
 #define CHASSIS_TURN_PID_I 0.0f
 #define CHASSIS_TURN_PID_D 5.0f // 0.0f 5.0f 5.0f 5.0f
 #define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_TURN_PID_OUT_LIMIT 4.0f
 
-/** 腿长位置环PID **/
-#define CHASSIS_LEG_L0_POS_PID_P 15.0f
-#define CHASSIS_LEG_L0_POS_PID_I 0.0f
-#define CHASSIS_LEG_L0_POS_PID_D 15.0f
-#define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2.0f
+#define CHASSIS_SPIN_PID_P 0.0f
+#define CHASSIS_SPIN_PID_I 0.0f
+#define CHASSIS_SPIN_PID_D 0.0f
+#define CHASSIS_SPIN_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_SPIN_PID_OUT_LIMIT 0.0f
 
-/** 腿长速度环PID **/
-#define CHASSIS_LEG_L0_SPEED_PID_P 30.0f // 50.0f
-#define CHASSIS_LEG_L0_SPEED_PID_I 0.0f
-#define CHASSIS_LEG_L0_SPEED_PID_D 0.0f
-#define CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
+/** Joint **/
 
-/** Roll PID **/
-#define CHASSIS_ROLL_PID_P 500.0f
-#define CHASSIS_ROLL_PID_I 0.0f
-#define CHASSIS_ROLL_PID_D 0.0f
-#define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_ROLL_PID_OUT_LIMIT 50.0f
-
-/** 离地后的腿长PID **/
-#define CHASSIS_OFFGROUND_LO_PID_P 0.0f
-#define CHASSIS_OFFGROUND_L0_PID_I 0.0f
-#define CHASSIS_OFFGROUND_L0_PID_D 0.0f
-#define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
-
-/** 防劈叉PID **/
+// 防劈叉PID
 #define CHASSIS_LEG_COORDINATION_PID_P 50.0f // 20.0f 30.0f
 #define CHASSIS_LEG_COORDINATION_PID_I 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_D 5.0f // 1.0f 5.0f
 #define CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT 0.0f
 #define CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT 10.0f
 
-#define PHI_BALANCE 0.5f * DEGREE_TO_RAD // 平衡点在0.5°
+// 腿长位置环PID
+#define CHASSIS_LEG_L0_POS_PID_P 15.0f
+#define CHASSIS_LEG_L0_POS_PID_I 0.0f
+#define CHASSIS_LEG_L0_POS_PID_D 15.0f
+#define CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_LEG_L0_POS_PID_OUT_LIMIT 2.0f
+
+// 腿长速度环PID
+#define CHASSIS_LEG_L0_SPEED_PID_P 30.0f // 50.0f
+#define CHASSIS_LEG_L0_SPEED_PID_I 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_D 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT 60.0f
+
+// 离地后的腿长PID 暂时没用到
+#define CHASSIS_OFFGROUND_LO_PID_P 0.0f
+#define CHASSIS_OFFGROUND_L0_PID_I 0.0f
+#define CHASSIS_OFFGROUND_L0_PID_D 0.0f
+#define CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT 0.0f
+
+// Roll补偿PID
+#define CHASSIS_ROLL_PID_P 500.0f
+#define CHASSIS_ROLL_PID_I 0.0f
+#define CHASSIS_ROLL_PID_D 0.0f
+#define CHASSIS_ROLL_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_ROLL_PID_OUT_LIMIT 50.0f
+
 
 /*******************************************************************************
  *                                    底盘                                     *
@@ -373,24 +370,36 @@ typedef struct{
     Leg leg_L;
     Leg leg_R;
 
-    /** 跳跃 **/
+    /****** 跳跃 ******/
     JumpState jump_state;
 
-    /** PID **/
-    // Wheel
-    float target_spin_speed;
+    /****** PID ******/
+    /** Wheel **/
 
+    // 转向PID
     Pid chassis_turn_pid;
     float wheel_turn_torque;          // 转向力矩
 
-    // Joint
-    Pid chassis_leg_coordination_pid; // 防劈叉pid
-    Pid chassis_roll_pid;             // roll补偿pid
+    // 小陀螺PID
+    Pid chassis_spin_pid;
+    float target_spin_speed;
 
+
+
+    /** Joint **/
+
+    // 防劈叉PID
     float phi0_error;
     float last_phi0_error;
     float d_phi0_error;
+    Pid chassis_leg_coordination_pid;
     float steer_compensatory_torque;  // 防劈叉力矩
+
+    // Roll补偿PID
+    Pid chassis_roll_pid;
+
+
+
 
 
     /** flag **/

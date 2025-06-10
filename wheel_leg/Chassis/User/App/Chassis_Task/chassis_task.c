@@ -19,7 +19,9 @@
 /** 底盘pid初始化 **/
 static void chassis_pid_init() {
 
-    /** 转向PID **/
+    /** Wheel **/
+
+    // 转向PID
     pid_init(&chassis.chassis_turn_pid,
              CHASSIS_TURN_PID_OUT_LIMIT,
              CHASSIS_TURN_PID_IOUT_LIMIT,
@@ -27,7 +29,25 @@ static void chassis_pid_init() {
              CHASSIS_TURN_PID_I,
              CHASSIS_TURN_PID_D);
 
-    /** 腿长PID(单环PD太难调了) **/
+    // 小陀螺PID
+    pid_init(&chassis.chassis_spin_pid,
+             CHASSIS_SPIN_PID_OUT_LIMIT,
+             CHASSIS_SPIN_PID_IOUT_LIMIT,
+             CHASSIS_SPIN_PID_P,
+             CHASSIS_SPIN_PID_I,
+             CHASSIS_SPIN_PID_D);
+
+    /** Joint **/
+
+    // 防劈叉PID
+    pid_init(&chassis.chassis_leg_coordination_pid,
+             CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT,
+             CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT,
+             CHASSIS_LEG_COORDINATION_PID_P,
+             CHASSIS_LEG_COORDINATION_PID_I,
+             CHASSIS_LEG_COORDINATION_PID_D);
+
+    // 腿长位置环PID
     pid_init(&chassis.leg_L.leg_pos_pid,
              CHASSIS_LEG_L0_POS_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_POS_PID_IOUT_LIMIT,
@@ -42,6 +62,7 @@ static void chassis_pid_init() {
              CHASSIS_LEG_L0_POS_PID_I,
              CHASSIS_LEG_L0_POS_PID_D);
 
+    // 腿长速度环PID
     pid_init(&chassis.leg_L.leg_speed_pid,
              CHASSIS_LEG_L0_SPEED_PID_OUT_LIMIT,
              CHASSIS_LEG_L0_SPEED_PID_IOUT_LIMIT,
@@ -56,7 +77,7 @@ static void chassis_pid_init() {
              CHASSIS_LEG_L0_SPEED_PID_I,
              CHASSIS_LEG_L0_SPEED_PID_D);
 
-    // 离地后的腿长PID(没用到)
+    // 离地后的腿长PID 暂时没用到
     pid_init(&chassis.leg_L.offground_leg_pid,
              CHASSIS_OFFGROUND_L0_PID_OUT_LIMIT,
              CHASSIS_OFFGROUND_L0_PID_IOUT_LIMIT,
@@ -71,15 +92,7 @@ static void chassis_pid_init() {
              CHASSIS_OFFGROUND_L0_PID_I,
              CHASSIS_OFFGROUND_L0_PID_D);
 
-    /** 防劈叉PID **/
-    pid_init(&chassis.chassis_leg_coordination_pid,
-             CHASSIS_LEG_COORDINATION_PID_OUT_LIMIT,
-             CHASSIS_LEG_COORDINATION_PID_IOUT_LIMIT,
-             CHASSIS_LEG_COORDINATION_PID_P,
-             CHASSIS_LEG_COORDINATION_PID_I,
-             CHASSIS_LEG_COORDINATION_PID_D);
-
-    /** Roll PID **/
+    // Roll补偿PID
     pid_init(&chassis.chassis_roll_pid,
              CHASSIS_ROLL_PID_OUT_LIMIT,
              CHASSIS_ROLL_PID_IOUT_LIMIT,
@@ -304,7 +317,7 @@ static void joint_calc(void)
                                                                          + joint_K_L[5] * (chassis.leg_L.state_variable_feedback.phi_dot - 0.0f);
 
 
-    //Right Lqr
+    //Right
     chassis.leg_R.vmc.forward_kinematics.Fxy_set_point.E.Tp_set_point =  joint_K_R[0] * (chassis.leg_R.state_variable_feedback.theta - 0.0f)
                                                                          + joint_K_R[1] * (chassis.leg_R.state_variable_feedback.theta_dot - 0.0f)
                                                                          + joint_K_R[2] * (chassis.leg_R.state_variable_feedback.x - 0.0f)
@@ -431,10 +444,13 @@ static void chassis_disable_task() {
     chassis.chassis_ctrl_info.height_m = MIN_L0;
 
     /** 初始化标志位 **/
+
+    // 底盘初始化标志位
     chassis.init_flag = false;
 
     // 平衡标志位
     chassis.chassis_is_balance = false;
+
     // 倒地自救成功标志位
     chassis.recover_finish = false;
 

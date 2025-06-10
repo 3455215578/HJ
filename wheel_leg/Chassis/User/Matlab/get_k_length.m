@@ -50,8 +50,7 @@ function K = get_k_length(leg_length)
     B=double(B);
 
 %   Q = diag([1 1 1 1 1 1]);
-%   Q = diag([1 1 150 1 1000 1]);
-    Q = diag([1 1 150 10 10000 1]);
+    Q = diag([1 1 100 1 10000 1]);
 
     R = [1 0;0 0.25];
     
