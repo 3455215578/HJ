@@ -17,7 +17,7 @@
 #define FIRE_SPEED_L  4700
 #define FIRE_SPEED_R  FIRE_SPEED_L
 /** 拨盘转速 **/
-#define TRIGGER_SPEED 1000
+#define TRIGGER_SPEED -1000
 
 //// 3508编码器转一圈编码值加8192  减速比1:19  编码器转19圈输出轴才转一圈  19×8192
 //// 2006编码器转一圈编码值加8192  减速比1:36  编码器转36圈输出轴才转一圈  36×8192/8
@@ -77,6 +77,6 @@ extern launcher_t launcher;
 extern void Launcher_Init(void);
 extern void Launcher_Mode_Set(void);
 extern void Launcher_Control(void);
-extern void Launcher_Relax_Handle(void);
+extern void Launcher_Disable(void);
 
 #endif //LAUNCHER_H

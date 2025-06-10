@@ -10,7 +10,7 @@ union I16 {
 };
 
 /** 板间发送函数 **/
-extern void Send_Chassis_Speed(int16_t ch1, int16_t ch2, int16_t ch4, char sl, char sr);
+extern void Send_Chassis_Speed(int16_t ch0, int16_t ch1, char sl, char sr);
 extern void Send_Control(int32_t W, int32_t A, int32_t S, int32_t D);
 
 /** 板间接收函数 **/

@@ -1,27 +1,38 @@
 #include "board_communication_task.h"
 
 /* 0x110 0x111 */
-void Send_Chassis_Speed(int16_t ch1, int16_t ch2, int16_t ch4, char sl, char sr){
+void Send_Chassis_Speed(int16_t ch0, int16_t ch1, char sl, char sr)
+{
+    /** 定义发送结构体 **/
     CAN_TxHeaderTypeDef  tx_message;
-    uint32_t send_mail_box;
-    uint8_t Send_data[8];
-    union I16 ch;
-    tx_message.StdId = 0x110;
-    tx_message.IDE = CAN_ID_STD;
-    tx_message.RTR = CAN_RTR_DATA;
-    tx_message.DLC = 0x08;
 
-    ch.value = ch1; /* 前后 */
+    tx_message.StdId = 0x110; //CAN ID
+    tx_message.IDE = CAN_ID_STD; // 标准帧
+    tx_message.RTR = CAN_RTR_DATA; // 数据帧
+    tx_message.DLC = 0x06; // 数据长度暂定为六个字节
+
+    /** 定义发送邮箱 **/
+    uint32_t send_mail_box;
+
+    /** 定义发送的数据字节 **/
+    uint8_t Send_data[8];
+
+    union I16 ch;
+
+    /** 转向 **/
+    ch.value = ch0;
     Send_data[0] = ch.data[0];
     Send_data[1] = ch.data[1];
-    ch.value = ch2; /* 转向 */
+
+    /** 前后 **/
+    ch.value = ch1;
     Send_data[2] = ch.data[0];
     Send_data[3] = ch.data[1];
-    ch.value = ch4; /* 小陀螺 */
-    Send_data[4] = ch.data[0];
-    Send_data[5] = ch.data[1];
-    Send_data[6] = sl;
-    Send_data[7] = sr;
+
+    /** 左右拨钮 **/
+    Send_data[4] = sl;
+    Send_data[5] = sr;
+
     /** 获取邮箱 **/
     uint32_t can_send_mail = get_can_free_mail(&hcan2);
 

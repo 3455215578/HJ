@@ -24,34 +24,34 @@
 #define GIMBAL_PERIOD 1
 
 /* pitch轴 PID */
-#define GIMBAL_PITCH_ANGLE_PID_KP           90.f
-#define GIMBAL_PITCH_ANGLE_PID_KI           0.f
-#define GIMBAL_PITCH_ANGLE_PID_KD           100.f
-#define GIMBAL_PITCH_ANGLE_MAX_IOUT         0.f
+#define GIMBAL_PITCH_ANGLE_PID_KP           50.0f
+#define GIMBAL_PITCH_ANGLE_PID_KI           0.0f
+#define GIMBAL_PITCH_ANGLE_PID_KD           0.0f
+#define GIMBAL_PITCH_ANGLE_MAX_IOUT         0.0f
 #define GIMBAL_PITCH_ANGLE_MAX_OUT          9000.f
 
-#define GIMBAL_PITCH_SPEED_PID_KP           40.f
-#define GIMBAL_PITCH_SPEED_PID_KI           0.1f
-#define GIMBAL_PITCH_SPEED_PID_KD           80.f
-#define GIMBAL_PITCH_SPEED_MAX_IOUT         5000.f
+#define GIMBAL_PITCH_SPEED_PID_KP           30.0f
+#define GIMBAL_PITCH_SPEED_PID_KI           0.0f
+#define GIMBAL_PITCH_SPEED_PID_KD           0.0f
+#define GIMBAL_PITCH_SPEED_MAX_IOUT         0.0f
 #define GIMBAL_PITCH_SPEED_MAX_OUT          10000.f
 
 /* yaw轴PID */
-#define GIMBAL_YAW_ANGLE_PID_KP             60.f
-#define GIMBAL_YAW_ANGLE_PID_KI             0.f
-#define GIMBAL_YAW_ANGLE_PID_KD             250.0f
-#define GIMBAL_YAW_ANGLE_MAX_IOUT           80.f
+#define GIMBAL_YAW_ANGLE_PID_KP             20.0f // 30 35 35 35 35
+#define GIMBAL_YAW_ANGLE_PID_KI             0.0f
+#define GIMBAL_YAW_ANGLE_PID_KD             20.0f // 0 100 120 150 170
+#define GIMBAL_YAW_ANGLE_MAX_IOUT           0.0f
 #define GIMBAL_YAW_ANGLE_MAX_OUT            10000.f
 
-#define GIMBAL_YAW_SPEED_PID_KP             30.f//140.f//100.0f
-#define GIMBAL_YAW_SPEED_PID_KI             0.f
-#define GIMBAL_YAW_SPEED_PID_KD             0.f//0.f//100.0f
-#define GIMBAL_YAW_SPEED_MAX_IOUT           3000.f
-#define GIMBAL_YAW_SPEED_MAX_OUT            15000.f
+#define GIMBAL_YAW_SPEED_PID_KP             500.0f // 500
+#define GIMBAL_YAW_SPEED_PID_KI             0.0f
+#define GIMBAL_YAW_SPEED_PID_KD             0.0f
+#define GIMBAL_YAW_SPEED_MAX_IOUT           0.0f
+#define GIMBAL_YAW_SPEED_MAX_OUT            15000.0f
 
 /* 对 pitch 进行动态限位 */
-#define MAX_ABS_ANGLE 14
-#define MIN_ABS_ANGLE (-24)
+#define MAX_ABS_ANGLE 30
+#define MIN_ABS_ANGLE (-23)
 
 /* ECD 回中值 */
 #define PITCH_OFFSET_ECD 0

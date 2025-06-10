@@ -52,10 +52,10 @@ static void Gimbal_Device_Offline_Handle(void);
 static void Gimbal_Mode_Set(void);
 static void Gimbal_Control(void);
 
-static void Gimbal_Relax_Handle(void);
+static void Gimbal_Disable(void);
 static void Gimbal_Active_Handle(void);
 static void Gimbal_Auto_Handle(void);
-static void Gimbal_Ctrl_Loop_Cal(void);
+static void Gimbal_Current_Calc(void);
 
 /*********************************************************************************************************
 *                                              内部函数实现
@@ -93,7 +93,7 @@ void Gimbal_task(void const*pvParameters) {
         /* 更新板间传输信息 */
         Send_Gimbal_Data();
 
-        /* 云台发射机构控制 */
+        /* 根据模式设置执行控制 */
         Gimbal_Control();
         Launcher_Control();
 
@@ -101,19 +101,36 @@ void Gimbal_task(void const*pvParameters) {
         Gimbal_Device_Offline_Handle();
 
         /* 控制电机 */
+//        DJI_Send_Motor_Mapping(CAN_1,
+//                               CAN_DJI_MOTOR_0x200_ID,
+//                               launcher.fire_l.target_current,    //201 左摩擦轮
+//                               launcher.fire_r.target_current,    //202 右摩擦轮
+//                               launcher.trigger.target_current,   //203 拨盘
+//                               0    // 204 无
+//        );
+//
+//        DJI_Send_Motor_Mapping(CAN_1,
+//                               CAN_DJI_MOTOR_0x1FF_ID,
+//                               gimbal.yaw.target_current,       //205 yaw
+//                               gimbal.pitch.target_current,     //206 pitch
+//                               0,                               //207 无
+//                               0                                //208 无
+//        );
+
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x200_ID,
-                               0,    //201
-                               0,    //202
-                               0,   //203
-                               0                                  //204
+                               0,    //201 左摩擦轮
+                               0,    //202 右摩擦轮
+                               0,   //203 拨盘
+                               0    // 204 无
         );
+
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x1FF_ID,
-                               0,                               //205
-                               0,                               //206
-                               0,                               //207
-                               0                                //208
+                               0,       //205 yaw
+                               0,     //206 pitch
+                               0,                               //207 无
+                               0                                //208 无
         );
 
 
@@ -133,6 +150,7 @@ void Gimbal_task(void const*pvParameters) {
   * @retval         返回空
   */
 static void Gimbal_Init(void) {
+
     gimbal.mode = gimbal.last_mode = GIMBAL_DISABLE;
 
     /* pit 轴电机角度环和速度环PID初始化 */
@@ -190,37 +208,58 @@ static void Gimbal_Init(void) {
   * 其中，角度信息通过陀螺仪测量、电机编码器数据以及惯性导航系统的角度信息等获得。
   * @retval         返回空
   */
-static void Gimbal_Angle_Update(void) {
-    // 更新云台俯仰角度信息
-    gimbal.pitch.absolute_angle_get=INS_angle[2]*MOTOR_RAD_TO_ANGLE;
-    gimbal.pitch.relative_angle_get= Motor_Ecd_To_Angle_Change(gimbal.pitch.motor_measure.ecd,
-                                                               gimbal.pitch.motor_measure.offset_ecd);
+static void Gimbal_Angle_Update(void)
+{
+    /** Pitch **/
+    gimbal.pitch.absolute_angle_get = INS_angle[2]*MOTOR_RAD_TO_ANGLE;
+    gimbal.pitch.relative_angle_get = Motor_Ecd_To_Angle_Change(gimbal.pitch.motor_measure.ecd,
+                                                                gimbal.pitch.motor_measure.offset_ecd);
+    gyro_pitch = -INS_gyro[0]*MOTOR_RAD_TO_ANGLE;
+    gimbal.absolute_gyro_pitch = (fp32) INS_gyro[0];
+
+    /** Yaw **/
     gimbal.yaw.absolute_angle_get=INS_angle[0]*MOTOR_RAD_TO_ANGLE;
     gimbal.yaw.relative_angle_get= Motor_Ecd_To_Angle_Change(gimbal.yaw.motor_measure.ecd,
                                                              gimbal.yaw.motor_measure.offset_ecd);
 
-    // 更新云台偏航角度信息,通过陀螺仪测量的偏航和俯仰角速度
     gyro_yaw = INS_gyro[2]*MOTOR_RAD_TO_ANGLE;
-    gyro_pitch = -INS_gyro[0]*MOTOR_RAD_TO_ANGLE;
-
     gimbal.absolute_gyro_yaw = (fp32) INS_gyro[2];
-    gimbal.absolute_gyro_pitch = (fp32) INS_gyro[0];
+
 }
 
 
-static void Send_Vision_Data(void) {
+static void Send_Vision_Data(void)
+{
     // 107:蓝 7:红
-    if (Referee.GameRobotStat.robot_id < 10) vision_data.id = 107;
-    else vision_data.id = 7;
+    if (Referee.GameRobotStat.robot_id < 10)
+    {
+        vision_data.id = 107;
+    }
+    else
+    {
+        vision_data.id = 7;
+    }
+
+
     /* 给视觉发开自瞄 */
-    if (gimbal.mode == GIMBAL_AUTO) vision_data.mode = 0x21;
-    else vision_data.mode = 0;
+    if (gimbal.mode == GIMBAL_AUTO)
+    {
+        vision_data.mode = 0x21;
+    }
+    else
+    {
+        vision_data.mode = 0;
+    }
+
     vision_data.pitch = gimbal.pitch.absolute_angle_get;
     vision_data.yaw   = gimbal.yaw.absolute_angle_get;
     vision_data.roll = (fp32) INS_angle[1] * MOTOR_RAD_TO_ANGLE;
-    for (int i = 0; i < 4; ++i) {
+
+    for (int i = 0; i < 4; ++i)
+    {
         vision_data.quaternion[i] = INS_quat[i];
     }
+
     vision_data.shoot_speed = Referee.ShootData.bullet_speed;
     rm_queue_data(VISION_ID, &vision_data, sizeof(vision_t));
 }
@@ -228,45 +267,52 @@ static void Send_Vision_Data(void) {
 
 static void Gimbal_Device_Offline_Handle(void) {
     if(detect_list[DETECT_REMOTE].status == OFFLINE &&
-       detect_list[DETECT_VIDEO_TRANSIMITTER].status == OFFLINE) {
-        Gimbal_Relax_Handle();
+       detect_list[DETECT_VIDEO_TRANSIMITTER].status == OFFLINE)
+    {
+        Gimbal_Disable();
         rc_ctrl.rc.ch[1] = rc_ctrl.rc.ch[2] = 0;
         KeyBoard.W.status = KeyBoard.A.status = KeyBoard.S.status = KeyBoard.D.status = 0;
 
     }
-    if (detect_list[DETECT_GIMBAL_6020_PITCH].status == OFFLINE) {
+    if (detect_list[DETECT_GIMBAL_6020_PITCH].status == OFFLINE)
+    {
         gimbal.pitch.absolute_angle_set = gimbal.pitch.absolute_angle_get;
         gimbal.pitch.target_current = 0;
     }
-    if (detect_list[DETECT_GIMBAL_6020_YAW].status == OFFLINE) {
+    if (detect_list[DETECT_GIMBAL_6020_YAW].status == OFFLINE)
+    {
         gimbal.yaw.target_current = 0;
     }
-    if (detect_list[DETECT_LAUNCHER_3508_FIRE_L].status == OFFLINE) {
+    if (detect_list[DETECT_LAUNCHER_3508_FIRE_L].status == OFFLINE)
+    {
         launcher.fire_l.target_current = 0;
     }
-    if (detect_list[DETECT_LAUNCHER_3508_FIRE_R].status == OFFLINE) {
+    if (detect_list[DETECT_LAUNCHER_3508_FIRE_R].status == OFFLINE)
+    {
         launcher.fire_r.target_current = 0;
     }
-    if (detect_list[DETECT_LAUNCHER_3508_TRIGGER].status == OFFLINE) {
+    if (detect_list[DETECT_LAUNCHER_3508_TRIGGER].status == OFFLINE)
+    {
         launcher.trigger.target_current = 0;
     }
 }
 
-
+// 因为这个任务是在1kHz的云台当中运行的，我希望它以500Hz运行
 static void Send_Gimbal_Data(void) {
-    /* 遥控器数据 */
-    Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_X_CHANNEL],
-                       rc_ctrl.rc.ch[YAW_CHANNEL],
-                       rc_ctrl.rc.ch[AUTO_CHANNEL],
-                       rc_ctrl.rc.s[RC_s_L],
-                       rc_ctrl.rc.s[RC_s_R]);
-    /* 键鼠数据 */
-    // Send_Control(KeyBoard.W.status,
-    //              KeyBoard.A.status,
-    //              KeyBoard.S.status,
-    //              KeyBoard.D.status);
 
-    vTaskDelay(GIMBAL_PERIOD);
+    static int count = 1;
+
+    if(count % 2 == 1) // 奇数发，偶数不发，实现500Hz
+    {
+        /* 遥控器数据 */
+        Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL],
+                           rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL],
+                           rc_ctrl.rc.s[RC_s_L],
+                           rc_ctrl.rc.s[RC_s_R]);
+    }
+
+    count ++;
+
 }
 
 
@@ -277,32 +323,45 @@ static void Send_Gimbal_Data(void) {
   * 右边拨杆向中和向上得到遥控器对云台电机的控制 —— 云台回中，自瞄判定
   * @retval         返回空
   */
-static void Gimbal_Mode_Set(void) {
+static void Gimbal_Mode_Set(void)
+{
     //根据遥控器设置云台模式（只使用到右边拨杆）
-    switch (rc_ctrl.rc.s[RC_s_R]) {
-        case RC_SW_DOWN: {
+    switch (rc_ctrl.rc.s[RC_s_R])
+    {
+        /** 拨到下面，云台失能 **/
+        case RC_SW_DOWN:
+        {
             gimbal.last_mode = gimbal.mode;
             gimbal.mode = GIMBAL_DISABLE;
         } break;
+
+        /** 拨到中间或上面，云台使能 **/
         case RC_SW_MID:
         case RC_SW_UP:
         {
-            /* 自瞄判定 */
-            if ((KeyBoard.Mouse_r.status == KEY_PRESS && robot_ctrl.target_lock == 0x31 && (detect_list[DETECT_AUTO_AIM].status == ONLINE))
-                ||(rc_ctrl.rc.ch[AUTO_CHANNEL]> 50    && robot_ctrl.target_lock == 0x31 && (detect_list[DETECT_AUTO_AIM].status == ONLINE))) {
+            /** 自瞄模式判定 **/
+            if (((KeyBoard.Mouse_r.status == KEY_PRESS) && (robot_ctrl.target_lock == 0x31) && (detect_list[DETECT_AUTO_AIM].status == ONLINE))
+                ||((rc_ctrl.rc.ch[GIMBAL_AUTO_CHANNEL]> 50) && (robot_ctrl.target_lock == 0x31) && (detect_list[DETECT_AUTO_AIM].status == ONLINE)))
+            {
                 gimbal.last_mode = GIMBAL_ACTIVE;
                 gimbal.mode = GIMBAL_AUTO;
             }
-            else {
+            else
+            {
                 gimbal.last_mode = gimbal.mode;
                 gimbal.mode = GIMBAL_ACTIVE;
             }
         } break;
+
         default:
             break;
     }
-    if (gimbal.mode == GIMBAL_AUTO) {   //0x32表示自瞄数据无效
-        if ((detect_list[DETECT_AUTO_AIM].status == OFFLINE) || robot_ctrl.target_lock == 0x32) {
+
+    /** 退出自瞄模式 **/
+    if (gimbal.mode == GIMBAL_AUTO)
+    {
+        if ((detect_list[DETECT_AUTO_AIM].status == OFFLINE) || robot_ctrl.target_lock == 0x32) //0x32表示自瞄数据无效
+        {
             gimbal.last_mode = GIMBAL_AUTO;
             gimbal.mode = GIMBAL_ACTIVE;
         }
@@ -317,19 +376,20 @@ static void Gimbal_Mode_Set(void) {
   * @retval         返回空
   */
 static void Gimbal_Control(void) {
-    switch (gimbal.mode) {
+    switch (gimbal.mode)
+    {
         case GIMBAL_DISABLE://云台失能（fire, pitch, single_shoot）
-            Gimbal_Relax_Handle();
+            Gimbal_Disable();
             break;
 
         case GIMBAL_ACTIVE: {//云台控制
             Gimbal_Active_Handle();  //得到遥控器对云台电机的控制
-            Gimbal_Ctrl_Loop_Cal();  //云台电机闭环控制函数
+            Gimbal_Current_Calc();  //云台电机闭环控制函数
         } break;
 
         case GIMBAL_AUTO: { //云台自瞄模式
             Gimbal_Auto_Handle();
-            Gimbal_Ctrl_Loop_Cal();  //云台电机闭环控制函数
+            Gimbal_Current_Calc();  //云台电机闭环控制函数
         } break;
         default:
             break;
@@ -343,22 +403,25 @@ static void Gimbal_Control(void) {
   * pitch 轴，左右摩擦轮，主动单发的给定电流设置为 0
   * @retval         返回空
   */
-void Gimbal_Relax_Handle(void) {
-    DJI_Send_Motor_Mapping(CAN_2,CAN_DJI_MOTOR_0x200_ID,0,0,0,0);
-    DJI_Send_Motor_Mapping(CAN_2,CAN_DJI_MOTOR_0x1FF_ID,0,0,0,0);
+void Gimbal_Disable(void) {
+
     gimbal.pitch.absolute_angle_set = gimbal.pitch.absolute_angle_get;
     gimbal.yaw.absolute_angle_set = gimbal.yaw.absolute_angle_get;
+
     gimbal.pitch.target_current = 0;
     gimbal.yaw.target_current = 0;
-    Launcher_Relax_Handle();
+
+    Launcher_Disable();
 }
 
 
 //一键掉头
-static void gimbal_turn_back_judge(void) {
-    if(KeyBoard.R.click_flag == 1){
+static void gimbal_turn_back_judge(void)
+{
+    if(KeyBoard.R.click_flag == 1)
+    {
         KeyBoard.R.click_flag = 0;
-        gimbal.yaw.absolute_angle_set+=180;
+        gimbal.yaw.absolute_angle_set += 180;
     }
 }
 
@@ -389,20 +452,18 @@ void Gimbal_Active_Handle(void) {
         first_order_filter_cali(&gimbal.mouse_in_y,Referee.keyboard.mouse_y);
     }
 
+    /** pitch **/
     //在pit期望值上,按遥控器或者鼠标进行增减
-    gimbal.pitch.absolute_angle_set +=
-            (float)rc_ctrl.rc.ch[PITCH_CHANNEL] * RC_TO_PITCH
-            + (float)gimbal.mouse_in_y.out * MOUSE_Y_RADIO;  // rc_ctrl.mouse.y
+    gimbal.pitch.absolute_angle_set += (float)rc_ctrl.rc.ch[GIMBAL_PITCH_CHANNEL] * RC_TO_PITCH + (float)gimbal.mouse_in_y.out * MOUSE_Y_RADIO;  // rc_ctrl.mouse.y
 
     //对pit期望值进行动态限幅（通过陀螺仪和编码器得到动态的限位）
     gimbal.pitch.absolute_angle_set = fp32_constrain(gimbal.pitch.absolute_angle_set,
                                                      MIN_ABS_ANGLE,
                                                      MAX_ABS_ANGLE);
 
+    /** yaw **/
     //在yaw期望值上,按遥控器或者鼠标进行增减
-    gimbal.yaw.absolute_angle_set -=
-            (float)rc_ctrl.rc.ch[YAW_CHANNEL] * RC_TO_YAW
-            + (float)gimbal.mouse_in_x.out * MOUSE_X_RADIO;    // rc_ctrl.mouse.x
+    gimbal.yaw.absolute_angle_set -= (float)rc_ctrl.rc.ch[GIMBAL_YAW_CHANNEL] * RC_TO_YAW + (float)gimbal.mouse_in_x.out * MOUSE_X_RADIO;    // rc_ctrl.mouse.x
 
     //云台绕圈时进行绝对角循环设置, 当yaw期望值超过180度时, 将其调整到[-180,180]的范围
     if (gimbal.yaw.absolute_angle_set >= 180) {
@@ -411,9 +472,6 @@ void Gimbal_Active_Handle(void) {
     else if (gimbal.yaw.absolute_angle_set <= -180) {
         gimbal.yaw.absolute_angle_set += 360;
     }
-
-    //一键掉头判断
-    gimbal_turn_back_judge();
 }
 
 
@@ -426,7 +484,7 @@ void Gimbal_Active_Handle(void) {
   * 避免由于角度环形性质导致PID控制过程中的不稳定性。
   * @retval         返回空
   */
-void Gimbal_Ctrl_Loop_Cal(void){
+void Gimbal_Current_Calc(void){
     //计算yaw轴的控制输出
     gimbal.yaw.gyro_set= pid_loop_calc(&gimbal.yaw.angle_p,
                                        gimbal.yaw.absolute_angle_get,
@@ -439,16 +497,18 @@ void Gimbal_Ctrl_Loop_Cal(void){
     gimbal.yaw.target_current = (int16_t)pid_calc(&gimbal.yaw.speed_p,
                                                 gimbal.filter_yaw_gyro_in.out,//gimbal.yaw.motor_measure->speed_rpm,
                                                 gimbal.yaw.gyro_set);
+
     //计算pitch轴的控制输出
-    gimbal.pitch.gyro_set= pid_calc(&gimbal.pitch.angle_p,
+    gimbal.pitch.gyro_set = pid_calc(&gimbal.pitch.angle_p,
                                     gimbal.pitch.absolute_angle_get,
                                     gimbal.pitch.absolute_angle_set);//Vision_info.pitch.value
 
     first_order_filter_cali(&gimbal.filter_pitch_gyro_in,gyro_pitch);
     ///// 读取陀螺仪的角速度加在内环的期望上面
-    gimbal.pitch.target_current= (int16_t)pid_calc(&gimbal.pitch.speed_p,
+    gimbal.pitch.target_current = (int16_t)pid_calc(&gimbal.pitch.speed_p,
                                                  gimbal.filter_pitch_gyro_in.out,
                                                  gimbal.pitch.gyro_set);
+
 
 }
 
@@ -459,29 +519,35 @@ void Gimbal_Ctrl_Loop_Cal(void){
   * 获取视觉发送的角度误差转动 pitch 轴和 yaw 轴
   * @retval         返回空
   */
-float a_pitch = 0.f;
-float a_yaw = 0.f;
+
+
+// 似乎只是处理了yaw pitch期望值
+float a_pitch = 0.0f;
+float a_yaw = 0.0f;
 void Gimbal_Auto_Handle(void) {
-    // if(KeyBoard.F.status == KEY_CLICK) a_pitch += 0.2f;
-    // if(KeyBoard.C.status == KEY_CLICK) a_pitch -= 0.2f;
-    // if(KeyBoard.Z.status == KEY_CLICK) a_yaw += 0.2f;
-    // if(KeyBoard.X.status == KEY_CLICK) a_yaw -= 0.2f;
+
     //获取视觉发送的角度误差
     first_order_filter_cali(&gimbal.auto_pitch, robot_ctrl.pitch);
     first_order_filter_cali(&gimbal.auto_yaw[0], sinf(robot_ctrl.yaw / 180.0f * PI));//yaw数据分解成x
     first_order_filter_cali(&gimbal.auto_yaw[1], cosf(robot_ctrl.yaw / 180.0f * PI));//yaw数据分解成y
-    gimbal.yaw.absolute_angle_set = (atan2f(gimbal.auto_yaw[0].out, gimbal.auto_yaw[1].out) * 180.0f / PI) + a_yaw;//在此处做合成
+
+    /** pitch **/
     gimbal.pitch.absolute_angle_set = gimbal.auto_pitch.out + a_pitch;
 
-    //云台绕圈时进行绝对角循环设置
-    if(gimbal.yaw.absolute_angle_set>=180){
-        gimbal.yaw.absolute_angle_set-=360;
-    }
-    else if(gimbal.yaw.absolute_angle_set<=-180){
-        gimbal.yaw.absolute_angle_set+=360;
-    }
     //对pit期望值进行动态限幅（通过陀螺仪和编码器得到动态的限位）
     gimbal.pitch.absolute_angle_set = fp32_constrain(gimbal.pitch.absolute_angle_set,
                                                      MIN_ABS_ANGLE,
                                                      MAX_ABS_ANGLE);
+
+    /** yaw **/
+    gimbal.yaw.absolute_angle_set = (atan2f(gimbal.auto_yaw[0].out, gimbal.auto_yaw[1].out) * 180.0f / PI) + a_yaw;//在此处做合成
+
+    //云台绕圈时进行绝对角循环设置
+    if(gimbal.yaw.absolute_angle_set >= 180){
+        gimbal.yaw.absolute_angle_set -= 360;
+    }
+    else if(gimbal.yaw.absolute_angle_set <= -180){
+        gimbal.yaw.absolute_angle_set += 360;
+    }
+
 }

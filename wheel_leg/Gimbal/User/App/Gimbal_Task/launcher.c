@@ -60,6 +60,11 @@ static uint32_t last_time = 0;
 
 
 static void Trigger_Mode_Set() {
+    if (switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS))
+    {
+        launcher.trigger_mode = SHOOT_CONTINUE;
+    }
+
     /* 拨盘处于正常模式才执行下一次的指令 */
     if((launcher.trigger_mode == SHOOT_CONTINUE) || (launcher.trigger_mode == SHOOT_OVER))
     {
@@ -76,10 +81,7 @@ static void Trigger_Mode_Set() {
         /* 遥控器左键在下面或长按鼠标左键，以200的转速连续发射弹丸 */
         /** Q: 检测上一次的左拨杆在下面能证明左键是向下拨吗 **/
         /** A: 这里修正一下，是判断遥控器左键在不在最下面，在最下面就是连发 **/
-        if (switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS))
-        {
-            launcher.trigger_mode = SHOOT_CONTINUE;
-        }
+
 #endif //!BRUSTS
         if ((gimbal.mode == GIMBAL_AUTO) && (robot_ctrl.fire_command == 1))
         {/** 当云台为自瞄模式且接收到视觉火控开启标志位为1时，准备进入单发模式，即视觉发一帧火控数据拨盘就转动一个弹丸角度 **/
@@ -413,7 +415,7 @@ void Launcher_Control(void) {
     /** 云台失能时 **/
     if (gimbal.mode == GIMBAL_DISABLE)
     {
-        Launcher_Relax_Handle();
+        Launcher_Disable();
     }
     else {
         if (launcher.fir_wheel_mode == Fire_ON) {
@@ -442,7 +444,7 @@ void Launcher_Control(void) {
 }
 
 /** 发射机构失能 **/
-void Launcher_Relax_Handle(void) {
+void Launcher_Disable(void) {
 
     /** 关闭摩擦轮 **/
     launcher.fir_wheel_mode = Fire_OFF;

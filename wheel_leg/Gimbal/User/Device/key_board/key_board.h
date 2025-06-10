@@ -12,14 +12,19 @@
 #define MOUSE_CLICK_R_CNT 5
 #define MOUSE_CLICK_L_CNT 5
 
-/* 遥控器摇杆通道标号 */
-#define CHASSIS_Y_CHANNEL 0
-#define CHASSIS_X_CHANNEL 1
-#define CHASSIS_Z_CHANNEL 2
 
-#define YAW_CHANNEL     2
-#define PITCH_CHANNEL   3
-#define AUTO_CHANNEL    4
+
+
+/** 遥控器摇杆通道标号 **/
+
+// 用于板间通信
+#define CHASSIS_VX_CHANNEL 1
+#define CHASSIS_YAW_CHANNEL 0
+
+// 云台控制
+#define GIMBAL_YAW_CHANNEL     2
+#define GIMBAL_PITCH_CHANNEL   3
+#define GIMBAL_AUTO_CHANNEL    4
 
 /* 修改摇杆的参数值 */
 #define RC_TO_YAW       0.0008f//0.0003f//0.00025f
