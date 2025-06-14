@@ -36,7 +36,6 @@
 #include "remote.h"
 #include "BMI088driver.h"
 #include "buzzer.h"
-#include "essemi_swd_print.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,11 +109,6 @@ int main(void)
   MX_TIM10_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-
-  /** Debug缓冲区初始化 **/
-  essemi_swd_configupbuffer(0, "SWDUP", NULL, 0, ESSEMI_SWD_MODE_BLOCK_IF_FIFO_FULL);
-  essemi_swd_configdownbuffer(0, "SWDDOWN", NULL, 0, ESSEMI_SWD_MODE_BLOCK_IF_FIFO_FULL);
-
   /** can过滤器初始化 **/
   can_filter_init();
 

@@ -5,6 +5,9 @@
 
 Dm8009 joint[4];
 
+float Kp, Kd;
+float pos, speed;
+
 /** 初始化关节电机ID **/
 void joint_init(void) {
     dm8009_init(&joint[LF], JOINT_LF_SEND);
@@ -34,6 +37,42 @@ void joint_enable(void) {
     {
         set_dm8009_enable(&joint[RB]);
         osDelay(1);
+    }
+}
+
+/** 判断关节是否复位 **/
+static void joint_is_reset(void)
+{
+
+    if((joint[LF].pos_r > RESET_THRESHOLD) || ((joint[LB].pos_r < -RESET_THRESHOLD)
+    || (joint[RF].pos_r < -RESET_THRESHOLD) || (joint[RB].pos_r > RESET_THRESHOLD)))
+    {
+        chassis.joint_is_reset = false;
+    }
+    else
+    {
+        chassis.joint_is_reset = true;
+    }
+}
+
+
+void joint_reset(void)
+{
+    joint_is_reset();
+
+    if(!chassis.joint_is_reset)
+    {
+        Kp = 3.0f;
+        Kd = 0.0f;
+        pos = 0.0f;
+        speed = 0.0f;
+    }
+    else
+    {
+        Kp = 0.0f;
+        Kd = 0.0f;
+        pos = 0.0f;
+        speed = 0.0f;
     }
 }
 

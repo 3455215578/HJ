@@ -13,8 +13,6 @@
 #include "lqr.h"
 #include "bsp_delay.h"
 #include "bsp_dwt.h"
-#include "essemi_swd_print.h"
-
 
 /** 底盘pid初始化 **/
 static void chassis_pid_init() {
@@ -160,9 +158,14 @@ static void chassis_selfhelp(void)
         chassis.leg_R.joint_F_torque = 0;
         chassis.leg_R.joint_B_torque = 0;
 
+        if(!chassis.joint_is_reset)
+        {
+            chassis.leg_L.wheel_torque = 0;
+            chassis.leg_R.wheel_torque = 0;
+
+            joint_reset();
+        }
     }
-
-
 }
 
 /** 获取底盘传感器数据 **/
@@ -426,6 +429,11 @@ static void controller_calc(void)
 /** 底盘失能任务 **/
 static void chassis_disable_task() {
 
+    pos = 0.0f;
+    speed = 0.0f;
+    Kp = 0.0f;
+    Kd = 0.0f;
+
     chassis.leg_L.wheel_torque = 0;
     chassis.leg_R.wheel_torque = 0;
 
@@ -447,6 +455,9 @@ static void chassis_disable_task() {
 
     // 底盘初始化标志位
     chassis.init_flag = false;
+
+    // 关节复位标志位
+    chassis.joint_is_reset = false;
 
     // 平衡标志位
     chassis.chassis_is_balance = false;
@@ -479,31 +490,35 @@ static void chassis_enable_task(void)
     /** 设置期望腿长 **/
     leg_length_set();
 
+    /** 控制器计算 **/
     controller_calc();
 
+    /** 倒地自救(简陋) **/
     chassis_selfhelp();
 }
 
 /** 发送力矩任务 **/
-// 500Hz
 static void send_torque_task(float joint_LF_torque, float joint_LB_torque, float joint_RF_torque, float joint_RB_torque,
-                             float wheel_L_torque, float wheel_R_torque)
+                             float wheel_L_torque, float wheel_R_torque,
+                             float pos, float speed, float Kp, float Kd)
 {
-    /** DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM DM **/
-        set_dm8009_MIT(&joint[LF],0.0f,0.0f, 0.0f, 0.0f,joint_LF_torque);
-        set_dm8009_MIT(&joint[LB],0.0f,0.0f, 0.0f, 0.0f,joint_LB_torque);
-        DWT_Delay(0.0002);
-        set_dm8009_MIT(&joint[RF],0.0f,0.0f, 0.0f, 0.0f,joint_RF_torque);
-        set_dm8009_MIT(&joint[RB],0.0f,0.0f, 0.0f, 0.0f,joint_RB_torque);
+    set_dm8009_MIT(&joint[LF],pos, speed, Kp, Kd,joint_LF_torque);
+    set_dm8009_MIT(&joint[LB],pos, speed, Kp, Kd,joint_LB_torque);
+    DWT_Delay(0.0002);
+    set_dm8009_MIT(&joint[RF],pos, speed, Kp, Kd,joint_RF_torque);
+    set_dm8009_MIT(&joint[RB],pos, speed, Kp, Kd,joint_RB_torque);
+
+    lk9025_torque_set(&wheel[L], wheel_L_torque);
+    lk9025_torque_set(&wheel[R], wheel_R_torque);
 
 //    set_dm8009_MIT(&joint[LF],0.0f,0.0f, 0.0f, 0.0f,0.0f);
 //    set_dm8009_MIT(&joint[LB],0.0f,0.0f, 0.0f, 0.0f,0.0f);
 //    DWT_Delay(0.0002);
 //    set_dm8009_MIT(&joint[RF],0.0f,0.0f, 0.0f, 0.0f,0.0f);
 //    set_dm8009_MIT(&joint[RB],0.0f,0.0f, 0.0f, 0.0f,0.0f);
-
-
-    lk9025_multi_torque_set(wheel_L_torque, wheel_R_torque);
+//
+//    lk9025_torque_set(&wheel[L], 0.0f);
+//    lk9025_torque_set(&wheel[R], 0.0f);
 
 }
 
@@ -536,7 +551,6 @@ void chassis_task(void)
         }
 
 
-
         default:
         {
             break;
@@ -548,6 +562,10 @@ void chassis_task(void)
                      chassis.leg_R.joint_F_torque,
                      chassis.leg_R.joint_B_torque,
                      -chassis.leg_L.wheel_torque,
-                     -chassis.leg_R.wheel_torque);
+                     -chassis.leg_R.wheel_torque,
+                     pos,
+                     speed,
+                     Kp,
+                     Kd);
 
 }

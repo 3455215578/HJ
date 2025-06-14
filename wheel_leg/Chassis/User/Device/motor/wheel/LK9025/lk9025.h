@@ -23,6 +23,8 @@ typedef struct{
 
 void lk9025_init(Lk9025 *motor, uint32_t device_id);
 
+void lk9025_torque_set(Lk9025 *motor, float motor_torque);
+
 /** 多电机转矩闭环 **/
 void lk9025_multi_torque_set(float motor1_torque, float motor2_torque);
 

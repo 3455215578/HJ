@@ -127,8 +127,8 @@ void Gimbal_task(void const*pvParameters) {
 
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x1FF_ID,
-                               0,       //205 yaw
-                               0,     //206 pitch
+                               gimbal.yaw.target_current,       //205 yaw
+                               gimbal.pitch.target_current,     //206 pitch
                                0,                               //207 нч
                                0                                //208 нч
         );

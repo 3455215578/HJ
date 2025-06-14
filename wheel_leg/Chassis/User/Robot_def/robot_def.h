@@ -7,7 +7,6 @@
 #include "moving_filter.h"
 #include "can_device.h"
 #include "user_lib.h"
-#include "essemi_swd_print.h"
 
 typedef float fp32; // 表明某个float类型变量是32位浮点数
 typedef double fp64;
@@ -403,6 +402,8 @@ typedef struct{
 
 
     /** flag **/
+
+    bool joint_is_reset; // 关节复位标志位
 
     bool init_flag;            // 底盘初始化完成标志位
 

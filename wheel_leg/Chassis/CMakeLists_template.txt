@@ -73,7 +73,6 @@ include_directories(${includes}
         User/Device/bmi088
         User/Device/buzzer
         User/Device/can_device
-        User/Device/debug
         User/Device/ist8310
         User/Device/key_board
         User/Device/led

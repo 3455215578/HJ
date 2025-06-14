@@ -25,8 +25,27 @@ void lk9025_init(Lk9025 *motor, uint32_t device_id) {
 }
 /****************************************************************************/
 
+/** 单电机扭矩闭环 **/
+void lk9025_torque_set(Lk9025 *motor, float motor_torque)
+{
+    WheelTxFrame.Header.StdId = motor->id;
 
-/** 多电机转矩闭环 **/
+    float motor_current = motor_torque / LK_TORQUE_CONSTANT;
+    int16_t motor_data = motor_current * LK_CURRENT_2_DATA;
+
+    WheelTxFrame.Data[0] = 0xA1;
+    WheelTxFrame.Data[1] = 0;
+    WheelTxFrame.Data[2] = 0;
+    WheelTxFrame.Data[3] = 0;
+    WheelTxFrame.Data[4] = *(uint8_t *) (&motor_data);
+    WheelTxFrame.Data[5] = *((uint8_t *) (&motor_data) + 1);
+    WheelTxFrame.Data[6] = 0;
+    WheelTxFrame.Data[7] = 0;
+
+    CAN_SendWheelData(&WheelTxFrame);
+}
+
+/** 一拖四模式 -- 多电机转矩闭环 **/
 void lk9025_multi_torque_set(float motor1_torque, float motor2_torque) {
 
     float motor1_current, motor2_current;
@@ -54,12 +73,13 @@ void lk9025_info_update(Lk9025* motor, uint8_t data[])
 {
     int16_t iq_int = (int16_t) ((data)[3] << 8 | (data)[2]);
 
-    /** 度每秒 **/
+    // °/s
     int16_t speed_int = (int16_t) ((data)[5] << 8 | (data)[4]);
 
+    /** 力矩 Nm **/
     motor->torque = (iq_int / LK_CURRENT_2_DATA) * LK_TORQUE_CONSTANT;
 
-    /** rad/s **/
+    /** 角速度 rad/s **/
     motor->angular_vel = speed_int * DEGREE_TO_RAD;
 
 
