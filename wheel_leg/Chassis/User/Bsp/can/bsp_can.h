@@ -3,7 +3,7 @@
 
 #include <stdint-gcc.h>
 #include "can_device.h"
-
+#include "can.h"
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;

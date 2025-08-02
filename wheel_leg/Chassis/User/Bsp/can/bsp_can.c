@@ -24,7 +24,7 @@ CAN_TxFrame_TypeDef WheelTxFrame = {
 
         .hcan = &hcan2,
 
-        .Header.StdId = 0x00,
+        .Header.StdId = 0x280,
         .Header.ExtId = 0,
         .Header.IDE = CAN_ID_STD,
         .Header.RTR = CAN_RTR_DATA,
@@ -142,13 +142,13 @@ static void CAN2_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
 {
     switch(CAN2_RxFrame.Header.StdId){
 
-        case WHEEL_L_RECEIVE:
+        case (LK_FDB_Identifier + WHEEL_L_SEND) :
         {
             lk9025_info_update(&wheel[L], Data);
             break;
         }
 
-        case WHEEL_R_RECEIVE :
+        case (LK_FDB_Identifier + WHEEL_R_SEND) :
         {
             lk9025_info_update(&wheel[R], Data);
             break;

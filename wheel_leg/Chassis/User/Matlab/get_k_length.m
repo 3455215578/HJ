@@ -14,11 +14,11 @@ function K = get_k_length(leg_length)
     syms theta(t) x(t) phi(t) T Tp R L LM l mw mp M Iw Ip IM g  
     syms f1 f2 f3 d_theta d_x d_phi theta0 x0 phi0 
 
-    R1=0.075;                         %驱动轮半径
+    R1=0.096;                         %驱动轮半径
     L1=leg_length/2;                  %摆杆重心到驱动轮轴距离
     LM1=leg_length/2;                 %摆杆重心到其转轴距离
     l1=0.257;                         %机体质心距离转轴距离
-    mw1=1.18;                         %驱动轮质量
+    mw1=1.30;                         %驱动轮质量
     mp1=1.308;                          %杆质量
     M1=17.14;                         %机体质量
    Iw1=0.001618196;                   %驱动轮转动惯量

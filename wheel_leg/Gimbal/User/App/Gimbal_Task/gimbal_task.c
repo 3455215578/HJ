@@ -127,8 +127,8 @@ void Gimbal_task(void const*pvParameters) {
 
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x1FF_ID,
-                               gimbal.yaw.target_current,       //205 yaw
-                               gimbal.pitch.target_current,     //206 pitch
+                               0,      //205 yaw
+                               0,     //206 pitch
                                0,                               //207 无
                                0                                //208 无
         );
@@ -305,8 +305,8 @@ static void Send_Gimbal_Data(void) {
     if(count % 2 == 1) // 奇数发，偶数不发，实现500Hz
     {
         /* 遥控器数据 */
-        Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL],
-                           rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL],
+        Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL],
+                           rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL],
                            rc_ctrl.rc.s[RC_s_L],
                            rc_ctrl.rc.s[RC_s_R]);
     }

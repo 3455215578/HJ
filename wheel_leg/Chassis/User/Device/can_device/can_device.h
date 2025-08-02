@@ -18,8 +18,8 @@ typedef enum{
     JOINT_RB_SEND = 0x04,
 
     // 轮毂发送报文ID
-    WHEEL_L_SEND = 0x141,
-    WHEEL_R_SEND = 0x142,
+    WHEEL_L_SEND = 0x01,
+    WHEEL_R_SEND = 0x02,
 
 } CanSendDeviceId;
 
@@ -31,10 +31,6 @@ typedef enum{
     JOINT_LB_RECEIVE = 0x12,
     JOINT_RF_RECEIVE = 0x13,
     JOINT_RB_RECEIVE = 0x14,
-
-    // 轮毂反馈报文ID
-    WHEEL_L_RECEIVE = 0x141,
-    WHEEL_R_RECEIVE = 0x142,
 
 } CanReceiveDeviceId;
 

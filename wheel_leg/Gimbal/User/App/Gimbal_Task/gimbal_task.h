@@ -43,7 +43,7 @@
 #define GIMBAL_YAW_ANGLE_MAX_IOUT           0.0f
 #define GIMBAL_YAW_ANGLE_MAX_OUT            10000.f
 
-#define GIMBAL_YAW_SPEED_PID_KP             500.0f // 500
+#define GIMBAL_YAW_SPEED_PID_KP             300.0f // 500
 #define GIMBAL_YAW_SPEED_PID_KI             0.0f
 #define GIMBAL_YAW_SPEED_PID_KD             0.0f
 #define GIMBAL_YAW_SPEED_MAX_IOUT           0.0f

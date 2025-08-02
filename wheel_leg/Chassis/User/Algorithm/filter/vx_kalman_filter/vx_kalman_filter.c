@@ -73,7 +73,6 @@ void speed_calc(void)
     // 轮毂相对于机体(b系)的速度
     v_rb = w_r * chassis_physical_config.wheel_radius + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0 * chassis.leg_R.state_variable_feedback.theta_dot * arm_cos_f32(chassis.leg_R.state_variable_feedback.theta) + chassis.leg_R.vmc.forward_kinematics.fk_L0.L0_dot * arm_sin_f32(chassis.leg_R.state_variable_feedback.theta);
 
-
     aver_v = (v_rb + v_lb) / 2.0f;//取平均
 
     vel_acc[0] = aver_v;

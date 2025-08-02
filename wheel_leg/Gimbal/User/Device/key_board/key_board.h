@@ -19,10 +19,10 @@
 
 // 用于板间通信
 #define CHASSIS_VX_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 0
+#define CHASSIS_YAW_CHANNEL 2
 
 // 云台控制
-#define GIMBAL_YAW_CHANNEL     2
+#define GIMBAL_YAW_CHANNEL     0
 #define GIMBAL_PITCH_CHANNEL   3
 #define GIMBAL_AUTO_CHANNEL    4
 

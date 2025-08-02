@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "robot_def.h"
 #include "vmc.h"
@@ -274,23 +275,6 @@ static void fn_cal(Leg *leg, float body_az, ChassisPhysicalConfig *chassis_physi
 
     leg->Fn = P + chassis_physical_config->wheel_weight * (GRAVITY + wheel_az);
 
-}
-
-static void leg_is_offground(Chassis* chassis)
-{
-    if(chassis->leg_L.Fn < 40.0f)
-    {
-        chassis->leg_L.leg_is_offground = true;
-    }else{
-        chassis->leg_L.leg_is_offground = false;
-    }
-
-    if(chassis->leg_R.Fn < 40.0f)
-    {
-        chassis->leg_R.leg_is_offground = true;
-    }else{
-        chassis->leg_R.leg_is_offground = false;
-    }
 }
 
 /*******************************************************************************

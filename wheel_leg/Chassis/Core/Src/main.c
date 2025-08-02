@@ -36,6 +36,9 @@
 #include "remote.h"
 #include "BMI088driver.h"
 #include "buzzer.h"
+
+#include "stdio.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +59,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -77,7 +79,6 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -108,20 +109,17 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM10_Init();
   MX_I2C2_Init();
+  MX_USART1_UART_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  /** can过滤器初始化 **/
   can_filter_init();
 
-  /** 延时模块初始化 **/
   delay_init();
 
-  /** 遥控器模块初始化 **/
   remote_control_init();
 
-  /** dwt外设初始化 **/
   DWT_Init(168);
 
-  /** IMU初始化 **/
   while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR);
 
   Buzzer_Init();

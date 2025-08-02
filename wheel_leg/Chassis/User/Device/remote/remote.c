@@ -6,6 +6,7 @@
 #include "remote.h"
 
 #include "robot_def.h"
+#include "vofa.h"
 
 #define RC_CHANNAL_ERROR_VALUE 700
 #define RC_HEARTBEAT_TIMEOUT_MS 200
@@ -291,7 +292,10 @@ static void chassis_device_offline_handle() {
 
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
-    chassis.chassis_ctrl_info.v_m_per_s = (float) (rc_ctrl.rc.ch[CHASSIS_SPEED_CHANNEL]) * RC_TO_VX;
+    float vel_temp = (float) (rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL]) * RC_TO_VX;
+    slope_following(&vel_temp,&chassis.chassis_ctrl_info.v_m_per_s,0.05f);
+
+    USART_Vofa_Justfloat_Transmit(chassis.chassis_ctrl_info.v_m_per_s, 0, 0);
 
     chassis.chassis_ctrl_info.yaw_rad -= (float) (rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
 
@@ -320,31 +324,11 @@ static void set_chassis_mode() {
 }
 
 
-/** 底盘通过板间通信接收云台的信息 **/
-static void set_chassis_ctrl_info_from_gimbal_msg()
-{
-
-}
-
-/** 底盘根据云台信息设置模式 **/
-static void set_chassis_mode_from_gimbal_msg()
-{
-
-}
-
 void remote_cmd(void)
 {
-#if CHASSIS_REMOTE
     set_chassis_mode();
 
     set_chassis_ctrl_info();
 
-//    chassis_device_offline_handle();
 
-#else
-    set_chassis_ctrl_info_from_gimbal_msg();
-
-    set_chassis_mode_from_gimbal_msg();
-
-#endif
 }

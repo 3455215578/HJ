@@ -1,7 +1,7 @@
 #include "board_communication_task.h"
 
 /* 0x110 0x111 */
-void Send_Chassis_Speed(int16_t ch0, int16_t ch1, char sl, char sr)
+void Send_Chassis_Speed(int16_t vx_channel, int16_t yaw_channel, char sl, char sr)
 {
     /** 定义发送结构体 **/
     CAN_TxHeaderTypeDef  tx_message;
@@ -19,13 +19,13 @@ void Send_Chassis_Speed(int16_t ch0, int16_t ch1, char sl, char sr)
 
     union I16 ch;
 
-    /** 转向 **/
-    ch.value = ch0;
+    /** 前后 **/
+    ch.value = vx_channel;
     Send_data[0] = ch.data[0];
     Send_data[1] = ch.data[1];
 
-    /** 前后 **/
-    ch.value = ch1;
+    /** 转向 **/
+    ch.value = yaw_channel;
     Send_data[2] = ch.data[0];
     Send_data[3] = ch.data[1];
 

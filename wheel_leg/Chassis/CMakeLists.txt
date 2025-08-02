@@ -1,7 +1,7 @@
 #此文件从模板自动生成! 请勿更改!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.31)
 
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -77,11 +77,13 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
         User/Device/ist8310
         User/Device/key_board
         User/Device/led
+        User/Device/motor/dji
         User/Device/motor/joint
         User/Device/motor/joint/DM8009
         User/Device/motor/wheel
         User/Device/motor/wheel/LK9025
         User/Device/remote
+        User/Device/vofa
 
         User/Robot_def
 )

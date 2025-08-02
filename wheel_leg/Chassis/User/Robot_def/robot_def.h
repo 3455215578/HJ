@@ -7,25 +7,26 @@
 #include "moving_filter.h"
 #include "can_device.h"
 #include "user_lib.h"
+#include "DJI_motor.h"
 
-typedef float fp32; // 表明某个float类型变量是32位浮点数
-typedef double fp64;
+
+/*******************************************************************************
+ *                                    底盘                                     *
+ *******************************************************************************/
 
 /** 宏定义 **/
-//CHASSIS_REMOTE置1：底盘由遥控器控制
-#define CHASSIS_REMOTE 1
-
-//DEBUG_MODE置1：进入调试模式，关闭关节和轮毂输出
-#define DEBUG_MODE 0
 
 #define CHASSIS_PERIOD 5 // ms 计算频率: 200Hz
+
+#define PHI_BALANCE 0.5f * DEGREE_TO_RAD // 平衡点在0.5°
+#define MIN_L0 0.10f
 
 /** 遥控器路径 **/
 // x : 2-左手 ; 0-右手
 // y : 3-左手 ; 1-右手
 
-#define CHASSIS_SPEED_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 0
+#define CHASSIS_VX_CHANNEL 1
+#define CHASSIS_YAW_CHANNEL 2
 
 /** 变量约束 **/
 #define MAX_CHASSIS_VX_SPEED 2.1f
@@ -34,31 +35,28 @@ typedef double fp64;
 #define MAX_JOINT_TORQUE 40.f
 #define MIN_JOINT_TORQUE (-40.f)
 
-#define MIN_L0 0.10f
-
 /** 遥控器值映射 **/
 #define RC_TO_VX  (MAX_CHASSIS_VX_SPEED/660)
 #define MAX_CHASSIS_YAW_INCREMENT 0.01f
 #define RC_TO_YAW_INCREMENT (MAX_CHASSIS_YAW_INCREMENT/660)
 
-#define PHI_BALANCE 0.5f * DEGREE_TO_RAD // 平衡点在0.5°
 
 /****** PID参数 ******/
 
 /** Wheel **/
 
 // 转向PID
-#define CHASSIS_TURN_PID_P 250.0f // 30.0f 45.0f 200.0f 250.0f
-#define CHASSIS_TURN_PID_I 0.0f
-#define CHASSIS_TURN_PID_D 5.0f // 0.0f 5.0f 5.0f 5.0f
-#define CHASSIS_TURN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_TURN_PID_OUT_LIMIT 4.0f
+#define CHASSIS_TURN_POS_PID_P 5.0f
+#define CHASSIS_TURN_POS_PID_I 0.0f
+#define CHASSIS_TURN_POS_PID_D 0.0f
+#define CHASSIS_TURN_POS_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_TURN_POS_PID_OUT_LIMIT 3.0f
 
-#define CHASSIS_SPIN_PID_P 0.0f
-#define CHASSIS_SPIN_PID_I 0.0f
-#define CHASSIS_SPIN_PID_D 0.0f
-#define CHASSIS_SPIN_PID_IOUT_LIMIT 0.0f
-#define CHASSIS_SPIN_PID_OUT_LIMIT 0.0f
+#define CHASSIS_TURN_SPEED_PID_P 10.0f
+#define CHASSIS_TURN_SPEED_PID_I 0.0f
+#define CHASSIS_TURN_SPEED_PID_D 0.0f
+#define CHASSIS_TURN_SPEED_PID_IOUT_LIMIT 0.0f
+#define CHASSIS_TURN_SPEED_PID_OUT_LIMIT 4.0f
 
 /** Joint **/
 
@@ -98,9 +96,6 @@ typedef double fp64;
 #define CHASSIS_ROLL_PID_OUT_LIMIT 50.0f
 
 
-/*******************************************************************************
- *                                    底盘                                     *
- *******************************************************************************/
 
 /** 底盘物理参数结构体 **/
 typedef struct{
@@ -120,6 +115,23 @@ typedef enum{
     CHASSIS_SPIN, // 小陀螺
     CHASSIS_JUMP, // 跳跃模式
 } ChassisCtrlMode;
+
+/** 底盘状态结构体 -- 用于倒地自救 **/
+typedef enum{
+    CHASSIS_BODY_UNNORMAL,
+    CHASSIS_BODY_NORMAL,
+} ChassisBodyState;
+
+typedef enum{
+    CHASSIS_FALL_LEG_UNNORMAL,
+    CHASSIS_FALL_LEG_NORMAL,
+} ChassisFallLegState;
+
+typedef enum{
+    CHASSIS_COULD_NOT_RECOVER,
+    CHASSIS_COULD_RECOVER,
+} ChassisRecoverState;
+
 
 typedef struct{
     float v_m_per_s; // 期望速度
@@ -350,8 +362,6 @@ typedef struct{
     MovingAverageFilter Fn_filter; // 竖直方向支持力Fn的移动平均滤波器
     float Fn; // 竖直方向支持力
 
-    bool leg_is_offground;
-
 } Leg;
 
 /** 底盘结构体 **/
@@ -369,21 +379,15 @@ typedef struct{
     Leg leg_L;
     Leg leg_R;
 
-    /****** 跳跃 ******/
-    JumpState jump_state;
 
     /****** PID ******/
     /** Wheel **/
 
     // 转向PID
-    Pid chassis_turn_pid;
+    Pid chassis_turn_pos_pid;
+    Pid chassis_turn_speed_pid;
+
     float wheel_turn_torque;          // 转向力矩
-
-    // 小陀螺PID
-    Pid chassis_spin_pid;
-    float target_spin_speed;
-
-
 
     /** Joint **/
 
@@ -397,27 +401,22 @@ typedef struct{
     // Roll补偿PID
     Pid chassis_roll_pid;
 
+    // 机体状态
+    ChassisBodyState chassis_body_state;
 
+    ChassisFallLegState chassis_fall_leg_state;
 
+    ChassisRecoverState chassis_recover_state;
 
-
-    /** flag **/
-
-    bool joint_is_reset; // 关节复位标志位
-
+    // flag
     bool init_flag;            // 底盘初始化完成标志位
-
-    bool chassis_is_balance;   // 平衡标志位
-    bool recover_finish;       // 倒地自起完成标志位
-
-    bool chassis_is_offground; // 离地标志位
-
-    bool jump_flag;            // 跳跃标志位
+    bool chassis_recover_finish;
 
 } Chassis;
 
 
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
+
 
 #endif
