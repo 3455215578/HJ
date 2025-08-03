@@ -72,11 +72,11 @@ include_directories(Core/Inc
         User/Algorithm/SMC
         User/Algorithm/user_lib
 
-        User/App/INS_Task
         User/App/Board_Communication_Task
-        User/App/Gimbal_Task
         User/App/Calibrate_Task
         User/App/Detect_Task
+        User/App/Gimbal_Task
+        User/App/INS_Task
         User/App/Referee_Task
 
         User/Balance

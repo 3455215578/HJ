@@ -194,7 +194,7 @@ typedef struct {
     uint8_t chassis_mode;//
     uint8_t block_warning;//堵弹警告
     uint8_t shoot_heat_limit;//当前热量限制
-    fp32 super_cap_value;//超级电容值
+    float super_cap_value;//超级电容值
     uint8_t fire_mode;
     float pitch_value;
     float relative_yaw_value;

@@ -34,8 +34,8 @@ extern robot_ctrl_info_t robot_ctrl;    // 获取视觉信息
 //todo: 图传的
 extern uint8_t control_flag;        // 通过状态判断是什么链路
 
-fp32 gyro_pitch = 0.0f;
-fp32 gyro_yaw = 0.0f;
+float gyro_pitch = 0.0f;
+float gyro_yaw = 0.0f;
 
 /*********************************************************************************************************
 *                                              内部函数声明
@@ -214,7 +214,7 @@ static void Gimbal_Angle_Update(void)
     gimbal.pitch.relative_angle_get = Motor_Ecd_To_Angle_Change(gimbal.pitch.motor_measure.ecd,
                                                                 gimbal.pitch.motor_measure.offset_ecd);
     gyro_pitch = -INS_gyro[0]*MOTOR_RAD_TO_ANGLE;
-    gimbal.absolute_gyro_pitch = (fp32) INS_gyro[0];
+    gimbal.absolute_gyro_pitch = (float) INS_gyro[0];
 
     /** Yaw **/
     gimbal.yaw.absolute_angle_get=INS_angle[0]*MOTOR_RAD_TO_ANGLE;
@@ -222,7 +222,7 @@ static void Gimbal_Angle_Update(void)
                                                              gimbal.yaw.motor_measure.offset_ecd);
 
     gyro_yaw = INS_gyro[2]*MOTOR_RAD_TO_ANGLE;
-    gimbal.absolute_gyro_yaw = (fp32) INS_gyro[2];
+    gimbal.absolute_gyro_yaw = (float) INS_gyro[2];
 
 }
 
@@ -252,7 +252,7 @@ static void Send_Vision_Data(void)
 
     vision_data.pitch = gimbal.pitch.absolute_angle_get;
     vision_data.yaw   = gimbal.yaw.absolute_angle_get;
-    vision_data.roll = (fp32) INS_angle[1] * MOTOR_RAD_TO_ANGLE;
+    vision_data.roll = (float) INS_angle[1] * MOTOR_RAD_TO_ANGLE;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -296,7 +296,7 @@ static void Gimbal_Device_Offline_Handle(void) {
     }
 }
 
-// 因为这个任务是在1kHz的云台当中运行的，我希望它以500Hz运行
+// 该函数在1kHz的云台任务中运，我希望以500Hz运行
 static void Send_Gimbal_Data(void) {
 
     static int count = 1;
@@ -304,10 +304,10 @@ static void Send_Gimbal_Data(void) {
     if(count % 2 == 1) // 奇数发，偶数不发，实现500Hz
     {
         /* 遥控器数据 */
-        Send_Chassis_Speed(rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL],
-                           rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL],
-                           rc_ctrl.rc.s[RC_s_L],
-                           rc_ctrl.rc.s[RC_s_R]);
+        Gimbal_Send_Chassis(rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL],
+                            rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL],
+                            rc_ctrl.rc.s[RC_s_L],
+                            rc_ctrl.rc.s[RC_s_R]);
     }
 
     count ++;

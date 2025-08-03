@@ -28,7 +28,7 @@ double smc_controller(SystemState state, SMC_Params params) {
 }
 
 // 摩擦轮系统状态更新
-SystemState update_system(fp32 speed, int16_t speed_rpm, double dt, SystemState prev_state) {
+SystemState update_system(float speed, int16_t speed_rpm, double dt, SystemState prev_state) {
     SystemState new_state;
     new_state.error = speed - speed_rpm;
     new_state.error_deriv = (new_state.error - prev_state.previous_error) / dt;

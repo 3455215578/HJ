@@ -1,6 +1,3 @@
-//
-// Created by xhuanc on 2021/11/14.
-//
 #include "AHRS_MiddleWare.h"
 #include "AHRS.h"
 #include "arm_math.h"
@@ -13,7 +10,7 @@
  * @retval         返回空
  */
 
-void AHRS_get_height(fp32* high)
+void AHRS_get_height(float* high)
 {
     if (high != NULL)
     {
@@ -28,7 +25,7 @@ void AHRS_get_height(fp32* high)
  * @retval         返回空
  */
 
-void AHRS_get_latitude(fp32* latitude)
+void AHRS_get_latitude(float* latitude)
 {
     if (latitude != NULL)
     {
@@ -43,7 +40,7 @@ void AHRS_get_latitude(fp32* latitude)
  * @retval         返回1/sqrt 开方后的倒数
  */
 
-fp32 AHRS_invSqrt(fp32 num)
+float AHRS_invSqrt(float num)
 {
     return 1/sqrtf(num);
 
@@ -64,7 +61,7 @@ fp32 AHRS_invSqrt(fp32 num)
  * @retval         返回对应角度的sin值
  */
 
-fp32 AHRS_sinf(fp32 angle)
+float AHRS_sinf(float angle)
 {
     return arm_sin_f32(angle);
 }
@@ -75,7 +72,7 @@ fp32 AHRS_sinf(fp32 angle)
  * @retval         返回对应角度的cos值
  */
 
-fp32 AHRS_cosf(fp32 angle)
+float AHRS_cosf(float angle)
 {
     return arm_cos_f32(angle);
 }
@@ -87,7 +84,7 @@ fp32 AHRS_cosf(fp32 angle)
  * @retval         返回对应角度的tan值
  */
 
-fp32 AHRS_tanf(fp32 angle)
+float AHRS_tanf(float angle)
 {
     return tanf(angle);
 }
@@ -98,7 +95,7 @@ fp32 AHRS_tanf(fp32 angle)
  * @retval         返回角度 单位弧度
  */
 
-fp32 AHRS_asinf(fp32 sin)
+float AHRS_asinf(float sin)
 {
 
     return asinf(sin);
@@ -111,7 +108,7 @@ fp32 AHRS_asinf(fp32 sin)
  * @retval         返回对应的角度 单位弧度
  */
 
-fp32 AHRS_acosf(fp32 cos)
+float AHRS_acosf(float cos)
 {
 
     return acosf(cos);
@@ -125,7 +122,7 @@ fp32 AHRS_acosf(fp32 cos)
  * @retval         返回对应的角度 单位弧度
  */
 
-fp32 AHRS_atan2f(fp32 y, fp32 x)
+float AHRS_atan2f(float y, float x)
 {
     return atan2f(y, x);
 }

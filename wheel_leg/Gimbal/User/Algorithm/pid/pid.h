@@ -26,13 +26,11 @@
   */
 
 
-
-
 #ifndef __pid_H__
 #define __pid_H__
 
-//#include "stm32f4xx_hal.h"
-#include "struct_typedef.h"
+#include <stdint-gcc.h>
+
 enum
 {
     LAST  = 0,

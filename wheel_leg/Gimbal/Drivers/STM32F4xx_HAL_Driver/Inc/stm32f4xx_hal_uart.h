@@ -333,7 +333,7 @@ typedef  void (*pUART_RxEventCallbackTypeDef)(struct __UART_HandleTypeDef *huart
   * @}
   */
 
-/** @defgroup UART_LIN_Break_Detection_Length  UART LIN Break Detect_Task Length
+/** @defgroup UART_LIN_Break_Detection_Length  UART LIN Break Detection Length
   * @{
   */
 #define UART_LINBREAKDETECTLENGTH_10B      0x00000000U

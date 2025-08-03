@@ -1,7 +1,7 @@
 #include "board_communication_task.h"
 
 /* 0x110 0x111 */
-void Send_Chassis_Speed(int16_t vx_channel, int16_t yaw_channel, char sl, char sr)
+void Gimbal_Send_Chassis(int16_t vx_channel, int16_t yaw_channel, char sl, char sr)
 {
     /** 定义发送结构体 **/
     CAN_TxHeaderTypeDef  tx_message;

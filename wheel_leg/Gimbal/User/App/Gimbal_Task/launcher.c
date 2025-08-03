@@ -14,7 +14,7 @@
 *                                              内部变量                                                   *
 *********************************************************************************************************/
 extern robot_ctrl_info_t robot_ctrl;    // 上位机数据
-static fp32 trigger_target_total_ecd = 0;      // 总拨盘电机转动ECD
+static float trigger_target_total_ecd = 0;      // 总拨盘电机转动ECD
 static uint32_t trigger_time = 0;       // 拨盘电机每次转动时间
 static uint8_t rc_last_sw_L;            // 拨杆上一时刻的状态值记录
 
@@ -161,8 +161,8 @@ static void Trigger_Control(void) {
 #define TRI_MINECD 5000     // 5000ecd
 #define TRI_MAXTIME 1000    // 1s
 #define TRI_MAXSPEED 100    // rpm
-static fp32 total_time = 0;
-static fp32 total_ecd_error = 0;
+static float total_time = 0;
+static float total_ecd_error = 0;
 static uint32_t continue_time = 0;
 
 static void Trigger_Finish_Judge() {

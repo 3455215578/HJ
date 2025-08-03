@@ -50,60 +50,60 @@ else ()
 endif ()
 
 include_directories(Core/Inc
-        USB_DEVICE/App USB_DEVICE/Target
-        Drivers/STM32F4xx_HAL_Driver/Inc
-        Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
-        Middlewares/Third_Party/FreeRTOS/Source/include
-        Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
-        Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-        Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-        Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-        Middlewares/ST/ARM/DSP/Inc
-        Drivers/CMSIS/Device/ST/STM32F4xx/Include
-        Drivers/CMSIS/Include
+                    USB_DEVICE/App USB_DEVICE/Target
+                    Drivers/STM32F4xx_HAL_Driver/Inc
+                    Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+                    Middlewares/Third_Party/FreeRTOS/Source/include
+                    Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+                    Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+                    Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+                    Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+                    Middlewares/ST/ARM/DSP/Inc
+                    Drivers/CMSIS/Device/ST/STM32F4xx/Include
+                    Drivers/CMSIS/Include
 
-        User/Algorithm/AHRS
-        User/Algorithm/CRC8_CRC16
-        User/Algorithm/filter
-        User/Algorithm/filter/kalman_filter
-        User/Algorithm/pid
-        User/Algorithm/QuaternionEKF
-        User/Algorithm/ramp
-        User/Algorithm/SMC
-        User/Algorithm/user_lib
+                    User/Algorithm/AHRS
+                    User/Algorithm/CRC8_CRC16
+                    User/Algorithm/filter
+                    User/Algorithm/filter/kalman_filter
+                    User/Algorithm/pid
+                    User/Algorithm/QuaternionEKF
+                    User/Algorithm/ramp
+                    User/Algorithm/SMC
+                    User/Algorithm/user_lib
 
-        User/App/Atti
-        User/App/Board_Communication_Task
-        User/App/Gimbal_Task
-        User/App/Referee_Task/Calibrate
-        User/App/Referee_Task/Detection
-        User/App/Referee_Task/Referee
+                    User/App/Board_Communication_Task
+                    User/App/Calibrate_Task
+                    User/App/Detect_Task
+                    User/App/Gimbal_Task
+                    User/App/INS_Task
+                    User/App/Referee_Task
 
-        User/Balance
+                    User/Balance
 
-        User/Bsp/adc
-        User/Bsp/buzzer
-        User/Bsp/can
-        User/Bsp/delay
-        User/Bsp/flash
-        User/Bsp/imu_pwm
-        User/Bsp/led
-        User/Bsp/rc
-        User/Bsp/spi
-        User/Bsp/usart
+                    User/Bsp/adc
+                    User/Bsp/buzzer
+                    User/Bsp/can
+                    User/Bsp/delay
+                    User/Bsp/flash
+                    User/Bsp/imu_pwm
+                    User/Bsp/led
+                    User/Bsp/rc
+                    User/Bsp/spi
+                    User/Bsp/usart
 
-        User/Component/decode
-        User/Component/fifo
-        User/Component/packet
+                    User/Component/decode
+                    User/Component/fifo
+                    User/Component/packet
 
-        User/Device/bmi088
-        User/Device/buzzer
-        User/Device/ist8310
-        User/Device/key_board
-        User/Device/motor/DJI_Motor
-        User/Device/remote
+                    User/Device/bmi088
+                    User/Device/buzzer
+                    User/Device/ist8310
+                    User/Device/key_board
+                    User/Device/motor/DJI_Motor
+                    User/Device/remote
 
-        User/Robot_def
+                    User/Robot_def
 )
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx)

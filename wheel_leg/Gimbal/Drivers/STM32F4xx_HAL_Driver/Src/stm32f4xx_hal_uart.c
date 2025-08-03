@@ -192,7 +192,7 @@
     (#) Compared to standard reception services which only consider number of received
         data elements as reception completion criteria, these functions also consider additional events
         as triggers for updating reception status to caller :
-       (+) Detect_Task of inactivity period (RX line has not been active for a given period).
+       (+) Detection of inactivity period (RX line has not been active for a given period).
           (++) RX inactivity detected by IDLE event, i.e. RX line has been in idle state (normally high state)
                for 1 frame time, after last received byte.
 

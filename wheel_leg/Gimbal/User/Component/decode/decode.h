@@ -4,7 +4,8 @@
 
 #ifndef OSX_PROJECT_DECODE_H
 #define OSX_PROJECT_DECODE_H
-#include "struct_typedef.h"
+
+#include <stdint-gcc.h>
 
 //反序列化函数
 void decode_unpack_fifo_data(void);

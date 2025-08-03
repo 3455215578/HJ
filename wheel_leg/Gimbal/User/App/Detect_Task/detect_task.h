@@ -1,10 +1,6 @@
-//
-// Created by xhuanc on 2022/3/10.
-//
+#ifndef _DETECT_TASK_H
+#define _DETECT_TASK_H
 
-#ifndef DEMO1_DETECTION_H
-#define DEMO1_DETECTION_H
-#include "struct_typedef.h"
 #include <stdbool.h>
 #include "cmsis_os.h"
 #include "bsp_buzzer.h"
