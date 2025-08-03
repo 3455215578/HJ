@@ -17,11 +17,10 @@
 /*********************************************************************************************************
 *                                              包含头文件
 *********************************************************************************************************/
-#include "Balance.h"
 #include "gimbal_task.h"
 #include "launcher.h"
 #include "protocol_balance.h"
-#include "Atti.h"
+#include "ins_task.h"
 #include "packet.h"
 #include "cmsis_os.h"
 #include "board_communication_task.h"
@@ -29,7 +28,7 @@
 /*********************************************************************************************************
 *                                              内部变量
 *********************************************************************************************************/
-gimbal_t gimbal;
+
 vision_t vision_data;   // 给视觉传信息
 extern robot_ctrl_info_t robot_ctrl;    // 获取视觉信息
 //todo: 图传的
@@ -127,7 +126,7 @@ void Gimbal_task(void const*pvParameters) {
 
         DJI_Send_Motor_Mapping(CAN_1,
                                CAN_DJI_MOTOR_0x1FF_ID,
-                               0,      //205 yaw
+                               gimbal.yaw.target_current,      //205 yaw
                                0,     //206 pitch
                                0,                               //207 无
                                0                                //208 无
@@ -151,7 +150,7 @@ void Gimbal_task(void const*pvParameters) {
   */
 static void Gimbal_Init(void) {
 
-    gimbal.mode = gimbal.last_mode = GIMBAL_DISABLE;
+    gimbal.gimbal_ctrl_mode = gimbal.gimbal_last_ctrl_mode = GIMBAL_DISABLE;
 
     /* pit 轴电机角度环和速度环PID初始化 */
     pid_init(&gimbal.pitch.speed_p,
@@ -242,7 +241,7 @@ static void Send_Vision_Data(void)
 
 
     /* 给视觉发开自瞄 */
-    if (gimbal.mode == GIMBAL_AUTO)
+    if (gimbal.gimbal_ctrl_mode == GIMBAL_AUTO)
     {
         vision_data.mode = 0x21;
     }
@@ -331,8 +330,8 @@ static void Gimbal_Mode_Set(void)
         /** 拨到下面，云台失能 **/
         case RC_SW_DOWN:
         {
-            gimbal.last_mode = gimbal.mode;
-            gimbal.mode = GIMBAL_DISABLE;
+            gimbal.gimbal_last_ctrl_mode = gimbal.gimbal_ctrl_mode;
+            gimbal.gimbal_ctrl_mode = GIMBAL_DISABLE;
         } break;
 
         /** 拨到中间或上面，云台使能 **/
@@ -343,13 +342,13 @@ static void Gimbal_Mode_Set(void)
             if (((KeyBoard.Mouse_r.status == KEY_PRESS) && (robot_ctrl.target_lock == 0x31) && (detect_list[DETECT_AUTO_AIM].status == ONLINE))
                 ||((rc_ctrl.rc.ch[GIMBAL_AUTO_CHANNEL]> 50) && (robot_ctrl.target_lock == 0x31) && (detect_list[DETECT_AUTO_AIM].status == ONLINE)))
             {
-                gimbal.last_mode = GIMBAL_ACTIVE;
-                gimbal.mode = GIMBAL_AUTO;
+                gimbal.gimbal_last_ctrl_mode = GIMBAL_ENABLE;
+                gimbal.gimbal_ctrl_mode = GIMBAL_AUTO;
             }
             else
             {
-                gimbal.last_mode = gimbal.mode;
-                gimbal.mode = GIMBAL_ACTIVE;
+                gimbal.gimbal_last_ctrl_mode = gimbal.gimbal_ctrl_mode;
+                gimbal.gimbal_ctrl_mode = GIMBAL_ENABLE;
             }
         } break;
 
@@ -358,12 +357,12 @@ static void Gimbal_Mode_Set(void)
     }
 
     /** 退出自瞄模式 **/
-    if (gimbal.mode == GIMBAL_AUTO)
+    if (gimbal.gimbal_ctrl_mode == GIMBAL_AUTO)
     {
         if ((detect_list[DETECT_AUTO_AIM].status == OFFLINE) || robot_ctrl.target_lock == 0x32) //0x32表示自瞄数据无效
         {
-            gimbal.last_mode = GIMBAL_AUTO;
-            gimbal.mode = GIMBAL_ACTIVE;
+            gimbal.gimbal_last_ctrl_mode = GIMBAL_AUTO;
+            gimbal.gimbal_ctrl_mode = GIMBAL_ENABLE;
         }
     }
 }
@@ -376,13 +375,13 @@ static void Gimbal_Mode_Set(void)
   * @retval         返回空
   */
 static void Gimbal_Control(void) {
-    switch (gimbal.mode)
+    switch (gimbal.gimbal_ctrl_mode)
     {
         case GIMBAL_DISABLE://云台失能（fire, pitch, single_shoot）
             Gimbal_Disable();
             break;
 
-        case GIMBAL_ACTIVE: {//云台控制
+        case GIMBAL_ENABLE: {//云台控制
             Gimbal_Active_Handle();  //得到遥控器对云台电机的控制
             Gimbal_Current_Calc();  //云台电机闭环控制函数
         } break;

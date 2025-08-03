@@ -12492,7 +12492,7 @@ typedef struct
 #define USART_SR_TXE                  USART_SR_TXE_Msk                         /*!<Transmit Data Register Empty */
 #define USART_SR_LBD_Pos              (8U)
 #define USART_SR_LBD_Msk              (0x1UL << USART_SR_LBD_Pos)               /*!< 0x00000100 */
-#define USART_SR_LBD                  USART_SR_LBD_Msk                         /*!<LIN Break Detection Flag     */
+#define USART_SR_LBD                  USART_SR_LBD_Msk                         /*!<LIN Break Detect_Task Flag     */
 #define USART_SR_CTS_Pos              (9U)
 #define USART_SR_CTS_Msk              (0x1UL << USART_SR_CTS_Pos)               /*!< 0x00000200 */
 #define USART_SR_CTS                  USART_SR_CTS_Msk                         /*!<CTS Flag                     */
@@ -12563,10 +12563,10 @@ typedef struct
 #define USART_CR2_ADD                 USART_CR2_ADD_Msk                        /*!<Address of the USART node            */
 #define USART_CR2_LBDL_Pos            (5U)
 #define USART_CR2_LBDL_Msk            (0x1UL << USART_CR2_LBDL_Pos)             /*!< 0x00000020 */
-#define USART_CR2_LBDL                USART_CR2_LBDL_Msk                       /*!<LIN Break Detection Length           */
+#define USART_CR2_LBDL                USART_CR2_LBDL_Msk                       /*!<LIN Break Detect_Task Length           */
 #define USART_CR2_LBDIE_Pos           (6U)
 #define USART_CR2_LBDIE_Msk           (0x1UL << USART_CR2_LBDIE_Pos)            /*!< 0x00000040 */
-#define USART_CR2_LBDIE               USART_CR2_LBDIE_Msk                      /*!<LIN Break Detection Interrupt Enable */
+#define USART_CR2_LBDIE               USART_CR2_LBDIE_Msk                      /*!<LIN Break Detect_Task Interrupt Enable */
 #define USART_CR2_LBCL_Pos            (8U)
 #define USART_CR2_LBCL_Msk            (0x1UL << USART_CR2_LBCL_Pos)             /*!< 0x00000100 */
 #define USART_CR2_LBCL                USART_CR2_LBCL_Msk                       /*!<Last Bit Clock pulse                 */

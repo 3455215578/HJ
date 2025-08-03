@@ -2,7 +2,7 @@
 // Created by xhuanc on 2022/3/10.
 //
 
-#include "Detection.h"
+#include "detect_task.h"
 
 #define DETECT_TASK_INIT_TIME 800//8000
 #define buzzer_remind() buzzer_on(1,18888);

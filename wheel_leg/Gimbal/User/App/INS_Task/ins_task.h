@@ -76,8 +76,9 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
 
-#ifndef INS_Task_H
-#define INS_Task_H
+#ifndef INS_TASK_H
+#define INS_TASK_H
+
 #include "struct_typedef.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -87,7 +88,7 @@
 #include "ist8310driver.h"
 #include "PID.h"
 #include "AHRS.h"
-#include "Calibrate.h"
+#include "calibrate_task.h"
 
 #define SPI_DMA_GYRO_LENGHT       8
 #define SPI_DMA_ACCEL_LENGHT      9

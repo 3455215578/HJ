@@ -1,6 +1,6 @@
 #include "bsp_can.h"
 #include "main.h"
-#include "Detection.h"
+#include "detect_task.h"
 #include "DJI_Motor.h"
 #include "gimbal_task.h"
 #include "launcher.h"
@@ -60,18 +60,21 @@ uint32_t get_can_free_mail(CAN_HandleTypeDef* hcan)
 static void CAN1_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
 {
     switch (CAN1_RxFrame.Header.StdId) {
+
         case CAN_LAUNCHER_FIRE_L: //201
         {
             DJI_Motor_Decode(&launcher.fire_l.motor_measure, Data);
             detect_handle(DETECT_LAUNCHER_3508_FIRE_L);
             break;
         }
+
         case CAN_LAUNCHER_FIRE_R: //202
         {
             DJI_Motor_Decode(&launcher.fire_r.motor_measure, Data);
             detect_handle(DETECT_LAUNCHER_3508_FIRE_R);
             break;
         }
+
         case CAN_LAUNCHER_TRIGGER: //203
         {
             DJI_Motor_Decode(&launcher.trigger.motor_measure, Data);
@@ -79,6 +82,7 @@ static void CAN1_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
             detect_handle(DETECT_LAUNCHER_3508_TRIGGER);
             break;
         }
+
         case CAN_GIMBAL_YAW: //205
         {
             DJI_Motor_Decode(&gimbal.yaw.motor_measure, Data);

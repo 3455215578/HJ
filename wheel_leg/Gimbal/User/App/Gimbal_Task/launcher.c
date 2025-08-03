@@ -2,6 +2,7 @@
 #include "gimbal_task.h"
 #include "key_board.h"
 #include "protocol_balance.h"
+#include "robot_def.h"
 
 /**
  *
@@ -12,7 +13,6 @@
 /*********************************************************************************************************
 *                                              内部变量                                                   *
 *********************************************************************************************************/
-launcher_t launcher;                    // 发射机构数据
 extern robot_ctrl_info_t robot_ctrl;    // 上位机数据
 static fp32 trigger_target_total_ecd = 0;      // 总拨盘电机转动ECD
 static uint32_t trigger_time = 0;       // 拨盘电机每次转动时间
@@ -83,7 +83,7 @@ static void Trigger_Mode_Set() {
         /** A: 这里修正一下，是判断遥控器左键在不在最下面，在最下面就是连发 **/
 
 #endif //!BRUSTS
-        if ((gimbal.mode == GIMBAL_AUTO) && (robot_ctrl.fire_command == 1))
+        if ((gimbal.gimbal_ctrl_mode == GIMBAL_AUTO) && (robot_ctrl.fire_command == 1))
         {/** 当云台为自瞄模式且接收到视觉火控开启标志位为1时，准备进入单发模式，即视觉发一帧火控数据拨盘就转动一个弹丸角度 **/
             launcher.trigger_mode = SHOOT_READY_TO_SINGLE;
         }
@@ -333,22 +333,22 @@ void Launcher_Mode_Set() {
     if ((!switch_is_up(rc_last_sw_L)) && switch_is_up(rc_ctrl.rc.s[RC_s_L]))
     {
         // 不懂键盘
-        if ((KeyBoard.Q.click_flag == 1) && (gimbal.mode != GIMBAL_DISABLE))
+        if ((KeyBoard.Q.click_flag == 1) && (gimbal.gimbal_ctrl_mode != GIMBAL_DISABLE))
         {
             KeyBoard.Q.click_flag = 0;
         }
-        else if ((KeyBoard.Q.click_flag == 0) && (gimbal.mode != GIMBAL_DISABLE))
+        else if ((KeyBoard.Q.click_flag == 0) && (gimbal.gimbal_ctrl_mode != GIMBAL_DISABLE))
         {
             KeyBoard.Q.click_flag = 1;
         }
     }
 
     /** 根据上面对 Q键 的值进行判断，决定摩擦轮是否开启 **/
-    if ((KeyBoard.Q.click_flag == 1) && (gimbal.mode != GIMBAL_DISABLE))
+    if ((KeyBoard.Q.click_flag == 1) && (gimbal.gimbal_ctrl_mode != GIMBAL_DISABLE))
     {
         launcher.fir_wheel_mode = Fire_ON;
     }
-    else if ((KeyBoard.Q.click_flag == 0) && (gimbal.mode != GIMBAL_DISABLE))
+    else if ((KeyBoard.Q.click_flag == 0) && (gimbal.gimbal_ctrl_mode != GIMBAL_DISABLE))
     {
         launcher.fir_wheel_mode = Fire_OFF;
     }
@@ -413,7 +413,7 @@ void Launcher_Mode_Set() {
 void Launcher_Control(void) {
 
     /** 云台失能时 **/
-    if (gimbal.mode == GIMBAL_DISABLE)
+    if (gimbal.gimbal_ctrl_mode == GIMBAL_DISABLE)
     {
         Launcher_Disable();
     }

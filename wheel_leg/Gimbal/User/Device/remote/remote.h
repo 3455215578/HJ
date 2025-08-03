@@ -8,7 +8,7 @@
 
 #include "struct_typedef.h"
 #include "bsp_rc.h"
-#include "Detection.h"
+#include "detect_task.h"
 #include "user_lib.h"
 
 #define SBUS_RX_BUF_NUM 36u

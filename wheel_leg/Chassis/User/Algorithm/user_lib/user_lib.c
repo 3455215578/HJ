@@ -265,3 +265,10 @@ float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS)
     return OLS->k * OLS->x[OLS->Order - 1] + OLS->b;
 }
 
+void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, float frame_period,  float num)
+{
+    first_order_filter_type->frame_period = frame_period;
+    first_order_filter_type->num[0] = num;
+    first_order_filter_type->input = 0.0f;
+    first_order_filter_type->out = 0.0f;
+}

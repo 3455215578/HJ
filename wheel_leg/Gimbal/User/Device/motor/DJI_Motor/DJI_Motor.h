@@ -1,7 +1,3 @@
-//
-// Created by Pazfic on 2024/10/26.
-//
-
 #ifndef DHSENTRY_CHASSIS_DJI_MOTOR_H
 #define DHSENTRY_CHASSIS_DJI_MOTOR_H
 

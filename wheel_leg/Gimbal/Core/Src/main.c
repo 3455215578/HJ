@@ -39,8 +39,8 @@
 #include "BMI088driver.h"
 #include "buzzer.h"
 #include "bsp_usart.h"
-#include "Referee.h"
-#include "Calibrate.h"
+#include "../../User/App/Referee_Task/referee_task.h"
+#include "calibrate_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

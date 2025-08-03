@@ -27,7 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "robot_def.h"
 #include "buzzer.h"
-#include "Atti.h"
+#include "ins_task.h"
 #include "gimbal_task.h"
 #include "decode.h"
 #include "usb_task.h"

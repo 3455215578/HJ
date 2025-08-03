@@ -8,6 +8,7 @@
 #include "can_device.h"
 #include "user_lib.h"
 #include "DJI_motor.h"
+#include "filter.h"
 
 
 /*******************************************************************************
@@ -353,14 +354,16 @@ typedef struct{
     /** 离地后的腿长PID **/
     Pid offground_leg_pid; // 离地后的腿长pid  使腿尽量接近地面，增加缓冲
 
-    float wheel_torque; // 轮毂力矩
-    float joint_F_torque; // 关节力矩
-    float joint_B_torque;
 
     /** 竖直方向支持力 **/
     MovingAverageFilter theta_ddot_filter; // dd_theta的移动平均滤波器, 用于计算竖直方向支持力Fn
     MovingAverageFilter Fn_filter; // 竖直方向支持力Fn的移动平均滤波器
     float Fn; // 竖直方向支持力
+
+    float wheel_torque; // 轮毂力矩
+    float joint_F_torque; // 关节力矩
+    float joint_B_torque;
+
 
 } Leg;
 
@@ -417,6 +420,18 @@ typedef struct{
 
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
+
+/*******************************************************************************
+ *                                    上层机构                                  *
+ *******************************************************************************/
+
+/*************************   发射机构   ******************************/
+
+
+
+
+
+/***************************   云台   ********************************/
 
 
 #endif

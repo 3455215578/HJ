@@ -4,7 +4,7 @@
 
 #ifndef DEMO1_REFEREE_H
 #define DEMO1_REFEREE_H
-#include "Balance.h"
+
 #include "stdbool.h"
 #include "CRC8_CRC16.h"
 #include "bsp_usart.h"

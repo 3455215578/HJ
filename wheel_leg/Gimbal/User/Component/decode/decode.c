@@ -10,7 +10,7 @@
 #include "cmsis_os.h"
 #include "bsp_usart.h"
 #include "decode.h"
-#include "Detection.h"
+#include "detect_task.h"
 
 extern robot_ctrl_info_t robot_ctrl;
 //static om_topic_t* robot_ctrl_topic;
