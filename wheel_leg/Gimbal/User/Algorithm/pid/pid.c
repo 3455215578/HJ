@@ -48,7 +48,7 @@ static void abs_limit(float *a, float ABS_MAX)
   * @param[in] intergral_limit: 积分限幅
   * @param[in] kp/ki/kd: 具体 PID 参数
   */
-void pid_init(pid_type_def *pid, uint32_t max_out, uint32_t intergral_limit, \
+void pid_init(Pid *pid, uint32_t max_out, uint32_t intergral_limit, \
               float kp, float ki, float kd)
 {
     pid->integral_limit = intergral_limit;
@@ -66,7 +66,7 @@ void pid_init(pid_type_def *pid, uint32_t max_out, uint32_t intergral_limit, \
   * @param[in] set: 目标数据
   * @retval    PID 计算输出
   */
-float pid_calc(pid_type_def *pid, float get, float set)
+float pid_calc(Pid *pid, float get, float set)
 {
     pid->get = get;
     pid->set = set;
@@ -85,7 +85,7 @@ float pid_calc(pid_type_def *pid, float get, float set)
     return pid->out;
 }
 
-float pid_loop_calc(pid_type_def *pid,float get,float set,float max_value,float min_value){
+float pid_loop_calc(Pid *pid,float get,float set,float max_value,float min_value){
     float gap,mid;
     mid=(max_value-min_value)/2;
     gap=set-get;
@@ -108,7 +108,7 @@ float pid_loop_calc(pid_type_def *pid,float get,float set,float max_value,float 
   * @param[in] pid: PID 结构体
   * @param[in] kp/ki/kd: 具体 PID 参数
   */
-void pid_reset(pid_type_def *pid, float kp, float ki, float kd)
+void pid_reset(Pid *pid, float kp, float ki, float kd)
 {
     pid->p = kp;
     pid->i = ki;
@@ -129,7 +129,7 @@ void pid_reset(pid_type_def *pid, float kp, float ki, float kd)
  * @param err_threshold 积分分离阈值
  * @return
  */
-float pid_calc_KI_Separation(pid_type_def* pid,float get,float set,float err_threshold)
+float pid_calc_KI_Separation(Pid* pid,float get,float set,float err_threshold)
 {
     pid->get = get;
     pid->set = set;
@@ -156,7 +156,7 @@ float pid_calc_KI_Separation(pid_type_def* pid,float get,float set,float err_thr
 }
 
 
-float pid_calc_balance(pid_type_def *pid, float get, float set,float gyro_y)
+float pid_calc_balance(Pid *pid, float get, float set,float gyro_y)
 {
     pid->get = get;
     pid->set = set;

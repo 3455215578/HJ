@@ -3,8 +3,8 @@
 #include "BMI088Middleware.h"
 
 
-float BMI088_ACCEL_SEN = BMI088_ACCEL_3G_SEN;
-float BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
+fp32 BMI088_ACCEL_SEN = BMI088_ACCEL_3G_SEN;
+fp32 BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
 
 
 
@@ -114,7 +114,7 @@ uint8_t BMI088_init(void)
     return error;
 }
 
-bool bmi088_accel_init(void)
+bool_t bmi088_accel_init(void)
 {
     volatile uint8_t res = 0;
     uint8_t write_reg_num = 0;
@@ -159,7 +159,7 @@ bool bmi088_accel_init(void)
     return BMI088_NO_ERROR;
 }
 
-bool bmi088_gyro_init(void)
+bool_t bmi088_gyro_init(void)
 {
     uint8_t write_reg_num = 0;
     uint8_t res = 0;
@@ -204,7 +204,7 @@ bool bmi088_gyro_init(void)
     return BMI088_NO_ERROR;
 }
 
-bool bmi088_accel_self_test(void)
+bool_t bmi088_accel_self_test(void)
 {
 
     int16_t self_test_accel[2][3];
@@ -316,7 +316,7 @@ bool bmi088_accel_self_test(void)
 
     return BMI088_NO_ERROR;
 }
-bool bmi088_gyro_self_test(void)
+bool_t bmi088_gyro_self_test(void)
 {
     uint8_t res = 0;
     uint8_t retry = 0;
@@ -377,7 +377,7 @@ void BMI088_read_accel_who_am_i(void)
 
 
 
-void BMI088_temperature_read_over(uint8_t *rx_buf, float *temperate)
+void BMI088_temperature_read_over(uint8_t *rx_buf, fp32 *temperate)
 {
     int16_t bmi088_raw_temp;
     bmi088_raw_temp = (int16_t)((rx_buf[0] << 3) | (rx_buf[1] >> 5));
@@ -390,7 +390,7 @@ void BMI088_temperature_read_over(uint8_t *rx_buf, float *temperate)
 
 }
 
-void BMI088_accel_read_over(uint8_t *rx_buf, float accel[3], float *time)
+void BMI088_accel_read_over(uint8_t *rx_buf, fp32 accel[3], fp32 *time)
 {
     int16_t bmi088_raw_temp;
     uint32_t sensor_time;
@@ -405,7 +405,7 @@ void BMI088_accel_read_over(uint8_t *rx_buf, float accel[3], float *time)
 
 }
 
-void BMI088_gyro_read_over(uint8_t *rx_buf, float gyro[3])
+void BMI088_gyro_read_over(uint8_t *rx_buf, fp32 gyro[3])
 {
     int16_t bmi088_raw_temp;
     bmi088_raw_temp = (int16_t)((rx_buf[1]) << 8) | rx_buf[0];
@@ -416,7 +416,7 @@ void BMI088_gyro_read_over(uint8_t *rx_buf, float gyro[3])
     gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
 }
 
-void BMI088_read(float gyro[3], float accel[3], float *temperate)
+void BMI088_read(fp32 gyro[3], fp32 accel[3], fp32 *temperate)
 {
     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
     int16_t bmi088_raw_temp;
@@ -463,10 +463,10 @@ uint32_t get_BMI088_sensor_time(void)
     return sensor_time;
 }
 
-float get_BMI088_temperate(void)
+fp32 get_BMI088_temperate(void)
 {
     uint8_t buf[2];
-    float temperate;
+    fp32 temperate;
     int16_t temperate_raw_temp;
 
     BMI088_accel_read_muli_reg(BMI088_TEMP_M, buf, 2);
@@ -498,7 +498,7 @@ void get_BMI088_gyro(int16_t gyro[3])
     gyro[2] = gyro_raw_temp ;
 }
 
-void get_BMI088_accel(float accel[3])
+void get_BMI088_accel(fp32 accel[3])
 {
     uint8_t buf[6] = {0, 0, 0, 0, 0, 0};
     int16_t accel_raw_temp;

@@ -6,6 +6,7 @@
 #define _REMOTE_H_
 
 
+#include "struct_typedef.h"
 #include "bsp_rc.h"
 #include "detect_task.h"
 #include "user_lib.h"

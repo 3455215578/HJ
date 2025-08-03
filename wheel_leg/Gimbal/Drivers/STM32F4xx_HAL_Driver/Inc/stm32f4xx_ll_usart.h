@@ -303,7 +303,7 @@ typedef struct
   * @}
   */
 
-/** @defgroup USART_LL_EC_LINBREAK_DETECT LIN Break Detection Length
+/** @defgroup USART_LL_EC_LINBREAK_DETECT LIN Break Detect_Task Length
   * @{
   */
 #define LL_USART_LINBREAK_DETECT_10B            0x00000000U           /*!< 10-bit break detection method selected */
@@ -1374,7 +1374,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledHalfDuplex(const USART_TypeDef *USART
   */
 
 /**
-  * @brief  Set LIN Break Detection Length
+  * @brief  Set LIN Break Detect_Task Length
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll CR2          LBDL          LL_USART_SetLINBrkDetectionLen
@@ -1390,7 +1390,7 @@ __STATIC_INLINE void LL_USART_SetLINBrkDetectionLen(USART_TypeDef *USARTx, uint3
 }
 
 /**
-  * @brief  Return LIN Break Detection Length
+  * @brief  Return LIN Break Detect_Task Length
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll CR2          LBDL          LL_USART_GetLINBrkDetectionLen
@@ -1541,7 +1541,7 @@ __STATIC_INLINE void LL_USART_ConfigSyncMode(USART_TypeDef *USARTx)
   *         - Clear HDSEL in CR3 using @ref LL_USART_DisableHalfDuplex() function
   *         - Set LINEN in CR2 using @ref LL_USART_EnableLIN() function
   * @note   Other remaining configurations items related to LIN Mode
-  *         (as Baud Rate, Word length, LIN Break Detection Length, ...) should be set using
+  *         (as Baud Rate, Word length, LIN Break Detect_Task Length, ...) should be set using
   *         dedicated functions
   * @rmtoll CR2          CLKEN         LL_USART_ConfigLINMode\n
   *         CR2          STOP          LL_USART_ConfigLINMode\n
@@ -1817,7 +1817,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXE(const USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Check if the USART LIN Break Detection Flag is set or not
+  * @brief  Check if the USART LIN Break Detect_Task Flag is set or not
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll SR           LBD           LL_USART_IsActiveFlag_LBD
@@ -1982,7 +1982,7 @@ __STATIC_INLINE void LL_USART_ClearFlag_RXNE(USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Clear LIN Break Detection Flag
+  * @brief  Clear LIN Break Detect_Task Flag
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll SR           LBD           LL_USART_ClearFlag_LBD
@@ -2071,7 +2071,7 @@ __STATIC_INLINE void LL_USART_EnableIT_PE(USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Enable LIN Break Detection Interrupt
+  * @brief  Enable LIN Break Detect_Task Interrupt
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll CR2          LBDIE         LL_USART_EnableIT_LBD
@@ -2167,7 +2167,7 @@ __STATIC_INLINE void LL_USART_DisableIT_PE(USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Disable LIN Break Detection Interrupt
+  * @brief  Disable LIN Break Detect_Task Interrupt
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll CR2          LBDIE         LL_USART_DisableIT_LBD
@@ -2263,7 +2263,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_PE(const USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Check if the USART LIN Break Detection Interrupt is enabled or disabled.
+  * @brief  Check if the USART LIN Break Detect_Task Interrupt is enabled or disabled.
   * @note   Macro IS_UART_LIN_INSTANCE(USARTx) can be used to check whether or not
   *         LIN feature is supported by the USARTx instance.
   * @rmtoll CR2          LBDIE         LL_USART_IsEnabledIT_LBD

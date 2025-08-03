@@ -17,7 +17,7 @@ volatile float integralFBx = 0.0f,  integralFBy = 0.0f, integralFBz = 0.0f;	// i
   * @param[in]      用于初始化的磁力计计,(x,y,z)不为空 单位 uT
   * @retval         返回空
   */
-void AHRS_init(float quat[4],const float accel[3], const float mag[3])
+void AHRS_init(fp32 quat[4],const fp32 accel[3], const fp32 mag[3])
 {
     quat[0] = 1.0f;
     quat[1] = 0.0f;
@@ -25,7 +25,7 @@ void AHRS_init(float quat[4],const float accel[3], const float mag[3])
     quat[3] = 0.0f;
 }
 
-bool AHRS_update(float quat[4],  float timing_time,  float gyro[3],  float accel[3],  float mag[3])
+bool_t AHRS_update(fp32 quat[4],  fp32 timing_time,  fp32 gyro[3],  fp32 accel[3],  fp32 mag[3])
 {
     MahonyAHRSupdate(quat, gyro[0], gyro[1], gyro[2], accel[0], accel[1], accel[2], mag[0], mag[1], mag[2]);
 }
@@ -197,7 +197,7 @@ void MahonyAHRSupdateIMU(float q[4], float gx, float gy, float gz, float ax, flo
     q[3] *= recipNorm;
 }
 
-void get_angle(const float quat[4], float *yaw, float *pitch, float *roll){
+void get_angle(const fp32 quat[4], fp32 *yaw, fp32 *pitch, fp32 *roll){
 
     *yaw = (atan2f(2.0f*(quat[0]*quat[3]+quat[1]*quat[2]), 2.0f*(quat[0]*quat[0]+quat[1]*quat[1])-1.0f));
     *pitch = (asinf(-2.0f*(quat[1]*quat[3]-quat[0]*quat[2])));

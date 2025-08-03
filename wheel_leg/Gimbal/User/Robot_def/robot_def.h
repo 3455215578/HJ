@@ -24,7 +24,7 @@
 
 /* 云台回中编码值 */
 #define PITCH_OFFSET_ECD 0
-#define YAW_OFFSET_ECD 7496
+#define YAW_OFFSET_ECD 7460
 
 
 /** PID参数 **/
@@ -69,15 +69,15 @@ typedef enum {
 typedef struct {
     DJI_Motor_t motor_measure;    // 电机的真实信息
 
-    pid_type_def speed_p;   //速度环 PID 控制参数
-    pid_type_def angle_p;   //角度环 PID 控制参数
-    float gyro_set;          //转速设置
+    Pid speed_pid;   //速度环 PID 控制参数
+    Pid angle_pid;   //角度环 PID 控制参数
+    fp32 gyro_set;          //转速设置
     int16_t target_current;   //设置电流值
 
-    float relative_angle_set; //°    设定
-    float relative_angle_get; //°    获取
-    float absolute_angle_set; //      rad
-    float absolute_angle_get; //      云台角
+    fp32 relative_angle_set; //°    设定
+    fp32 relative_angle_get; //°    获取
+    fp32 absolute_angle_set; //      rad
+    fp32 absolute_angle_get; //      云台角
 }Motor_Gimbal_t;
 
 
@@ -90,8 +90,8 @@ typedef struct {
     Gimbal_Mode_e gimbal_ctrl_mode;
     Gimbal_Mode_e gimbal_last_ctrl_mode;
 
-    float absolute_gyro_yaw;
-    float absolute_gyro_pitch;
+    fp32 absolute_gyro_yaw;
+    fp32 absolute_gyro_pitch;
 
     first_order_filter_type_t mouse_in_y;
     first_order_filter_type_t mouse_in_x;
@@ -168,10 +168,11 @@ typedef enum{
 typedef struct {
     DJI_Motor_t motor_measure;    // 电机的真实信息
 
-    float target_speed;            // 摩擦轮转速设定值
-    pid_type_def speed_p;         // 拨盘速度环pid
-    pid_type_def angle_p;         // 拨盘角度环pid
-    int16_t target_current;         // 期望电流值
+    fp32 target_speed;            // 摩擦轮转速设定值
+    Pid speed_pid;                // 拨盘速度环pid
+    Pid angle_pid;                // 拨盘角度环pid
+    int16_t target_current;       // 期望电流值
+
 }Motor_Launcher_t;
 
 /** 发射机构结构体 **/

@@ -1,8 +1,7 @@
 #ifndef BMI088MIDDLEWARE_H
 #define BMI088MIDDLEWARE_H
 
-
-#include <stdint-gcc.h>
+#include "struct_typedef.h"
 
 #define BMI088_USE_SPI
 //#define BMI088_USE_IIC

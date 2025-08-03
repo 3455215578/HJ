@@ -35,11 +35,11 @@ uint8_t bit_2;
 
 /*函数和声明*/
 static void referee_unpack_fifo_data(void);
-static bool Referee_read_data(uint8_t *ReadFromUsart);
+static bool_t Referee_read_data(uint8_t *ReadFromUsart);
 static void ui_static_draw();
 /*裁判系统主任务*/
 
-extern float INS_angle[3];
+extern fp32 INS_angle[3];
 
 void USART1_IRQHandler(void)
 {
@@ -167,7 +167,7 @@ void judge_team_client(){
 
 float all_rpm_mul_current = 0;
 float all_current_pingfang = 0;
-bool Referee_read_data(uint8_t *ReadFromUsart)
+bool_t Referee_read_data(uint8_t *ReadFromUsart)
 {
     int CmdID=0;//数据命令码解析
 

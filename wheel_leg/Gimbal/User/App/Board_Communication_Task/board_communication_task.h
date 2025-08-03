@@ -10,7 +10,7 @@ union I16 {
 };
 
 /** 板间发送函数 **/
-void Gimbal_Send_Chassis(int16_t vx_channel, int16_t yaw_channel, char sl, char sr);
+void Send_Chassis_Speed(int16_t vx_channel, int16_t yaw_channel, char sl, char sr);
 void Send_Control(int32_t W, int32_t A, int32_t S, int32_t D);
 
 /** 板间接收函数 **/

@@ -79,6 +79,7 @@
 #ifndef INS_TASK_H
 #define INS_TASK_H
 
+#include "struct_typedef.h"
 #include "main.h"
 #include "cmsis_os.h"
 #include "bsp_imu_pwm.h"
@@ -140,9 +141,9 @@
 #define INS_MAG_Z_ADDRESS_OFFSET 2
 
 typedef struct {
-    float yaw;
-    float pitch;
-    float roll;
+    fp32 yaw;
+    fp32 pitch;
+    fp32 roll;
 }Eulr_t;
 
 
@@ -172,7 +173,7 @@ extern void INS_task(void const *pvParameters);
   * @param[out]     陀螺仪的时刻，每次在gyro_offset调用会加1,
   * @retval         none
   */
-extern void INS_cali_gyro(float cali_scale[3], float cali_offset[3], uint16_t *time_count);
+extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 
 /**
   * @brief          get gyro zero drift from flash
@@ -186,7 +187,7 @@ extern void INS_cali_gyro(float cali_scale[3], float cali_offset[3], uint16_t *t
   * @param[in]      陀螺仪的零漂
   * @retval         none
   */
-extern void INS_set_cali_gyro(float cali_scale[3], float cali_offset[3]);
+extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);
 
 /**
   * @brief          get the quat
@@ -198,7 +199,7 @@ extern void INS_set_cali_gyro(float cali_scale[3], float cali_offset[3]);
   * @param[in]      none
   * @retval         INS_quat的指针
   */
-extern const float *get_INS_quat_point(void);
+extern const fp32 *get_INS_quat_point(void);
 
 
 /**
@@ -211,7 +212,7 @@ extern const float *get_INS_quat_point(void);
   * @param[in]      none
   * @retval         INS_angle的指针
   */
-extern const float *get_INS_angle_point(void);
+extern const fp32 *get_INS_angle_point(void);
 
 
 /**
@@ -224,7 +225,7 @@ extern const float *get_INS_angle_point(void);
   * @param[in]      none
   * @retval         INS_gyro的指针
   */
-extern const float *get_gyro_data_point(void);
+extern const fp32 *get_gyro_data_point(void);
 
 
 /**
@@ -237,7 +238,7 @@ extern const float *get_gyro_data_point(void);
   * @param[in]      none
   * @retval         INS_gyro的指针
   */
-extern const float *get_accel_data_point(void);
+extern const fp32 *get_accel_data_point(void);
 
 /**
   * @brief          get mag, 0:x-axis, 1:y-axis, 2:roll-axis unit ut
@@ -249,10 +250,10 @@ extern const float *get_accel_data_point(void);
   * @param[in]      none
   * @retval         INS_mag的指针
   */
-extern const float *get_mag_data_point(void);
+extern const fp32 *get_mag_data_point(void);
 
-extern float INS_gyro[3] ;
-extern float INS_quat[4];
-extern float INS_angle[3];
+extern fp32 INS_gyro[3] ;
+extern fp32 INS_quat[4];
+extern fp32 INS_angle[3];
 
 #endif

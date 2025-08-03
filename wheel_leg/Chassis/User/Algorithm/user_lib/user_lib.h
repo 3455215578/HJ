@@ -103,6 +103,5 @@ float Get_OLS_Derivative(Ordinary_Least_Squares_t *OLS);
 float OLS_Smooth(Ordinary_Least_Squares_t *OLS, float deltax, float y);
 float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS);
 
-void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, float frame_period,  float num);
 
 #endif

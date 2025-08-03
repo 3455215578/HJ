@@ -49,8 +49,6 @@ else ()
 endif ()
 
 include_directories(${includes}
-
-        User/Algorithm/filter
         User/Algorithm/controller
         User/Algorithm/filter/moving_filter
         User/Algorithm/filter/low_pass_filter

@@ -99,6 +99,7 @@
 #ifndef _CALIBRATE_H_
 #define _CALIBRATE_H_
 
+#include "struct_typedef.h"
 #include "string.h"
 #include "bsp_flash.h"
 #include "remote.h"
@@ -182,7 +183,7 @@ typedef struct {
     uint8_t flash_len: 7;                              //buf lenght
     uint8_t cali_cmd: 1;                               //1 means to run cali hook function,
     uint32_t *flash_buf;                                //link to device calibration data
-    bool (*cali_hook)(uint32_t *point, bool cmd);   //cali function
+    bool_t (*cali_hook)(uint32_t *point, bool_t cmd);   //cali function
 } cali_sensor_t;
 
 //header device
@@ -192,21 +193,21 @@ typedef struct {
     //'temperature' and 'latitude' should not be in the head_cali, because don't want to create a new sensor
     //'temperature' and 'latitude'不应该在head_cali,因为不想创建一个新的设备就放这了
     int8_t temperature;         // imu control temperature
-    float latitude;              // latitude
+    fp32 latitude;              // latitude
 } head_cali_t;
 //gimbal device
 typedef struct {
     uint16_t yaw_offset;
     uint16_t pitch_offset;
-    float yaw_max_angle;
-    float yaw_min_angle;
-    float pitch_max_angle;
-    float pitch_min_angle;
+    fp32 yaw_max_angle;
+    fp32 yaw_min_angle;
+    fp32 pitch_max_angle;
+    fp32 pitch_min_angle;
 } gimbal_cali_t;
 //gyro, accel, mag device
 typedef struct {
-    float offset[3]; //x,y,z
-    float scale[3];  //x,y,z
+    fp32 offset[3]; //x,y,z
+    fp32 scale[3];  //x,y,z
 } imu_cali_t;
 
 

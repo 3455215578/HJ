@@ -57,7 +57,7 @@
   * @param[in]      ist8310: 磁力计数据
   * @retval         none
   */
-static void imu_cali_slove(float gyro[3], float accel[3], float mag[3], bmi088_real_data_t *bmi088, ist8310_real_data_t *ist8310);
+static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], bmi088_real_data_t *bmi088, ist8310_real_data_t *ist8310);
 
 /**
   * @brief          control the temperature of bmi088
@@ -69,7 +69,7 @@ static void imu_cali_slove(float gyro[3], float accel[3], float mag[3], bmi088_r
   * @param[in]      temp:bmi088的温度
   * @retval         none
   */
-static void imu_temp_control(float temp);
+static void imu_temp_control(fp32 temp);
 /**
   * @brief          open the SPI DMA accord to the value of imu_update_flag
   * @param[in]      none
@@ -110,40 +110,40 @@ volatile uint8_t imu_start_dma_flag = 0;
 
 Eulr_t Eulr;
 bmi088_real_data_t bmi088_real_data;
-float gyro_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
-float gyro_offset[3];
-float gyro_cali_offset[3];
+fp32 gyro_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
+fp32 gyro_offset[3];
+fp32 gyro_cali_offset[3];
 
-float accel_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
-float accel_offset[3];
-float accel_cali_offset[3];
+fp32 accel_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
+fp32 accel_offset[3];
+fp32 accel_cali_offset[3];
 
 ist8310_real_data_t ist8310_real_data;
-float mag_scale_factor[3][3] = {IST8310_BOARD_INSTALL_SPIN_MATRIX};
-float mag_offset[3];
-float mag_cali_offset[3];
+fp32 mag_scale_factor[3][3] = {IST8310_BOARD_INSTALL_SPIN_MATRIX};
+fp32 mag_offset[3];
+fp32 mag_cali_offset[3];
 
 static uint8_t first_temperate;
-static const float imu_temp_PID[3] = {TEMPERATURE_PID_KP, TEMPERATURE_PID_KI, TEMPERATURE_PID_KD};
-static pid_type_def imu_temp_pid;
+static const fp32 imu_temp_PID[3] = {TEMPERATURE_PID_KP, TEMPERATURE_PID_KI, TEMPERATURE_PID_KD};
+static Pid imu_temp_pid;
 
 static const float timing_time = 0.001f;   //tast run time , unit s.任务运行的时间 单位 s
 //extern Vision_info_send Vision_send;
 
 //加速度计低通滤波
-static float accel_fliter_1[3] = {0.0f, 0.0f, 0.0f};
-static float accel_fliter_2[3] = {0.0f, 0.0f, 0.0f};
-static float accel_fliter_3[3] = {0.0f, 0.0f, 0.0f};
-static const float fliter_num[3] = {1.929454039488895f, -0.93178349823448126f, 0.002329458745586203f};
+static fp32 accel_fliter_1[3] = {0.0f, 0.0f, 0.0f};
+static fp32 accel_fliter_2[3] = {0.0f, 0.0f, 0.0f};
+static fp32 accel_fliter_3[3] = {0.0f, 0.0f, 0.0f};
+static const fp32 fliter_num[3] = {1.929454039488895f, -0.93178349823448126f, 0.002329458745586203f};
 
 
 
 
-static float INS_accel[3] = {0.0f, 0.0f, 0.0f};
-static float INS_mag[3] = {0.0f, 0.0f, 0.0f};
-float INS_gyro[3] = {0.0f, 0.0f, 0.0f};
-float INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-float INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.欧拉角 单位 rad
+static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
+static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
+fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
+fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.欧拉角 单位 rad
 
 
 
@@ -296,7 +296,7 @@ void INS_task(void const *pvParameters)
   * @param[in]      ist8310: 磁力计数据
   * @retval         none
   */
-static void imu_cali_slove(float gyro[3], float accel[3], float mag[3], bmi088_real_data_t *bmi088, ist8310_real_data_t *ist8310)
+static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], bmi088_real_data_t *bmi088, ist8310_real_data_t *ist8310)
 {
     for (uint8_t i = 0; i < 3; i++)
     {
@@ -316,7 +316,7 @@ static void imu_cali_slove(float gyro[3], float accel[3], float mag[3], bmi088_r
   * @param[in]      temp:bmi088的温度
   * @retval         none
   */
-static void imu_temp_control(float temp)
+static void imu_temp_control(fp32 temp)
 {
     uint16_t tempPWM;
     static uint8_t temp_constant_time = 0;
@@ -364,7 +364,7 @@ static void imu_temp_control(float temp)
   * @param[out]     offset_time_count: 自动加1
   * @retval         none
   */
-void gyro_offset_calc(float gyro_offset[3], float gyro[3], uint16_t *offset_time_count)
+void gyro_offset_calc(fp32 gyro_offset[3], fp32 gyro[3], uint16_t *offset_time_count)
 {
     if (gyro_offset == NULL || gyro == NULL || offset_time_count == NULL)
     {
@@ -391,7 +391,7 @@ void gyro_offset_calc(float gyro_offset[3], float gyro[3], uint16_t *offset_time
   * @param[out]     陀螺仪的时刻，每次在gyro_offset调用会加1,
   * @retval         none
   */
-void INS_cali_gyro(float cali_scale[3], float cali_offset[3], uint16_t *time_count)
+void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
 {
     if( *time_count == 0)
     {
@@ -422,7 +422,7 @@ void INS_cali_gyro(float cali_scale[3], float cali_offset[3], uint16_t *time_cou
   * @param[in]      陀螺仪的零漂
   * @retval         none
   */
-void INS_set_cali_gyro(float cali_scale[3], float cali_offset[3])
+void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
 {
     gyro_cali_offset[0] = cali_offset[0];
     gyro_cali_offset[1] = cali_offset[1];
@@ -442,7 +442,7 @@ void INS_set_cali_gyro(float cali_scale[3], float cali_offset[3])
   * @param[in]      none
   * @retval         INS_quat的指针
   */
-const float *get_INS_quat_point(void)
+const fp32 *get_INS_quat_point(void)
 {
     return INS_quat;
 }
@@ -456,7 +456,7 @@ const float *get_INS_quat_point(void)
   * @param[in]      none
   * @retval         INS_angle的指针
   */
-const float *get_INS_angle_point(void)
+const fp32 *get_INS_angle_point(void)
 {
     return INS_angle;
 }
@@ -471,7 +471,7 @@ const float *get_INS_angle_point(void)
   * @param[in]      none
   * @retval         INS_gyro的指针
   */
-extern const float *get_gyro_data_point(void)
+extern const fp32 *get_gyro_data_point(void)
 {
     return INS_gyro;
 }
@@ -485,7 +485,7 @@ extern const float *get_gyro_data_point(void)
   * @param[in]      none
   * @retval         INS_accel的指针
   */
-extern const float *get_accel_data_point(void)
+extern const fp32 *get_accel_data_point(void)
 {
     return INS_accel;
 }
@@ -499,7 +499,7 @@ extern const float *get_accel_data_point(void)
   * @param[in]      none
   * @retval         INS_mag的指针
   */
-extern const float *get_mag_data_point(void)
+extern const fp32 *get_mag_data_point(void)
 {
     return INS_mag;
 }

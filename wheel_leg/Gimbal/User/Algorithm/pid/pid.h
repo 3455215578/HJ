@@ -26,11 +26,13 @@
   */
 
 
+
+
 #ifndef __pid_H__
 #define __pid_H__
 
-#include <stdint-gcc.h>
-
+//#include "stm32f4xx_hal.h"
+#include "struct_typedef.h"
 enum
 {
     LAST  = 0,
@@ -66,7 +68,7 @@ typedef struct
     /* pid积分输出项限幅 */
     uint32_t integral_limit;
 
-} pid_type_def;
+} Pid;
 
 /**
   * @brief     PID 初始化函数
@@ -75,7 +77,7 @@ typedef struct
   * @param[in] intergral_limit: 积分限幅
   * @param[in] kp/ki/kd: 具体 PID 参数
   */
-extern void pid_init(pid_type_def *pid, uint32_t max_out, uint32_t intergral_limit, \
+extern void pid_init(Pid *pid, uint32_t max_out, uint32_t intergral_limit, \
               float kp, float ki, float kd);
 
 /**
@@ -83,7 +85,7 @@ extern void pid_init(pid_type_def *pid, uint32_t max_out, uint32_t intergral_lim
   * @param[in] pid: PID 结构体
   * @param[in] kp/ki/kd: 具体 PID 参数
   */
-extern void pid_reset(pid_type_def *pid, float kp, float ki, float kd);
+extern void pid_reset(Pid *pid, float kp, float ki, float kd);
 
 /**
   * @brief     PID 计算函数，使用位置式 PID 计算
@@ -92,10 +94,10 @@ extern void pid_reset(pid_type_def *pid, float kp, float ki, float kd);
   * @param[in] set: 目标数据
   * @retval    PID 计算输出
   */
-extern float pid_calc(pid_type_def *pid, float get, float set);
-extern float pid_calc_balance(pid_type_def *pid, float get, float set,float gyro_y);
-extern float pid_calc_KI_Separation(pid_type_def* pid,float get,float set,float err_threshold);
+extern float pid_calc(Pid *pid, float get, float set);
+extern float pid_calc_balance(Pid *pid, float get, float set,float gyro_y);
+extern float pid_calc_KI_Separation(Pid* pid,float get,float set,float err_threshold);
 
-extern float pid_loop_calc(pid_type_def *pid,float get,float set,float max_value,float min_value);
+extern float pid_loop_calc(Pid *pid,float get,float set,float max_value,float min_value);
 
 #endif

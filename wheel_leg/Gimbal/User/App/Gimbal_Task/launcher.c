@@ -14,7 +14,7 @@
 *                                              内部变量                                                   *
 *********************************************************************************************************/
 extern robot_ctrl_info_t robot_ctrl;    // 上位机数据
-static float trigger_target_total_ecd = 0;      // 总拨盘电机转动ECD
+static fp32 trigger_target_total_ecd = 0;      // 总拨盘电机转动ECD
 static uint32_t trigger_time = 0;       // 拨盘电机每次转动时间
 static uint8_t rc_last_sw_L;            // 拨杆上一时刻的状态值记录
 
@@ -32,17 +32,8 @@ SMC_Params params =
                 .max_i = 10000      // 控制输入限幅
         };
 
-/*********************************************************************************************************
-*                                              内部函数声明
-*********************************************************************************************************/
-static void Trigger_Mode_Set(void);
-static void Trigger_Control(void);
-static void Trigger_Finish_Judge(void);
-static void Launcher_Current_Calc(void);
 
-/*********************************************************************************************************
-*                                              内部函数实现
-*********************************************************************************************************/
+
 //TODO: 非也非也，还得测试角度发和速度发哪个准度更高，以及要不要做一定频率的双连发
 // #define ANGLE // 代码基于Hero修改，因为它的发弹是角度环，所以会有个ANGLE宏定义
 #define BRUSTS // 步兵的发弹只要一直转就行
@@ -59,98 +50,6 @@ static uint32_t time = 0;
 static uint32_t last_time = 0;
 
 
-static void Trigger_Mode_Set() {
-    if (switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS))
-    {
-        launcher.trigger_mode = SHOOT_CONTINUE;
-    }
-
-    /* 拨盘处于正常模式才执行下一次的指令 */
-    if((launcher.trigger_mode == SHOOT_CONTINUE) || (launcher.trigger_mode == SHOOT_OVER))
-    {
-#ifdef ANGLE
-        time = HAL_GetTick();
-        /* 遥控器左键往下拨或长按鼠标左键，每1s转45度，用于调试 */
-        else if ((switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS)) && ((time - last_time) > 1000))
-        {
-            last_time = HAL_GetTick();
-            launcher.trigger_state = SHOOT_READLY;
-        }
-#endif //!ANGLE
-#ifdef BRUSTS
-        /* 遥控器左键在下面或长按鼠标左键，以200的转速连续发射弹丸 */
-        /** Q: 检测上一次的左拨杆在下面能证明左键是向下拨吗 **/
-        /** A: 这里修正一下，是判断遥控器左键在不在最下面，在最下面就是连发 **/
-
-#endif //!BRUSTS
-        if ((gimbal.gimbal_ctrl_mode == GIMBAL_AUTO) && (robot_ctrl.fire_command == 1))
-        {/** 当云台为自瞄模式且接收到视觉火控开启标志位为1时，准备进入单发模式，即视觉发一帧火控数据拨盘就转动一个弹丸角度 **/
-            launcher.trigger_mode = SHOOT_READY_TO_SINGLE;
-        }
-    }
-        /* 当拨盘正反转都失败后，将拨盘失能 */
-    else if(launcher.trigger_mode == SHOOT_FAIL)
-    {
-        launcher.trigger.target_speed = 0;
-        launcher.trigger.target_current = 0;
-        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd;
-    }
-}
-
-
-/**
- * 拨盘的模式控制逻辑，主要为SHOOT_BURSTS，SHOOT_READLY，SHOOT_BLOCK模式的实现
- */
-static void Trigger_Control(void) {
-
-    /** 连发模式 **/
-    if(launcher.trigger_mode == SHOOT_CONTINUE)
-    {
-        // 设置拨盘期望转速
-        launcher.trigger.target_speed = TRIGGER_SPEED;
-
-        // 连发时让期望总编码器值总与实际反馈总编码器值相等，便于后续切换单发模式
-        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd;
-    }
-    /** 读取单发指令，预备进入单发模式 **/
-    else if (launcher.trigger_mode == SHOOT_READY_TO_SINGLE)
-    {
-        trigger_time = HAL_GetTick(); // 这时候开始计时，开始转的时候计时
-
-        // 开始单发处理
-        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd - DEGREE_45_TO_ENCODER;
-
-        // 切换为单发模式
-        launcher.trigger_mode = SHOOT_SINGLE; // 处于单发中还未执行完成
-    }
-        /** 如果拨盘堵转，则切换为反转模式 **/
-    else if (launcher.trigger_mode == SHOOT_BLOCK)
-    {
-#ifdef BLOCK_ANGLE
-        trigger_time = HAL_GetTick(); // 这时候开始计时，开始转的时候计时(反转也需要重新计时)
-
-        // Q: 我以为是以固定速度反转，原来是每隔一段时间变化一定角度吗?
-        // A: 这里也可以改成固定速度反转固定时间，不过我写的是固定时间反转固定角度，可以写一个第一种方案测试哪个效果好
-        trigger_target_total_ecd += DEGREE_90_TO_ENCODER;
-
-        // 切换为反转模式
-        launcher.trigger_mode = SHOOT_INVERSING;
-#endif //!BLOCK_ANGLE
-
-#ifdef BLOCK_SPEED
-        // 设置拨盘期望转速
-        launcher.trigger.target_speed = -TRIGGER_SPEED;
-#endif //!BLOCK_SPEED
-    }
-
-    /* 只有在不处于连续发射的状态下才会进入角度环模式，连续发射会直接定义拨盘转速 */
-    if(launcher.trigger_mode != SHOOT_CONTINUE && launcher.trigger_mode != SHOOT_BLOCK) {
-        /** 拨盘的位置环pid **/
-        launcher.trigger.target_speed = pid_calc(&launcher.trigger.angle_p,
-                                                 launcher.trigger.motor_measure.total_ecd,
-                                                 trigger_target_total_ecd);
-    }
-}
 
 /**
  * 识别到在 SHOOT_READLY 时进入 SHOOT_SINGLE
@@ -161,10 +60,11 @@ static void Trigger_Control(void) {
 #define TRI_MINECD 5000     // 5000ecd
 #define TRI_MAXTIME 1000    // 1s
 #define TRI_MAXSPEED 100    // rpm
-static float total_time = 0;
-static float total_ecd_error = 0;
+static fp32 total_time = 0;
+static fp32 total_ecd_error = 0;
 static uint32_t continue_time = 0;
 
+/** 拨盘堵弹检测 **/
 static void Trigger_Finish_Judge() {
     if(launcher.trigger_mode != SHOOT_CLOSE) {
         /* 这里记录的是拨盘完成一次单发使用的时间 */
@@ -255,27 +155,6 @@ static void Trigger_Finish_Judge() {
 }
 
 
-/** 计算发射机构电流 **/
-static void Launcher_Current_Calc(void) {
-
-    /** 拨盘电流计算(串级pid 位置环在别的地方) **/
-    launcher.trigger.target_current = (int16_t)pid_calc(&launcher.trigger.speed_p,
-                                                        launcher.trigger.motor_measure.speed_rpm,
-                                                        launcher.trigger.target_speed);
-
-    /** 摩擦轮电流计算 **/
-    state_l = update_system(launcher.fire_l.target_speed, launcher.fire_l.motor_measure.speed_rpm, dt, state_l);
-    launcher.fire_l.target_current = -smc_controller(state_l, params);
-
-    state_r = update_system(launcher.fire_r.target_speed, launcher.fire_r.motor_measure.speed_rpm, dt, state_r);
-    launcher.fire_r.target_current = -smc_controller(state_r, params);
-}
-
-
-/*********************************************************************************************************
-*                                              API函数实现
-*********************************************************************************************************/
-
 /** 发射机构初始化 **/
 void Launcher_Init(void) {
 
@@ -291,7 +170,7 @@ void Launcher_Init(void) {
 
     /** 拨盘电机pid **/
     // 位置环pid
-    pid_init(&launcher.trigger.angle_p,
+    pid_init(&launcher.trigger.angle_pid,
              TRIGGER_ANGLE_PID_MAX_OUT,
              TRIGGER_ANGLE_PID_MAX_IOUT,
              TRIGGER_ANGLE_PID_KP,
@@ -299,7 +178,7 @@ void Launcher_Init(void) {
              TRIGGER_ANGLE_PID_KD);
 
     // 速度环pid
-    pid_init(&launcher.trigger.speed_p,
+    pid_init(&launcher.trigger.speed_pid,
              TRIGGER_SPEED_PID_MAX_OUT,
              TRIGGER_SPEED_PID_MAX_IOUT,
              TRIGGER_SPEED_PID_KP,
@@ -315,6 +194,45 @@ void Launcher_Init(void) {
     /* 以后再看 */
     first_order_filter_init(&launcher.filter_fire,0.05f, 0.5f);
     first_order_filter_init(&launcher.filter_trigger,1,1);
+}
+
+/** 拨盘模式设置 **/
+static void Trigger_Mode_Set() {
+    if (switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS))
+    {
+        launcher.trigger_mode = SHOOT_CONTINUE;
+    }
+
+    /* 拨盘处于正常模式才执行下一次的指令 */
+    if((launcher.trigger_mode == SHOOT_CONTINUE) || (launcher.trigger_mode == SHOOT_OVER))
+    {
+#ifdef ANGLE
+        time = HAL_GetTick();
+        /* 遥控器左键往下拨或长按鼠标左键，每1s转45度，用于调试 */
+        else if ((switch_is_down(rc_last_sw_L) || (KeyBoard.Mouse_l.status == KEY_PRESS)) && ((time - last_time) > 1000))
+        {
+            last_time = HAL_GetTick();
+            launcher.trigger_state = SHOOT_READLY;
+        }
+#endif //!ANGLE
+#ifdef BRUSTS
+        /* 遥控器左键在下面或长按鼠标左键，以200的转速连续发射弹丸 */
+        /** Q: 检测上一次的左拨杆在下面能证明左键是向下拨吗 **/
+        /** A: 这里修正一下，是判断遥控器左键在不在最下面，在最下面就是连发 **/
+
+#endif //!BRUSTS
+        if ((gimbal.gimbal_ctrl_mode == GIMBAL_AUTO) && (robot_ctrl.fire_command == 1))
+        {/** 当云台为自瞄模式且接收到视觉火控开启标志位为1时，准备进入单发模式，即视觉发一帧火控数据拨盘就转动一个弹丸角度 **/
+            launcher.trigger_mode = SHOOT_READY_TO_SINGLE;
+        }
+    }
+        /* 当拨盘正反转都失败后，将拨盘失能 */
+    else if(launcher.trigger_mode == SHOOT_FAIL)
+    {
+        launcher.trigger.target_speed = 0;
+        launcher.trigger.target_current = 0;
+        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd;
+    }
 }
 
 /** 我觉得这个函数本质上是对摩擦轮模式进行判断，是因为顺带在摩擦轮模式为开启时进行了拨盘的模式判断，引起了发弹，所以被定义为发射模式设置吗? **/
@@ -402,8 +320,79 @@ void Launcher_Mode_Set() {
  *
  * **/
 
+}
 
 
+
+
+/** 计算发射机构电流 **/
+static void Launcher_Current_Calc(void) {
+
+    /** 拨盘电流计算(串级pid 位置环在别的地方) **/
+    launcher.trigger.target_current = (int16_t)pid_calc(&launcher.trigger.speed_pid,
+                                                        launcher.trigger.motor_measure.speed_rpm,
+                                                        launcher.trigger.target_speed);
+
+    /** 摩擦轮电流计算 **/
+    state_l = update_system(launcher.fire_l.target_speed, launcher.fire_l.motor_measure.speed_rpm, dt, state_l);
+    launcher.fire_l.target_current = -smc_controller(state_l, params);
+
+    state_r = update_system(launcher.fire_r.target_speed, launcher.fire_r.motor_measure.speed_rpm, dt, state_r);
+    launcher.fire_r.target_current = -smc_controller(state_r, params);
+}
+
+/**
+ * 拨盘的模式控制逻辑，主要为SHOOT_BURSTS，SHOOT_READLY，SHOOT_BLOCK模式的实现
+ */
+static void Trigger_Control(void) {
+
+    /** 连发模式 **/
+    if(launcher.trigger_mode == SHOOT_CONTINUE)
+    {
+        // 设置拨盘期望转速
+        launcher.trigger.target_speed = TRIGGER_SPEED;
+
+        // 连发时让期望总编码器值总与实际反馈总编码器值相等，便于后续切换单发模式
+        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd;
+    }
+        /** 读取单发指令，预备进入单发模式 **/
+    else if (launcher.trigger_mode == SHOOT_READY_TO_SINGLE)
+    {
+        trigger_time = HAL_GetTick(); // 这时候开始计时，开始转的时候计时
+
+        // 开始单发处理
+        trigger_target_total_ecd = launcher.trigger.motor_measure.total_ecd - DEGREE_45_TO_ENCODER;
+
+        // 切换为单发模式
+        launcher.trigger_mode = SHOOT_SINGLE; // 处于单发中还未执行完成
+    }
+        /** 如果拨盘堵转，则切换为反转模式 **/
+    else if (launcher.trigger_mode == SHOOT_BLOCK)
+    {
+#ifdef BLOCK_ANGLE
+        trigger_time = HAL_GetTick(); // 这时候开始计时，开始转的时候计时(反转也需要重新计时)
+
+        // Q: 我以为是以固定速度反转，原来是每隔一段时间变化一定角度吗?
+        // A: 这里也可以改成固定速度反转固定时间，不过我写的是固定时间反转固定角度，可以写一个第一种方案测试哪个效果好
+        trigger_target_total_ecd += DEGREE_90_TO_ENCODER;
+
+        // 切换为反转模式
+        launcher.trigger_mode = SHOOT_INVERSING;
+#endif //!BLOCK_ANGLE
+
+#ifdef BLOCK_SPEED
+        // 设置拨盘期望转速
+        launcher.trigger.target_speed = -TRIGGER_SPEED;
+#endif //!BLOCK_SPEED
+    }
+
+    /* 只有在不处于连续发射的状态下才会进入角度环模式，连续发射会直接定义拨盘转速 */
+    if(launcher.trigger_mode != SHOOT_CONTINUE && launcher.trigger_mode != SHOOT_BLOCK) {
+        /** 拨盘的位置环pid **/
+        launcher.trigger.target_speed = pid_calc(&launcher.trigger.angle_pid,
+                                                 launcher.trigger.motor_measure.total_ecd,
+                                                 trigger_target_total_ecd);
+    }
 }
 
 

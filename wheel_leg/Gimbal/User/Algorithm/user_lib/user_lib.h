@@ -12,10 +12,10 @@
  */
 #ifndef _USER_LIB_H
 #define _USER_LIB_H
-
 #include "stdint.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "struct_typedef.h"
 
 enum
 {
@@ -146,10 +146,10 @@ float Get_OLS_Smooth(Ordinary_Least_Squares_t *OLS);
 
 typedef  struct
 {
-    float input;        //输入数据
-    float out;          //滤波输出的数据
-    float num[1];       //滤波参数
-    float frame_period; //滤波的时间间隔 单位 s
+    fp32 input;        //输入数据
+    fp32 out;          //滤波输出的数据
+    fp32 num[1];       //滤波参数
+    fp32 frame_period; //滤波的时间间隔 单位 s
 }__packed first_order_filter_type_t;
 
 #ifndef ABS
@@ -160,11 +160,11 @@ typedef  struct
 
 #define DEGREE_TO_RAD PI/180
 
-void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, float frame_period,  float num);
-void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, float input);
+void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 frame_period,  fp32 num);
+void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, fp32 input);
 
-void fabs_limit(float *x, float limit);
+void fabs_limit(fp32 *x, fp32 limit);
 
-float fp32_constrain(float Value, float minValue, float maxValue);
+fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
 
 #endif

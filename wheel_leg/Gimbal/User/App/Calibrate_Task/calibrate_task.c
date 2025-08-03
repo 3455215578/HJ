@@ -160,7 +160,7 @@ static void cali_data_write(void);
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_head_hook(uint32_t *cali, bool cmd);   //header device cali function
+static bool_t cali_head_hook(uint32_t *cali, bool_t cmd);   //header device cali function
 
 /**
   * @brief          gyro cali function
@@ -180,7 +180,7 @@ static bool cali_head_hook(uint32_t *cali, bool cmd);   //header device cali fun
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_gyro_hook(uint32_t *cali, bool cmd);   //gyro device cali function
+static bool_t cali_gyro_hook(uint32_t *cali, bool_t cmd);   //gyro device cali function
 
 /**
   * @brief          gimbal cali function
@@ -200,7 +200,7 @@ static bool cali_gyro_hook(uint32_t *cali, bool cmd);   //gyro device cali funct
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_gimbal_hook(uint32_t *cali, bool cmd); //gimbal device cali function
+static bool_t cali_gimbal_hook(uint32_t *cali, bool_t cmd); //gimbal device cali function
 
 
 
@@ -494,7 +494,7 @@ void cali_param_init(void)
     {
         cali_sensor[i].flash_len = cali_sensor_size[i];
         cali_sensor[i].flash_buf = cali_sensor_buf[i];
-        cali_sensor[i].cali_hook = (bool(*)(uint32_t *, bool))cali_hook_fun[i];
+        cali_sensor[i].cali_hook = (bool_t(*)(uint32_t *, bool_t))cali_hook_fun[i];
     }
 
     cali_data_read();
@@ -605,7 +605,7 @@ static void cali_data_write(void)
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_head_hook(uint32_t *cali, bool cmd)
+static bool_t cali_head_hook(uint32_t *cali, bool_t cmd)
 {
     head_cali_t *local_cali_t = (head_cali_t *)cali;
     if (cmd == CALI_FUNC_CMD_INIT)
@@ -649,7 +649,7 @@ static bool cali_head_hook(uint32_t *cali, bool cmd)
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_gyro_hook(uint32_t *cali, bool cmd)
+static bool_t cali_gyro_hook(uint32_t *cali, bool_t cmd)
 {
     imu_cali_t *local_cali_t = (imu_cali_t *)cali;
     if (cmd == CALI_FUNC_CMD_INIT)
@@ -699,7 +699,7 @@ static bool cali_gyro_hook(uint32_t *cali, bool cmd)
   * @retval         0:校准任务还没有完
                     1:校准任务已经完成
   */
-static bool cali_gimbal_hook(uint32_t *cali, bool cmd)
+static bool_t cali_gimbal_hook(uint32_t *cali, bool_t cmd)
 {
 
     gimbal_cali_t *local_cali_t = (gimbal_cali_t *)cali;

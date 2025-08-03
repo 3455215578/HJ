@@ -1,10 +1,22 @@
-//
-// Created by xhuanc on 2021/10/11.
-//
+
+/*遥控器键位：
+
+        S1                                                                         S0
+                    |                                                   |
+                    |                                                   |
+                    |                                                   |
+                    |                                                   |
+           ------------------ 2                                ------------------ 0
+                    |                                                   |
+                    |                                                   |
+                    |                                                   |
+                    3                                                   1
+
+*/
+
 
 #include "remote.h"
 
-//define
 #define RC_CHANNAL_ERROR_VALUE 700
 
 
@@ -15,9 +27,6 @@ extern DMA_HandleTypeDef hdma_usart3_rx;
 RC_ctrl_t rc_ctrl;       //遥控器
 
 static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
-
-int16_t last_last_rc_s[2];
-
 
 //函数定义及声明 声明靠前
 

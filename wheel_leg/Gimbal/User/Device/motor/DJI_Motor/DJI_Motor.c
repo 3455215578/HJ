@@ -50,7 +50,7 @@ void DJI_Round_Count(DJI_Motor_t *motor) {
  * @param[in] ecd  编码值
  * @return  编码值限幅后的值
  */
-float DJI_Encoder_Limit(int16_t ecd) {
+fp32 DJI_Encoder_Limit(int16_t ecd) {
     while(ecd < 0 || ecd > ECD360) {
         if(ecd < 0) {
             ecd += ECD360;
@@ -58,7 +58,7 @@ float DJI_Encoder_Limit(int16_t ecd) {
             ecd -= ECD360;
         }
     }
-    return (float)ecd;
+    return (fp32)ecd;
 }
 
 
@@ -66,7 +66,7 @@ float DJI_Encoder_Limit(int16_t ecd) {
  * 计算距离零点的度数  -180-180
  * 根据电机编码器数据和偏移量计算相对角度变化的函数
  */
-float Motor_Ecd_To_Angle_Change(uint16_t ecd, uint16_t offset_ecd) {
+fp32 Motor_Ecd_To_Angle_Change(uint16_t ecd, uint16_t offset_ecd) {
     int16_t tmp = 0;
     if(offset_ecd >= ECD180) {
         if(ecd > offset_ecd - ECD180) {
@@ -84,7 +84,7 @@ float Motor_Ecd_To_Angle_Change(uint16_t ecd, uint16_t offset_ecd) {
             tmp = ecd - offset_ecd;
         }
     }
-    return (float)(tmp / 8192.f * 360);//TODO:必须要浮点数
+    return (fp32)(tmp / 8192.f * 360);//TODO:必须要浮点数
 }
 
 /**

@@ -2,7 +2,6 @@
 #define BSP_CAN_H
 
 #include <stdint-gcc.h>
-#include "can.h"
 #include "DJI_Motor.h"
 
 
