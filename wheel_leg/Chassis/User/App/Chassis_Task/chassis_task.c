@@ -304,13 +304,11 @@ static void wheel_calc(void)
     chassis_K_matrix_fitting(chassis.leg_R.vmc.forward_kinematics.fk_L0.L0, wheel_K_R, wheel_fitting_factor);
 
     float target_yaw_speed = pid_calc(&chassis.chassis_turn_pos_pid,
-                                      chassis.imu_reference.yaw_total_rad,
-                                      chassis.chassis_ctrl_info.yaw_rad);
+                                      gimbal_unpack_data.yaw_relative_angle * DEGREE_TO_RAD,
+                                      0.0f);
 
     if(chassis.chassis_ctrl_mode == CHASSIS_SPIN)
     {
-        chassis.chassis_ctrl_info.yaw_rad = chassis.imu_reference.yaw_total_rad;
-
         target_yaw_speed = 3.5f;
     }
 
@@ -433,23 +431,6 @@ static void joint_calc(void)
 
 }
 
-/** 设置腿长 **/
-static void leg_length_set(void)
-{
-    if(switch_is_down(get_rc_ctrl()->rc.s[RC_s_L]))
-    {
-        chassis.chassis_ctrl_info.height_m = 0.12f;
-    }
-    else if(switch_is_mid(get_rc_ctrl()->rc.s[RC_s_L]))
-    {
-        chassis.chassis_ctrl_info.height_m = 0.22f;
-    }
-    else if(switch_is_up(get_rc_ctrl()->rc.s[RC_s_L]))
-    {
-        chassis.chassis_ctrl_info.height_m = 0.32f;
-    }
-}
-
 /** 控制器计算 **/
 static void controller_calc(void)
 {
@@ -517,9 +498,6 @@ static void chassis_init_task()
 /** 底盘使能任务 **/
 static void chassis_enable_task(void)
 {
-    /** 设置期望腿长 **/
-    leg_length_set();
-
     /** 控制器计算 **/
     controller_calc();
 
@@ -566,7 +544,11 @@ void chassis_task(void)
         case CHASSIS_ENABLE:
         case CHASSIS_SPIN:
         {
-            chassis_enable_task();
+            // 确保云台复位完毕再使能底盘
+            if(gimbal_unpack_data.gimbal_init_flag)
+            {
+                chassis_enable_task();
+            }
             break;
         }
 
@@ -577,23 +559,23 @@ void chassis_task(void)
         }
     }
 
-//        send_torque_task(-chassis.leg_L.joint_F_torque,
-//                     -chassis.leg_L.joint_B_torque,
-//                     chassis.leg_R.joint_F_torque,
-//                     chassis.leg_R.joint_B_torque,
-//                     -chassis.leg_L.wheel_torque,
-//                     -chassis.leg_R.wheel_torque,
-//                     vel,
-//                     Kd);
+        send_torque_task(-chassis.leg_L.joint_F_torque,
+                     -chassis.leg_L.joint_B_torque,
+                     chassis.leg_R.joint_F_torque,
+                     chassis.leg_R.joint_B_torque,
+                     -chassis.leg_L.wheel_torque,
+                     -chassis.leg_R.wheel_torque,
+                     vel,
+                     Kd);
 
-    send_torque_task(0,
-                     0,
-                     0,
-                     0,
-                     0,
-                     0,
-                     0,
-                     0);
+//    send_torque_task(0,
+//                     0,
+//                     0,
+//                     0,
+//                     0,
+//                     0,
+//                     0,
+//                     0);
 
 
 }

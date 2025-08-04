@@ -99,15 +99,6 @@ typedef struct
     uint16_t B;
 } RBG_info_t;
 
-/*typedef struct
-{
-    uint8_t command_info;
-    uint8_t game_state;
-    float goal_point_x; //m
-    float goal_point_y; //m
-    float goal_point_z;
-}receive_goal_info;*/
-
 #pragma pack(pop)
 
 #endif

@@ -19,38 +19,38 @@
 #include "remote.h"
 #include "robot_def.h"
 
-void Gimbal_to_Chassis_Can(uint32_t can_id, const uint8_t *rx_data) {
-    switch (can_id) {
-        case 0x110:
-        {
-            union I16 vx_channel; // 前后
-            union I16 yaw_channel; // 左右
+Gimbal_Unpack_Data gimbal_unpack_data;
+
+static float uint_to_float(int x, float x_min, float x_max, int bits) {
+    /// 将无符号整数转换回浮点数，还原float_to_uint的映射过程 ///
+    float span = x_max - x_min;
+    float max_val = (1 << bits) - 1;  // 目标整数的最大值
+    return x_min + (x / max_val) * span;
+}
 
 
-            {
-                /** 解析前后通道 **/
-                vx_channel.data[0] = rx_data[0];
-                vx_channel.data[1] = rx_data[1];
+void Gimbal_Data_Unpack(const uint8_t *rx_data) {
 
-                /** 解析转向通道 **/
-                yaw_channel.data[0] = rx_data[2];
-                yaw_channel.data[1] = rx_data[3];
+    /** 解析前后通道 **/
+    gimbal_unpack_data.vx_channel.data[0] = rx_data[0];
+    gimbal_unpack_data.vx_channel.data[1] = rx_data[1];
 
-                /** 解析左右拨钮 **/
-                rc_ctrl.rc.s[RC_s_L] = rx_data[4];
-                rc_ctrl.rc.s[RC_s_R] = rx_data[5];
-            }
+    /** 解析腿长通道 **/
+    gimbal_unpack_data.leg_channel.data[0] = rx_data[2];
+    gimbal_unpack_data.leg_channel.data[1] = rx_data[3];
 
-            rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL] = vx_channel.value;
-            rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL] = yaw_channel.value;
+    /** 解析右拨钮 **/
+    gimbal_unpack_data.sr = rx_data[4];
+
+    /** 解析云台初始化标志位 **/
+    gimbal_unpack_data.gimbal_init_flag = rx_data[5];
+
+    /** 解析yaw与底盘正方向相对角度 **/
+    int16_t yaw_relative_angle_int = (int16_t)((rx_data[7] << 8) | rx_data[6]);
+    uint16_t yaw_relative_angle_uint = (uint16_t)yaw_relative_angle_int;
+    gimbal_unpack_data.yaw_relative_angle = uint_to_float(yaw_relative_angle_uint, -180.0f, 180.0f, 16);
 
 
-        } break;
-
-
-        default:
-            break;
-    }
 }
 
 

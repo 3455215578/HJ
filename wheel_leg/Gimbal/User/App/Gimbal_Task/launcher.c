@@ -64,112 +64,9 @@ static fp32 total_time = 0;
 static fp32 total_ecd_error = 0;
 static uint32_t continue_time = 0;
 
-/** 拨盘堵弹检测 **/
-static void Trigger_Finish_Judge() {
-    if(launcher.trigger_mode != SHOOT_CLOSE) {
-        /* 这里记录的是拨盘完成一次单发使用的时间 */
-        total_time = HAL_GetTick() - trigger_time;
-        /* 这里记录的是拨盘当前总编码器值与我们期望它转动到的总编码器值的差值 */
-        total_ecd_error = ABS(trigger_target_total_ecd - launcher.trigger.motor_measure.total_ecd);
-
-        /***********************        判断单发模式和连发模式时拨盘是否卡弹       *************************************/
-
-        // Q：对(total_ecd_error > TRI_MINECD)的判断是为了什么， 大于时说明什么?
-        // A：total_ecd_error的物理意义是当前电机的实时总ECD与目标总ECD的差值，如果差值还大于TRI_MINECD就说明还没有完成转动任务，需要继续停留在单发执行任务里面
-        // A: 当然不是差值一直大于TRI_MINECD都判断为单发未完成，如果在TRI_MAXTIME时间内都没有完成就会认为他堵转了，将状态改为单发堵转
-        // A: 所以这里判断是SHOOT_SINGLE还是SHOOT_BLOCK的关键在于total_time的判断
-
-        /** 单发 **/
-        if(total_ecd_error > TRI_MINECD) // 说明还未完成转动任务，需要继续停留在单发执行任务
-        {
-            if((launcher.trigger_mode == SHOOT_SINGLE) && (total_time < TRI_MAXTIME))
-            {/* 未超过规定最大时间，则维持单发模式不变 */
-                launcher.trigger_mode = SHOOT_SINGLE;
-            }
-            else if((launcher.trigger_mode == SHOOT_SINGLE) && (total_time > TRI_MAXTIME))
-            {/* 如果在单发状态里面待的时间太长,则判断其为堵转状态 */
-                launcher.trigger_mode = SHOOT_BLOCK;
-            }
-        }
-         // 单发顺利
-        else if((total_ecd_error < TRI_MINECD) && (launcher.trigger_mode != SHOOT_CONTINUE))
-        {
-            launcher.trigger_mode = SHOOT_OVER;
-        }
-
-        /** 连发 **/
-        else if(launcher.trigger_mode == SHOOT_CONTINUE)
-        {
-            /* 如果在连发状态下的反馈转速小于TRI_MAXSPEED持续一段时间，则判断其为堵转状态 */
-            if(ABS(launcher.trigger.motor_measure.speed_rpm) < TRI_MAXSPEED) {
-                continue_time++;
-            }
-            else{
-                continue_time = 0;
-            }
-
-            if(continue_time > 200)
-            {
-                launcher.trigger_mode = SHOOT_BLOCK;
-            }
-        }
-
-        /************************************        End       **************************************************/
-
-
-        /***********************        判断反转状态时是否解决卡弹       *************************************/
-
-#ifdef BLOCK_ANGLE
-        //* 反转逻辑需要测试平步的拨盘是否能实现反转这个功能，才会考虑添加，需要测试，如果不行的话要考虑第二个方案反方向转动固定时间 */
-        if(total_ecd_error > TRI_MINECD) {
-            if((launcher.trigger_mode == SHOOT_INVERSING) && (total_time < TRI_MAXTIME))
-            {// 实际反转时间未超过最大反转时间，则维持反转模式不变
-                launcher.trigger_mode = SHOOT_INVERSING;
-            }
-            else if((launcher.trigger_mode == SHOOT_INVERSING) && (total_time > TRI_MAXTIME))
-            {// 如果反转时间超过了规定的最大反转时间，则视为解决失败
-                launcher.trigger_mode = SHOOT_FAIL;
-            }
-        }
-            /* 在规定时间内完成则将状态改为发射完成 */
-            // total_ecd_error刚刚说过了是当前电机的实时总ECD与目标总ECD的差值，那么总差值小于TRI_MINECD
-            // 就说明已经转动到我们想要他达到的转动角度，所以判断为完成一次单发
-        else if((total_ecd_error < TRI_MINECD) && (launcher.trigger_mode != SHOOT_CONTINUE))
-        {
-            launcher.trigger_mode = SHOOT_OVER;
-        }
-#endif //!BLOCK_ANGLE
-
-#ifdef BLOCK_SPEED
-        /* TRI_MAXTIME时间内都保持在反转的状态，TRI_MAXTIME后将模式改为完成模式再进行下一次程序判断 */
-        if((launcher.trigger_mode == SHOOT_BLOCK) && (total_time < TRI_MAXTIME))
-        {// 实际反转时间未超过最大反转时间，则维持反转模式不变
-            launcher.trigger_mode = SHOOT_BLOCK;
-        }
-        else if((launcher.trigger_mode == SHOOT_BLOCK) && (total_time > TRI_MAXTIME))
-        {// 如果反转时间超过了规定的最大反转时间，则视为解决失败
-            launcher.trigger_mode = SHOOT_OVER;
-        }
-#endif //!BLOCK_SPEED
-    }
-}
-
-
-/** 发射机构初始化 **/
-void Launcher_Init(void) {
-
-    /** 摩擦轮默认为失能模式 **/
-    launcher.fir_wheel_mode = launcher.fir_wheel_last_mode = Fire_OFF;
-
-    /** 拨盘默认为失能模式 **/
-    launcher.trigger_mode = launcher.trigger_last_mode = SHOOT_CLOSE;
-
-    /* 默认此时拨盘的初始ECD等于当前ECD, 提高发射准度 */
-    /* 以后再看 似乎与上电回中有关 */
-    launcher.trigger.motor_measure.total_ecd = launcher.trigger.motor_measure.offset_ecd = launcher.trigger.motor_measure.ecd;
-
-    /** 拨盘电机pid **/
-    // 位置环pid
+static void Launcher_Pid_Init(void)
+{
+    // 拨盘
     pid_init(&launcher.trigger.angle_pid,
              TRIGGER_ANGLE_PID_MAX_OUT,
              TRIGGER_ANGLE_PID_MAX_IOUT,
@@ -177,24 +74,35 @@ void Launcher_Init(void) {
              TRIGGER_ANGLE_PID_KI,
              TRIGGER_ANGLE_PID_KD);
 
-    // 速度环pid
     pid_init(&launcher.trigger.speed_pid,
              TRIGGER_SPEED_PID_MAX_OUT,
              TRIGGER_SPEED_PID_MAX_IOUT,
              TRIGGER_SPEED_PID_KP,
              TRIGGER_SPEED_PID_KI,
              TRIGGER_SPEED_PID_KD);
+}
 
-    /* 发射机构期望电流置零 */
+
+/** 发射机构初始化 **/
+void Launcher_Init(void) {
+
     launcher.fire_l.target_current = 0;
     launcher.fire_r.target_current = 0;
     launcher.trigger.target_current = 0;
 
-    /* 最开始的编码值作为拨轮电机的校准值 */
-    /* 以后再看 */
-    first_order_filter_init(&launcher.filter_fire,0.05f, 0.5f);
-    first_order_filter_init(&launcher.filter_trigger,1,1);
+    /** 初始化发射机构模式 **/
+    // 摩擦轮
+    launcher.fir_wheel_mode = launcher.fir_wheel_last_mode = Fire_OFF;
+    // 拨盘
+    launcher.trigger_mode = launcher.trigger_last_mode = SHOOT_CLOSE;
+
+    /** 发射机构PID初始化 **/
+    Launcher_Pid_Init();
+
+    /** 防止PID误差过大，电机疯转 **/
+    launcher.trigger.motor_measure.total_ecd = launcher.trigger.motor_measure.offset_ecd = launcher.trigger.motor_measure.ecd;
 }
+
 
 /** 拨盘模式设置 **/
 static void Trigger_Mode_Set() {

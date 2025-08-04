@@ -85,20 +85,25 @@ float pid_calc(Pid *pid, float get, float set)
     return pid->out;
 }
 
-float pid_loop_calc(Pid *pid,float get,float set,float max_value,float min_value){
-    float gap,mid;
-    mid=(max_value-min_value)/2;
-    gap=set-get;
-    if(gap>=mid){
-        gap-=max_value-min_value;
+float pid_loop_calc(Pid *pid,float get, float set, float max_value, float min_value){
+
+    float gap, mid;
+
+    mid = (max_value - min_value) / 2;
+    gap = set - get;
+
+    if(gap >= mid){
+        gap -= max_value - min_value;
+
         return pid_calc(pid,-gap,0);
     }
-    else if(gap<=-mid){
-        gap+=max_value-min_value;
-        return pid_calc(pid,-gap,0);
+    else if(gap <= -mid){
+        gap += max_value-min_value;
+
+        return pid_calc(pid, -gap, 0);
     }
     else{
-        return pid_calc(pid,get,set);
+        return pid_calc(pid, get, set);
     }
 
 }

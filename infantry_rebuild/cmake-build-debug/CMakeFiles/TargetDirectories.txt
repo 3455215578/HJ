@@ -1,3 +1,0 @@
-D:/GitHub/Code/HJ/infantry_rebuild/cmake-build-debug/CMakeFiles/omni-infantry.elf.dir
-D:/GitHub/Code/HJ/infantry_rebuild/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/GitHub/Code/HJ/infantry_rebuild/cmake-build-debug/CMakeFiles/rebuild_cache.dir

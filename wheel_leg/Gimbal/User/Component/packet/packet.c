@@ -28,6 +28,7 @@ extern void append_CRC8_check_sum(unsigned char *pchMessage, unsigned int dwLeng
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 
 robot_ctrl_info_t robot_ctrl;
+
 chassis_odom_info_t chassis_odom;
 extern QueueHandle_t CDC_send_queue;
 msg_end_info msg_end;

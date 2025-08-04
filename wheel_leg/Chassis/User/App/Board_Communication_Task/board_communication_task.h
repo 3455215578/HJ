@@ -2,12 +2,27 @@
 #define _BOARD_COMMUNICATION_TASK_H
 
 #include <stdint-gcc.h>
+#include <stdbool.h>
 
 union I16{
     uint8_t data[2];
     int16_t value;
 };
 
-void Gimbal_to_Chassis_Can(uint32_t can_id, const uint8_t *rx_data);
+typedef struct
+{
+    union I16 vx_channel; // 前后
+    union I16 leg_channel; // 腿长
+
+    char sr;
+    bool gimbal_init_flag;
+
+    float yaw_relative_angle; // yaw与底盘正方向的相对角度
+
+
+
+}Gimbal_Unpack_Data;
+
+void Gimbal_Data_Unpack(const uint8_t *rx_data);
 
 #endif

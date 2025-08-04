@@ -8,6 +8,7 @@
 #include "can_device.h"
 #include "user_lib.h"
 #include "DJI_motor.h"
+#include "board_communication_task.h"
 
 
 /*******************************************************************************
@@ -26,7 +27,7 @@
 // y : 3-左手 ; 1-右手
 
 #define CHASSIS_VX_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 2
+#define CHASSIS_LEG_CHANNEL 2
 
 /** 变量约束 **/
 #define MAX_CHASSIS_VX_SPEED 2.1f
@@ -418,5 +419,9 @@ typedef struct{
 extern Chassis chassis;
 extern ChassisPhysicalConfig chassis_physical_config;
 
+/*******************************************************************************
+ *                                  板间通信                                    *
+ *******************************************************************************/
+extern Gimbal_Unpack_Data gimbal_unpack_data;
 
 #endif

@@ -19,7 +19,7 @@
 
 // 用于板间通信
 #define CHASSIS_VX_CHANNEL 1
-#define CHASSIS_YAW_CHANNEL 2
+#define CHASSIS_LEG_CHANNEL 2
 
 // 云台控制
 #define GIMBAL_YAW_CHANNEL     0
@@ -27,7 +27,7 @@
 #define GIMBAL_AUTO_CHANNEL    4
 
 /* 修改摇杆的参数值 */
-#define RC_TO_YAW       0.0008f//0.0003f//0.00025f
+#define RC_TO_YAW       0.0003f//0.0003f//0.00025f // 0.0008f
 #define RC_TO_PITCH     0.0002f
 
 /* 修改鼠标的参数值 */

@@ -16,11 +16,12 @@
 
 
 #include "remote.h"
+#include "key_board.h"
+#include "robot_def.h"
 
 #define RC_CHANNAL_ERROR_VALUE 700
 
 
-//变量
 extern UART_HandleTypeDef huart3;
 extern DMA_HandleTypeDef hdma_usart3_rx;
 
@@ -28,24 +29,21 @@ RC_ctrl_t rc_ctrl;       //遥控器
 
 static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
 
-//函数定义及声明 声明靠前
 
-/**
- * 取正函数
- */
+static int16_t RC_abs(int16_t value)
+{
+    if (value > 0)
+    {
+        return value;
+    }
+    else
+    {
+        return -value;
+    }
+}
 
 
-static int16_t RC_abs(int16_t value);
-
-/**
-  * @brief          遥控器协议解析
-  * @param[in]      sbus_buf: 原生数据指针
-  * @param[out]     rc_ctrl: 遥控器数据指
-  * @retval         none
-  */
-static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl);
-
-//在main函数中调用此函数
+// 遥控器初始化
 void remote_control_init(void)
 {
     RC_Init(sbus_rx_buf[0], sbus_rx_buf[1], SBUS_RX_BUF_NUM);
@@ -98,13 +96,63 @@ uint8_t RC_data_is_error(void)
     return 1;
 }
 
+
 void slove_RC_lost(void)
 {
     RC_restart(SBUS_RX_BUF_NUM);
 }
+
+
 void slove_data_error(void)
 {
     RC_restart(SBUS_RX_BUF_NUM);
+}
+
+
+static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
+{
+    static char rc_temp_L_s[2] = {'0','0'};  //遥控器拨杆数值缓冲区，用于防止C板接收发癫,'0'为空
+    static char rc_temp_R_s[2] = {'0','0'};
+    detect_handle(DETECT_REMOTE);
+
+    if (sbus_buf == NULL || rc_ctrl == NULL)
+    {
+        return;
+    }
+
+    rc_ctrl->rc.ch[0] = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;        //!< Channel 0
+    rc_ctrl->rc.ch[1] = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff; //!< Channel 1
+    rc_ctrl->rc.ch[2] = ((sbus_buf[2] >> 6) | (sbus_buf[3] << 2) |          //!< Channel 2
+                         (sbus_buf[4] << 10)) &0x07ff;
+    rc_ctrl->rc.ch[3] = ((sbus_buf[4] >> 1) | (sbus_buf[5] << 7)) & 0x07ff; //!< Channel 3
+
+    rc_ctrl->rc.s[0] = ((sbus_buf[5] >> 4) & 0x0003);                       //!< Switch left
+    rc_ctrl->rc.s[1] = ((sbus_buf[5] >> 4) & 0x000C) >> 2;                  //!< Switch right
+
+    rc_ctrl->mouse.x = sbus_buf[6] | (sbus_buf[7] << 8);                    //!< Mouse X axis
+    rc_ctrl->mouse.y = sbus_buf[8] | (sbus_buf[9] << 8);                    //!< Mouse Y axis
+    rc_ctrl->mouse.z = sbus_buf[10] | (sbus_buf[11] << 8);                  //!< Mouse Z axis
+    rc_ctrl->mouse.press_l = sbus_buf[12];                                  //!< Mouse Left Is Press ?
+    rc_ctrl->mouse.press_r = sbus_buf[13];                                  //!< Mouse Right Is Press ?
+    rc_ctrl->key.v = sbus_buf[14] | (sbus_buf[15] << 8);                    //!< KeyBoard value
+    rc_ctrl->rc.ch[4] = sbus_buf[16] | (sbus_buf[17] << 8);                 //NULL
+
+    rc_ctrl->rc.ch[0] -= RC_CH_VALUE_OFFSET;
+    rc_ctrl->rc.ch[1] -= RC_CH_VALUE_OFFSET;
+    rc_ctrl->rc.ch[2] -= RC_CH_VALUE_OFFSET;
+    rc_ctrl->rc.ch[3] -= RC_CH_VALUE_OFFSET;
+    rc_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+    if(rc_ctrl->rc.ch[2]<=10&&rc_ctrl->rc.ch[2]>=-10)
+    {
+        rc_ctrl->rc.ch[2]=0;
+    }
+    //摇杆错误检测，若摇杆一次变化量超过500，即产生错误，将本次的值回归上次的值
+    for (int i = 0; i < 4; ++i) {
+        if(ABS((rc_ctrl->rc.last_ch[i]-rc_ctrl->rc.ch[i]))>500)
+            rc_ctrl->rc.ch[i] = rc_ctrl->rc.last_ch[i];
+        else
+            rc_ctrl->rc.last_ch[i] = rc_ctrl->rc.ch[i];
+    }
 }
 
 //串口中断
@@ -185,90 +233,63 @@ void USART3_IRQHandler(void)
     }
 }
 
-//取正函数
-static int16_t RC_abs(int16_t value)
+
+/****************************************************************************************
+ *                                         remote                                       *
+ ****************************************************************************************/
+
+/** 云台根据遥控器设置模式 **/
+static void Gimbal_Mode_Set(void)
 {
-    if (value > 0)
-    {
-        return value;
+    if (switch_is_down(rc_ctrl.rc.s[RC_s_R])) { // 失能
+            gimbal.gimbal_last_ctrl_mode = gimbal.gimbal_ctrl_mode;
+            gimbal.gimbal_ctrl_mode = GIMBAL_DISABLE;
     }
-    else
-    {
-        return -value;
+    else if (switch_is_mid(rc_ctrl.rc.s[RC_s_R]) && (gimbal.init_flag == false)) { // 初始化模式
+        gimbal.gimbal_last_ctrl_mode = gimbal.gimbal_ctrl_mode;
+        gimbal.gimbal_ctrl_mode = GIMBAL_INIT;
     }
+    else if (switch_is_mid(rc_ctrl.rc.s[RC_s_R]) && (gimbal.init_flag == true)) { // 使能
+        gimbal.gimbal_last_ctrl_mode = gimbal.gimbal_ctrl_mode;
+        gimbal.gimbal_ctrl_mode = GIMBAL_ENABLE;
+    }
+
 }
 
-/**
-  * @brief          遥控器协议解析
-  * @param[in]      sbus_buf: 原生数据指针
-  * @param[out]     rc_ctrl: 遥控器数据指
-  * @retval         none
-  */
-static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
+/** 云台接收遥控器信息 **/
+static void Gimbal_Ctrl_Info_Set(void)
 {
-    static char rc_temp_L_s[2] = {'0','0'};  //遥控器拨杆数值缓冲区，用于防止C板接收发癫,'0'为空
-    static char rc_temp_R_s[2] = {'0','0'};
-    detect_handle(DETECT_REMOTE);
+    /** pitch **/
+    //在pit期望值上,按遥控器或者鼠标进行增减
+    gimbal.pitch.absolute_angle_set += (float)rc_ctrl.rc.ch[GIMBAL_PITCH_CHANNEL] * RC_TO_PITCH + (float)gimbal.mouse_in_y.out * MOUSE_Y_RADIO;  // rc_ctrl.mouse.y
 
-    if (sbus_buf == NULL || rc_ctrl == NULL)
+    //限幅
+    gimbal.pitch.absolute_angle_set = fp32_constrain(gimbal.pitch.absolute_angle_set,
+                                                     MIN_ABS_ANGLE,
+                                                     MAX_ABS_ANGLE);
+
+    /** yaw **/
+    //在yaw期望值上,按遥控器或者鼠标进行增减
+    gimbal.yaw.absolute_angle_set -= (float)rc_ctrl.rc.ch[GIMBAL_YAW_CHANNEL] * RC_TO_YAW + (float)gimbal.mouse_in_x.out * MOUSE_X_RADIO;    // rc_ctrl.mouse.x
+
+    // 圈数检测
+    if (gimbal.yaw.absolute_angle_set >= 180)
     {
-        return;
+        gimbal.yaw.absolute_angle_set -= 360;
     }
-
-    rc_ctrl->rc.ch[0] = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;        //!< Channel 0
-    rc_ctrl->rc.ch[1] = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff; //!< Channel 1
-    rc_ctrl->rc.ch[2] = ((sbus_buf[2] >> 6) | (sbus_buf[3] << 2) |          //!< Channel 2
-                         (sbus_buf[4] << 10)) &0x07ff;
-    rc_ctrl->rc.ch[3] = ((sbus_buf[4] >> 1) | (sbus_buf[5] << 7)) & 0x07ff; //!< Channel 3
-
-//    //START
-//    //遥控器拨杆错误检测，若缓冲区连续两次的值相同则OK，不一样则清除缓冲区上一次的值
-//    rc_temp_L_s[1] = rc_temp_L_s[0];
-//    rc_temp_L_s[0] = ((sbus_buf[5] >> 4) & 0x0003);
-//    if((rc_temp_L_s[0] == rc_temp_L_s[1]) && rc_temp_L_s[1] != '0') {
-//        rc_ctrl->rc.s[0] = rc_temp_L_s[1];
-//    }else{
-//        rc_temp_L_s[1] = '0';
-//    }
-//
-//    rc_temp_R_s[1] = rc_temp_R_s[0];
-//    rc_temp_R_s[0] = ((sbus_buf[5] >> 4) & 0x000C) >> 2;
-//    if((rc_temp_R_s[0] == rc_temp_R_s[1]) && rc_temp_R_s[1] != '0') {
-//        rc_ctrl->rc.s[1] = rc_temp_R_s[1];
-//    }else{
-//        rc_temp_R_s[1] = '0';
-//    }
-//    //END
-
-    rc_ctrl->rc.s[0] = ((sbus_buf[5] >> 4) & 0x0003);                       //!< Switch left
-    rc_ctrl->rc.s[1] = ((sbus_buf[5] >> 4) & 0x000C) >> 2;                  //!< Switch right
-
-    rc_ctrl->mouse.x = sbus_buf[6] | (sbus_buf[7] << 8);                    //!< Mouse X axis
-    rc_ctrl->mouse.y = sbus_buf[8] | (sbus_buf[9] << 8);                    //!< Mouse Y axis
-    rc_ctrl->mouse.z = sbus_buf[10] | (sbus_buf[11] << 8);                  //!< Mouse Z axis
-    rc_ctrl->mouse.press_l = sbus_buf[12];                                  //!< Mouse Left Is Press ?
-    rc_ctrl->mouse.press_r = sbus_buf[13];                                  //!< Mouse Right Is Press ?
-    rc_ctrl->key.v = sbus_buf[14] | (sbus_buf[15] << 8);                    //!< KeyBoard value
-    rc_ctrl->rc.ch[4] = sbus_buf[16] | (sbus_buf[17] << 8);                 //NULL
-
-    rc_ctrl->rc.ch[0] -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch[1] -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch[2] -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch[3] -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
-    if(rc_ctrl->rc.ch[2]<=10&&rc_ctrl->rc.ch[2]>=-10)
+    else if (gimbal.yaw.absolute_angle_set <= -180)
     {
-        rc_ctrl->rc.ch[2]=0;
+        gimbal.yaw.absolute_angle_set += 360;
     }
-    //摇杆错误检测，若摇杆一次变化量超过500，即产生错误，将本次的值回归上次的值
-    for (int i = 0; i < 4; ++i) {
-        if(ABS((rc_ctrl->rc.last_ch[i]-rc_ctrl->rc.ch[i]))>500)
-            rc_ctrl->rc.ch[i] = rc_ctrl->rc.last_ch[i];
-        else
-            rc_ctrl->rc.last_ch[i] = rc_ctrl->rc.ch[i];
-    }
-//    SEGGER_RTT_printf(0,"%d ,",rc_ctrl->rc.s[0]);
+
 }
 
+void Gimbal_Remote_Cmd(void)
+{
+    /** 云台根据遥控器设置模式 **/
+    Gimbal_Mode_Set();
 
+    /** 云台接收遥控器信息 **/
+    Gimbal_Ctrl_Info_Set();
+}
 

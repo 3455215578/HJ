@@ -154,9 +154,9 @@ static void CAN2_RxFifo0RxHandler(uint32_t *StdId, uint8_t Data[])
             break;
         }
 
-        case 0x110: // 云台发给底盘的数据包的ID
+        case 0x110: // 云台发给底盘的数据帧的ID
         {
-            Gimbal_to_Chassis_Can(0x110, Data);
+            Gimbal_Data_Unpack(Data);
         }
 
         default:

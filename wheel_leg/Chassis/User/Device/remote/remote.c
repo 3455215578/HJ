@@ -292,17 +292,40 @@ static void chassis_device_offline_handle() {
 
 /** 底盘接收遥控器信息 **/
 static void set_chassis_ctrl_info() {
+
+    /** 期望速度 -- 简易斜坡函数 **/
+    rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL] = gimbal_unpack_data.vx_channel.value;
+
     float vel_temp = (float) (rc_ctrl.rc.ch[CHASSIS_VX_CHANNEL]) * RC_TO_VX;
     slope_following(&vel_temp,&chassis.chassis_ctrl_info.v_m_per_s,0.05f);
 
-    USART_Vofa_Justfloat_Transmit(chassis.chassis_ctrl_info.v_m_per_s, 0, 0);
 
-    chassis.chassis_ctrl_info.yaw_rad -= (float) (rc_ctrl.rc.ch[CHASSIS_YAW_CHANNEL]) * (-RC_TO_YAW_INCREMENT);
+    /** 期望腿长 **/
+    rc_ctrl.rc.ch[CHASSIS_LEG_CHANNEL] = gimbal_unpack_data.leg_channel.value;
+
+    if(rc_ctrl.rc.ch[CHASSIS_LEG_CHANNEL] == -660)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.12f;
+    }
+    else if(rc_ctrl.rc.ch[CHASSIS_LEG_CHANNEL] == 660)
+    {
+        chassis.chassis_ctrl_info.height_m = 0.32f;
+    }
+    else
+    {
+        chassis.chassis_ctrl_info.height_m = 0.18f;
+    }
+
+
 
 }
 
 /** 底盘根据遥控器设置模式 **/
 static void set_chassis_mode() {
+
+    /** 从板间通信获取 **/
+    rc_ctrl.rc.s[RC_s_R] = gimbal_unpack_data.sr;
+
     if (switch_is_down(rc_ctrl.rc.s[RC_s_R])) { // 失能
         chassis.chassis_last_ctrl_mode = chassis.chassis_ctrl_mode;
         chassis.chassis_ctrl_mode = CHASSIS_DISABLE;
@@ -330,5 +353,6 @@ void remote_cmd(void)
 
     set_chassis_ctrl_info();
 
+    USART_Vofa_Justfloat_Transmit(gimbal_unpack_data.gimbal_init_flag, gimbal_unpack_data.yaw_relative_angle, 0);
 
 }

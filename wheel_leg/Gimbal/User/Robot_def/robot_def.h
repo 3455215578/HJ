@@ -5,6 +5,7 @@
 #include "pid.h"
 #include "user_lib.h"
 #include "filter.h"
+#include "protocol_Balance.h"
 
 /* 云台任务初始化时间 */
 #define GIMBAL_TASK_INIT_TIME 800
@@ -58,9 +59,9 @@
 
 /** 云台控制模式 **/
 typedef enum {
-    GIMBAL_DISABLE,   //云台失能
-    GIMBAL_BACK,    //从失能到使能
-    GIMBAL_ENABLE,  //得到遥控器对云台电机的控制,自瞄判定
+    GIMBAL_DISABLE,   // 失能
+    GIMBAL_INIT,      // 初始化
+    GIMBAL_ENABLE,    // 使能
     GIMBAL_AUTO,    //云台自瞄模式
     GIMBAL_FIRE,    //云台打弹模式
 }Gimbal_Mode_e;
@@ -69,42 +70,50 @@ typedef enum {
 typedef struct {
     DJI_Motor_t motor_measure;    // 电机的真实信息
 
-    Pid speed_pid;   //速度环 PID 控制参数
-    Pid angle_pid;   //角度环 PID 控制参数
-    fp32 gyro_set;          //转速设置
-    int16_t target_current;   //设置电流值
+    float gyro; // °/s
 
-    fp32 relative_angle_set; //°    设定
-    fp32 relative_angle_get; //°    获取
-    fp32 absolute_angle_set; //      rad
-    fp32 absolute_angle_get; //      云台角
+    Pid speed_pid;   //速度环 PID
+    Pid angle_pid;   //角度环 PID
+
+    int16_t target_current; // 期望电流值
+
+    fp32 absolute_angle_get; // ° IMU角度值
+    fp32 relative_angle_get; // ° 与电机上电复位位置的角度差值
+
+    fp32 absolute_angle_set; // °
+
+    // 上电复位标志位
+    bool reset_finished;
+
 }Motor_Gimbal_t;
 
 
 /** 云台结构体 **/
 typedef struct {
 
+    /** 云台电机 **/
     Motor_Gimbal_t yaw;
     Motor_Gimbal_t pitch;
 
+    /** 云台控制模式 **/
     Gimbal_Mode_e gimbal_ctrl_mode;
     Gimbal_Mode_e gimbal_last_ctrl_mode;
 
-    fp32 absolute_gyro_yaw;
-    fp32 absolute_gyro_pitch;
+    /** 滤波器 **/
 
+    // 鼠标输入滤波
     first_order_filter_type_t mouse_in_y;
     first_order_filter_type_t mouse_in_x;
 
+    // 对视觉传回的yaw和pitch滤波
     first_order_filter_type_t auto_pitch;
     first_order_filter_type_t auto_yaw[2];
-    first_kalman_filter_t filter_autoYaw;
 
-    first_order_filter_type_t filter_pitch_gyro_in;
-    first_order_filter_type_t filter_yaw_gyro_in;
+    // 角速度滤波
+    first_order_filter_type_t pitch_gyro_filter;
+    first_order_filter_type_t yaw_gyro_filter;
 
-    first_order_filter_type_t pitch_first_order_set;
-    first_order_filter_type_t pitch_current_first_order_set;
+    bool init_flag;
 
 }gimbal_t;
 
@@ -188,12 +197,16 @@ typedef struct {
     Shoot_Cmd_e trigger_last_mode;
     Shoot_Cmd_e trigger_mode;
 
-    /** 滤波器但是暂时没有用到 **/
-    first_order_filter_type_t filter_fire;
-    first_order_filter_type_t filter_trigger;
 
 }launcher_t;
 
 extern launcher_t launcher;
+
+
+/**********************************************************************************
+ *                                    Vision                                      *
+ **********************************************************************************/
+
+extern robot_ctrl_info_t robot_ctrl;
 
 #endif

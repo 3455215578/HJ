@@ -2,6 +2,7 @@
 #define _BOARD_COMMUNICATION_TASK_H
 
 #include <stdint-gcc.h>
+#include <stdbool.h>
 #include "bsp_can.h"
 
 union I16 {
@@ -10,7 +11,7 @@ union I16 {
 };
 
 /** 板间发送函数 **/
-void Send_Chassis_Speed(int16_t vx_channel, int16_t yaw_channel, char sl, char sr);
+void Send_Chassis_Data(int16_t vx_channel, int16_t leg_channel, char sr, bool gimbal_init_flag, float yaw_relative_angle);
 void Send_Control(int32_t W, int32_t A, int32_t S, int32_t D);
 
 /** 板间接收函数 **/

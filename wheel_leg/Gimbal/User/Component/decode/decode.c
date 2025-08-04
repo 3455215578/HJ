@@ -1,6 +1,3 @@
-//
-// Created by Shockley on 2022/12/5.
-//
 #include "decode.h"
 #include "string.h"
 #include "stdio.h"
@@ -13,7 +10,6 @@
 #include "detect_task.h"
 
 extern robot_ctrl_info_t robot_ctrl;
-//static om_topic_t* robot_ctrl_topic;
 
 //usb fifo 控制结构体
 fifo_s_t usb_fifo;
